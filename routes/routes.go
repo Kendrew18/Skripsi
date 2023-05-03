@@ -1,7 +1,7 @@
 package routes
 
 import (
-	controllers "Backend-Project-NDL/controller"
+	controllers "Skripsi/controllers"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"net/http"
@@ -16,24 +16,59 @@ func Init() *echo.Echo {
 		return c.String(http.StatusOK, "Project-NDL")
 	})
 
-	NDL := e.Group("/NDL")
-	Rekap := e.Group("/Rekap")
-	PO := e.Group("/PO")
+	um := e.Group("/um")
+	pryk := e.Group("/pryk")
 
-	//NDL
-	NDL.POST("/read-excel", controllers.ReadEXCEL)
+	//MAIN
 
-	NDL.POST("/input-ndl", controllers.InputNDL)
+	//User_Management
+	um.GET("/login-user", controllers.LoginUM)
 
-	NDL.GET("/NDL", controllers.ReadNDL)
+	//Proyek
 
-	//Rekap
-	Rekap.GET("/Rekap", controllers.ReadRekap)
+	//Create
+	pryk.POST("/input-proyek", controllers.InputProyek)
 
-	Rekap.PUT("/update-status-rkp", controllers.UpdateStatusRekap)
+	//Read Nama Proyek
+	pryk.GET("/Read-Nama", controllers.ReadNamaProyek)
 
-	//PO-supplier
-	PO.POST("/input-PO-supplier", controllers.InputPOsupplier)
+	//Read Detail
+	pryk.GET("/Read-proyek", controllers.ReadProyek)
+
+	//Finish (bag 2)
+	pryk.PUT("/finish-proyek", controllers.FinishProyek)
+
+	//History Proyek (bag 2)
+	//Read Nama Proyek
+	pryk.GET("/Read-Nama-his", controllers.ReadNamaProyekHistory)
+
+	//Read Detail
+	pryk.GET("/Read-proyek-his", controllers.ReadHistory)
+
+	//Edit (bag 2)
+
+	//Kontrak-Vendor
+	//input update delete  read
+
+	//Pemayaran-Vendor
+	//input update delete  read
+
+	//Penawaran
+	//create update read
+
+	//Penjadwalan
+	//cpm
+
+	//PENDUKUNG//
+
+	//Laporan
+	// read create update
+
+	//Budgeting
+	//input update read
+
+	//Analisa Budgeting
+	//Read
 
 	return e
 }

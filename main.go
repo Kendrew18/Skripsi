@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Backend-Project-NDL/db"
-	"Backend-Project-NDL/routes"
+	"Skripsi/db"
+	"Skripsi/routes"
 )
 
 func main() {

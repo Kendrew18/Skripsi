@@ -3,5 +3,5 @@
   "DB_PASSWORD": "xyz13juli",
   "DB_PORT":"3306",
   "DB_HOST": "kostsoda.onthewifi.com",
-  "DB_NAME":"ndl"
+  "DB_NAME":"ndr"
 }
