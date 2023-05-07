@@ -48,7 +48,7 @@ func Input_Proyek(id_user string, nama_proyek string, jumlah_lantai string, luas
 	jmlt, _ := strconv.Atoi(jumlah_lantai)
 	luas_tanah_dbl, _ := strconv.ParseFloat(luas_tanah, 64)
 
-	sqlStatement := "INSERT INTO Proyek (id_proyek,id_user,nama_proyek,jumlah_lantai,luas_tanah,status_proyek,penanggungjawab) values(?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO proyek (id_proyek,id_user,nama_proyek,jumlah_lantai,luas_tanah,status_proyek,penanggungjawab) values(?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 

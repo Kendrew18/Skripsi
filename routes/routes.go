@@ -18,6 +18,8 @@ func Init() *echo.Echo {
 
 	um := e.Group("/um")
 	pryk := e.Group("/pryk")
+	kv := e.Group("/kv")
+	pv := e.Group("/pv")
 
 	//MAIN
 
@@ -48,13 +50,25 @@ func Init() *echo.Echo {
 	//Edit (bag 2)
 
 	//Kontrak-Vendor
-	//input update delete  read
+	//input
+	kv.POST("/input-kv", controllers.InputKontrakVendor)
+	//update
+	//delete
+	//read
+	kv.GET("/read-kv", controllers.ReadKontrakVendor)
 
 	//Pemayaran-Vendor
-	//input update delete  read
+	//input
+	pv.POST("/input-pv", controllers.InputPembayaranVendor)
+	//update
+	//delete
+	//read
+	pv.GET("/read-pv", controllers.ReadPembayaranVendor)
 
 	//Penawaran
-	//create update read
+	//create
+	//update
+	//read
 
 	//Penjadwalan
 	//cpm
