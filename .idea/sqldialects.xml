@@ -3,5 +3,6 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/models/kontrak-vendor.go" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/models/pembayaran-vendor.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/models/penawaran.go" dialect="MariaDB" />
   </component>
 </project>

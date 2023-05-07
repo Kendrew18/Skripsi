@@ -8,7 +8,7 @@ import (
 )
 
 func InputKontrakVendor(c echo.Context) error {
-	id_proyek := c.FormValue("id_user")
+	id_proyek := c.FormValue("id_proyek")
 	nomor_kontrak := c.FormValue("nomor_kontrak")
 	nama_vendor := c.FormValue("nama_vendor")
 	total_nilai_kontrak := c.FormValue("total_nilai_kontrak")

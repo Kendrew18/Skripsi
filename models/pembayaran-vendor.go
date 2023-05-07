@@ -40,7 +40,7 @@ func Input_Pembayaran_Vendor(id_kontrak string, nomor_invoice string,
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Kotrak_Vendor()
+	nm := Generate_Id_Pembayaran_Vendor()
 
 	nm_str := strconv.Itoa(nm)
 
