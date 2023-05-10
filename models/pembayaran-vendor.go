@@ -4,8 +4,12 @@ import (
 	"Skripsi/db"
 	str "Skripsi/struct_all"
 	"Skripsi/tools"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -103,6 +107,92 @@ func Read_Pembayaran_Vendor(id_Proyek string) (tools.Response, error) {
 		res.Message = "Sukses"
 		res.Data = arr_invent
 	}
+
+	return res, nil
+}
+
+func Upload_Invoice(id_PV string, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
+	var res tools.Response
+
+	con := db.CreateCon()
+	request.ParseMultipartForm(10 * 1024 * 1024)
+	file, handler, err := request.FormFile("photo")
+	if err != nil {
+		fmt.Println(err)
+		return res, err
+	}
+
+	defer file.Close()
+
+	fmt.Println("File Info")
+	fmt.Println("File Name : ", handler.Filename)
+	fmt.Println("File Size : ", handler.Size)
+	fmt.Println("File Type : ", handler.Header.Get("Content-Type"))
+
+	var tempFile *os.File
+	path := ""
+
+	if strings.Contains(handler.Filename, "jpg") {
+		path = "uploads/" + id_PV + ".jpg"
+		tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.jpg")
+	}
+	if strings.Contains(handler.Filename, "jpeg") {
+		path = "uploads/" + id_PV + ".jpeg"
+		tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.jpeg")
+	}
+	if strings.Contains(handler.Filename, "png") {
+		path = "uploads/" + id_PV + ".png"
+		tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.png")
+	}
+
+	if err != nil {
+		return res, err
+	}
+
+	fileBytes, err2 := ioutil.ReadAll(file)
+	if err2 != nil {
+		return res, err2
+	}
+
+	_, err = tempFile.Write(fileBytes)
+	if err != nil {
+		return res, err
+	}
+
+	fmt.Println("Success!!")
+	fmt.Println(tempFile.Name())
+	tempFile.Close()
+
+	err = os.Rename(tempFile.Name(), path)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer tempFile.Close()
+
+	fmt.Println("new path:", tempFile.Name())
+
+	sqlstatement := "UPDATE pembayaran_vendor SET foto_invoice=? WHERE id_PV=?"
+	stmt, err := con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	result, err := stmt.Exec(path, id_PV)
+
+	if err != nil {
+		return res, err
+	}
+
+	_, err = result.RowsAffected()
+
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Sukses"
 
 	return res, nil
 }

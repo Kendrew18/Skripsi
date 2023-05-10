@@ -36,6 +36,18 @@ func ReadPembayaranVendor(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+func UploadInvoice(c echo.Context) error {
+	id_PV := c.FormValue("id_PV")
+
+	result, err := models.Upload_Invoice(id_PV, c.Response(), c.Request())
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
 func Foto_Invoice(c echo.Context) error {
 	path := c.FormValue("path")
 	return c.File(path)

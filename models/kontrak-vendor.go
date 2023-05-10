@@ -128,6 +128,7 @@ func Read_Kontrak_Vendor(id_Proyek string) (tools.Response, error) {
 	return res, nil
 }
 
+/*
 func Edit_Kontrak_Vendor(id_kontrak string, nomor_kontrak string, nama_vendor string,
 	total_nilai_kontrak int64, jenis_pekerjaan string, tanggal_dimulai string,
 	tanggal_selesai string) (tools.Response, error) {
@@ -184,4 +185,8 @@ func Edit_Kontrak_Vendor(id_kontrak string, nomor_kontrak string, nama_vendor st
 	}
 
 	return res, nil
-}
+}*/
+/*
+func Delete_Kontrak_Vendor(id_kontrak string) (tools.Response, error) {
+
+}*/

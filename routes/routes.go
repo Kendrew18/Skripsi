@@ -21,6 +21,8 @@ func Init() *echo.Echo {
 	kv := e.Group("/kv")
 	pv := e.Group("/pv")
 	ph := e.Group("/ph")
+	pen := e.Group("/pen")
+	LV := e.Group("/LV")
 
 	//MAIN
 
@@ -51,20 +53,34 @@ func Init() *echo.Echo {
 	//Edit (bag 2)
 
 	//Kontrak-Vendor
+
+	//memberikan proges
+
 	//input
 	kv.POST("/input-kv", controllers.InputKontrakVendor)
 	//read
 	kv.GET("/read-kv", controllers.ReadKontrakVendor)
-	//update
+
 	//delete
 
-	//Pemayaran-Vendor
+	//Pembayaran-Vendor
 	//input
 	pv.POST("/input-pv", controllers.InputPembayaranVendor)
 	//read
 	pv.GET("/read-pv", controllers.ReadPembayaranVendor)
 	//update
 	//delete
+	//upload-foto-invoice
+	pv.POST("/upload-fi", controllers.UploadInvoice)
+	//read-foto-invoice
+	pv.GET("/read-fi", controllers.Foto_Invoice)
+
+	//laporan-vendor
+	//Create
+	LV.POST("/input-lv", controllers.InputLaporanVendor)
+	//read
+	LV.GET("/Read-lv", controllers.ReadLaporanVendor)
+	//update
 
 	//Penawaran(header)
 	//create
@@ -72,10 +88,13 @@ func Init() *echo.Echo {
 	//read
 	ph.GET("/read-ph", controllers.ReadHeaderPenawaran)
 	//update
+
 	//Penawaran
 	//create
+	pen.POST("/input-pen", controllers.InputPenawaran)
 	//update
 	//read
+	pen.GET("/read-pen", controllers.ReadPenawaran)
 
 	//Penjadwalan
 	//cpm
@@ -83,7 +102,7 @@ func Init() *echo.Echo {
 	//PENDUKUNG//
 
 	//Laporan
-	// read create update
+	//read create update
 
 	//Budgeting
 	//input update read
