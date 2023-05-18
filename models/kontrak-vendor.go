@@ -36,8 +36,8 @@ func Generate_Id_Kotrak_Vendor() int {
 }
 
 func Input_Kontrak_Vendor(id_proyek string, nomor_kontrak string, nama_vendor string,
-	total_nilai_kontrak int64, jenis_pekerjaan string, tanggal_dimulai string,
-	tanggal_selesai string) (tools.Response, error) {
+	total_nilai_kontrak int64, jenis_pekerjaan_vendor string, pekerjaan_vendor string, tanggal_dimulai string,
+	tanggal_selesai string, date_pengiriman string, date_dimulai string, date_selesai string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -48,7 +48,7 @@ func Input_Kontrak_Vendor(id_proyek string, nomor_kontrak string, nama_vendor st
 
 	id_kontrak := "KV-" + nm_str
 
-	sqlStatement := "INSERT INTO kontrak_vendor (id_proyek,id_kontrak,nomor_kontrak,nama_vendor,total_nilai_kontrak ,nominal_pembayaran,jenis_pekerjaan,tanggal_mulai_kontrak,tanggal_berakhir_kontrak,sisa_pembayaran) values(?,?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO kontrak_vendor (id_proyek,id_kontrak,nomor_kontrak,nama_vendor,total_nilai_kontrak ,nominal_pembayaran,jenis_pekerjaan_vendor,pekerjaan_vendor,tanggal_mulai_kontrak,tanggal_berakhir_kontrak,sisa_pembayaran,tanggal_pengiriman,tanggal_pengerjaan_dimulai,tanggal_pengerjaan_berakhir) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	date, _ := time.Parse("02-01-2006", tanggal_dimulai)
 	date_sql := date.Format("2006-01-02")
@@ -57,6 +57,15 @@ func Input_Kontrak_Vendor(id_proyek string, nomor_kontrak string, nama_vendor st
 	date2, _ := time.Parse("02-01-2006", tanggal_selesai)
 	date_sql2 := date2.Format("2006-01-02")
 	dt := date2.Format("200601")
+
+	date3, _ := time.Parse("02-01-2006", date_pengiriman)
+	date_sql3 := date3.Format("2006-01-02")
+
+	date4, _ := time.Parse("02-01-2006", date_dimulai)
+	date_sql4 := date4.Format("2006-01-02")
+
+	date5, _ := time.Parse("02-01-2006", date_selesai)
+	date_sql5 := date5.Format("2006-01-02")
 
 	fmt.Println(dm)
 	fmt.Println(dt)
@@ -78,7 +87,8 @@ func Input_Kontrak_Vendor(id_proyek string, nomor_kontrak string, nama_vendor st
 	}
 
 	_, err = stmt.Exec(id_proyek, id_kontrak, nomor_kontrak, nama_vendor, total_nilai_kontrak,
-		nominal_pembayaran, jenis_pekerjaan, date_sql, date_sql2, total_nilai_kontrak)
+		nominal_pembayaran, jenis_pekerjaan_vendor, pekerjaan_vendor, date_sql, date_sql2,
+		total_nilai_kontrak, date_sql3, date_sql4, date_sql5)
 
 	stmt.Close()
 
@@ -95,7 +105,7 @@ func Read_Kontrak_Vendor(id_Proyek string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_proyek,id_kontrak,nomor_kontrak,nama_vendor,total_nilai_kontrak,nominal_pembayaran,jenis_pekerjaan,tanggal_mulai_kontrak,tanggal_berakhir_kontrak,sisa_pembayaran FROM kontrak_vendor WHERE id_Proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_proyek,id_kontrak,nomor_kontrak,nama_vendor,total_nilai_kontrak,nominal_pembayaran,pekerjaan_vendor,tanggal_mulai_kontrak,tanggal_berakhir_kontrak,sisa_pembayaran FROM kontrak_vendor WHERE id_Proyek=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, id_Proyek)
 
@@ -186,7 +196,64 @@ func Edit_Kontrak_Vendor(id_kontrak string, nomor_kontrak string, nama_vendor st
 
 	return res, nil
 }*/
-/*
-func Delete_Kontrak_Vendor(id_kontrak string) (tools.Response, error) {
 
-}*/
+func Delete_Kontrak_Vendor(id_kontrak string) (tools.Response, error) {
+	var res tools.Response
+	var arrobj []str.Read_id_pv
+	var obj str.Read_id_pv
+
+	con := db.CreateCon()
+
+	sqlStatement := "SELECT id_PV FROM pembayaran_vendor WHERE id_kontrak=? "
+
+	rows, err := con.Query(sqlStatement, id_kontrak)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&obj.Id_pv)
+		if err != nil {
+			return res, err
+		}
+		arrobj = append(arrobj, obj)
+	}
+
+	if arrobj == nil {
+
+		sqlstatement := "DELETE FROM kontrak_vendor WHERE id_kontrak=?"
+
+		stmt, err := con.Prepare(sqlstatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		result, err := stmt.Exec(id_kontrak)
+
+		if err != nil {
+			return res, err
+		}
+
+		rowsAffected, err := result.RowsAffected()
+
+		if err != nil {
+			return res, err
+		}
+
+		res.Status = http.StatusOK
+		res.Message = "Suksess"
+		res.Data = map[string]int64{
+			"rows": rowsAffected,
+		}
+
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Tidak bisa di hapus"
+	}
+
+	return res, nil
+}

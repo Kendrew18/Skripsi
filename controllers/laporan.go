@@ -6,13 +6,12 @@ import (
 	"net/http"
 )
 
-func InputLaporanVendor(c echo.Context) error {
+func InputLaporan(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
-	id_kontrak := c.FormValue("id_kontrak")
 	laporan := c.FormValue("laporan")
 	tanggal_laporan := c.FormValue("tanggal_laporan")
 
-	result, err := models.Input_Laporan_Vendor(id_proyek, id_kontrak, laporan, tanggal_laporan)
+	result, err := models.Input_Laporan(id_proyek, laporan, tanggal_laporan)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -21,10 +20,10 @@ func InputLaporanVendor(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func ReadLaporanVendor(c echo.Context) error {
+func ReadLaporan(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
 
-	result, err := models.Read_Laporan_Vendor(id_proyek)
+	result, err := models.Read_Laporan(id_proyek)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -33,11 +32,11 @@ func ReadLaporanVendor(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func UpdateLaporanVendor(c echo.Context) error {
-	id_laporan_vendor := c.FormValue("id_laporan_vendor")
+func UpdateLaporan(c echo.Context) error {
+	id_laporan := c.FormValue("id_laporan")
 	laporan := c.FormValue("total_nilai_kontrak")
 
-	result, err := models.Update_Laporan(id_laporan_vendor, laporan)
+	result, err := models.Update_Laporan(id_laporan, laporan)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

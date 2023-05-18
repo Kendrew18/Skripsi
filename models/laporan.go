@@ -9,19 +9,19 @@ import (
 	"time"
 )
 
-func Generate_Id_Laporan_Vendor() int {
+func Generate_Id_Laporan() int {
 	var obj str.Generate_Id
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_LV FROM generate_id"
+	sqlStatement := "SELECT id_LP FROM generate_id"
 
 	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
 
 	no := obj.Id
 	no = no + 1
 
-	sqlstatement := "UPDATE generate_id SET id_LV=?"
+	sqlstatement := "UPDATE generate_id SET id_LP=?"
 
 	stmt, err := con.Prepare(sqlstatement)
 
@@ -34,18 +34,18 @@ func Generate_Id_Laporan_Vendor() int {
 	return no
 }
 
-func Input_Laporan_Vendor(id_proyek string, id_kontrak string, laporan string, tanggal_laporan string) (tools.Response, error) {
+func Input_Laporan(id_proyek string, laporan string, tanggal_laporan string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Laporan_Vendor()
+	nm := Generate_Id_Laporan()
 
 	nm_str := strconv.Itoa(nm)
 
-	id_LV := "LV-" + nm_str
+	id_LP := "LP-" + nm_str
 
-	sqlStatement := "INSERT INTO laporan_vendor (id_proyek,id_kontrak_vendor,id_laporan_vendor,laporan,tanggal_laporan,photo_laporan) values(?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO laporan (id_proyek,id_laporan,laporan,tanggal_laporan,foto_laporan) values(?,?,?,?,?)"
 
 	date, _ := time.Parse("02-01-2006", tanggal_laporan)
 	date_sql := date.Format("2006-01-02")
@@ -56,7 +56,7 @@ func Input_Laporan_Vendor(id_proyek string, id_kontrak string, laporan string, t
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_proyek, id_kontrak, id_LV, laporan, date_sql, "|images.png|")
+	_, err = stmt.Exec(id_proyek, id_LP, laporan, date_sql, "|images.png|")
 
 	stmt.Close()
 
@@ -66,14 +66,14 @@ func Input_Laporan_Vendor(id_proyek string, id_kontrak string, laporan string, t
 	return res, nil
 }
 
-func Read_Laporan_Vendor(id_Proyek string) (tools.Response, error) {
+func Read_Laporan(id_Proyek string) (tools.Response, error) {
 	var res tools.Response
-	var arr_invent []str.Read_Laporan_Vendor
-	var invent str.Read_Laporan_Vendor
+	var arr_invent []str.Read_Laporan
+	var invent str.Read_Laporan
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_laporan_vendor, nama_vendor,pekerjaan_vendor, laporan, tanggal_laporan, photo_laporan FROM laporan_vendor join kontrak_vendor on laporan_vendor.id_kontrak_vendor=kontrak_vendor.id_kontrak WHERE laporan_vendor.id_Proyek=? ORDER BY tanggal_laporan desc"
+	sqlStatement := "SELECT id_laporan, laporan, tanggal_laporan,foto_laporan FROM laporan WHERE laporan.id_Proyek=? ORDER BY tanggal_laporan desc"
 
 	rows, err := con.Query(sqlStatement, id_Proyek)
 
@@ -84,8 +84,7 @@ func Read_Laporan_Vendor(id_Proyek string) (tools.Response, error) {
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&invent.Id_laporan_vendor, &invent.Nama_vendor, &invent.Pekerjaan_vendor,
-			&invent.Laporan, &invent.Tanggal_laporan, &invent.Foto_laporan)
+		err = rows.Scan(&invent.Id_laporan, &invent.Laporan, &invent.Tanggal_laporan, &invent.Foto_laporan)
 		if err != nil {
 			return res, err
 		}
@@ -105,20 +104,20 @@ func Read_Laporan_Vendor(id_Proyek string) (tools.Response, error) {
 	return res, nil
 }
 
-func Update_Laporan_Vendor(id_laporan_vendor string, laporan string) (tools.Response, error) {
+func Update_Laporan(id_laporan string, laporan string) (tools.Response, error) {
 
 	var res tools.Response
 	var st str.Status_laporan
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT status_laporan FROM laporan_vendor WHERE id_laporan_vendor=?"
+	sqlStatement := "SELECT status_laporan FROM laporan WHERE id_laporan=?"
 
-	_ = con.QueryRow(sqlStatement, id_laporan_vendor).Scan(&st.Status)
+	_ = con.QueryRow(sqlStatement, id_laporan).Scan(&st.Status)
 
 	if st.Status == 0 {
 
-		sqlStatement = "UPDATE laporan_vendor SET laporan=? WHERE id_laporan_vendor=?"
+		sqlStatement = "UPDATE laporan SET laporan=? WHERE id_laporan=?"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -126,7 +125,7 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string) (tools.Resp
 			return res, err
 		}
 
-		result, err := stmt.Exec(laporan, id_laporan_vendor)
+		result, err := stmt.Exec(laporan, id_laporan)
 
 		if err != nil {
 			return res, err
