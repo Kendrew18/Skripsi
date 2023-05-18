@@ -46,7 +46,8 @@ func ReadNamaProyekHistory(c echo.Context) error {
 
 //Read_Proyek
 func ReadProyek(c echo.Context) error {
-	result, err := models.Read_Proyek()
+	id_proyek := c.FormValue("id_proyek")
+	result, err := models.Read_Proyek(id_proyek)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -67,9 +68,9 @@ func ReadHistory(c echo.Context) error {
 
 //Update Status
 func FinishProyek(c echo.Context) error {
-	id_user := c.FormValue("id_user")
+	id_proyek := c.FormValue("id_proyek")
 
-	result, err := models.Finish_Proyek(id_user)
+	result, err := models.Finish_Proyek(id_proyek)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

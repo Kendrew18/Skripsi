@@ -105,16 +105,16 @@ func Read_Nama_Proyek() (tools.Response, error) {
 	return res, nil
 }
 
-func Read_Proyek() (tools.Response, error) {
+func Read_Proyek(id_proyek string) (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []str.Read_proyek
 	var invent str.Read_proyek
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_proyek,nama_proyek,jumlah_lantai,luas_tanah,penanggungjawab FROM proyek WHERE status_proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_proyek,nama_proyek,jumlah_lantai,luas_tanah,penanggungjawab FROM proyek WHERE status_proyek=? && id_proyek=? ORDER BY co ASC "
 
-	rows, err := con.Query(sqlStatement, 0)
+	rows, err := con.Query(sqlStatement, 0, id_proyek)
 
 	defer rows.Close()
 
