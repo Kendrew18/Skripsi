@@ -78,7 +78,15 @@ func Input_Kontrak_Vendor(id_proyek string, nomor_kontrak string, nama_vendor st
 
 	_ = con.QueryRow(sqlStatement2).Scan(&temp)
 
-	nominal_pembayaran := total_nilai_kontrak / temp
+	var nominal_pembayaran int64
+
+	nominal_pembayaran = 0
+
+	if temp == 0 {
+		nominal_pembayaran = total_nilai_kontrak
+	} else {
+		nominal_pembayaran = total_nilai_kontrak / temp
+	}
 
 	stmt, err := con.Prepare(sqlStatement)
 

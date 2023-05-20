@@ -25,14 +25,13 @@ func Init() *echo.Echo {
 	LV := e.Group("/LV")
 	LP := e.Group("/LP")
 	PJDL := e.Group("/PJDL")
+	FT := e.Group("/FT")
 
 	//MAIN
-
 	//User_Management
 	um.GET("/login-user", controllers.LoginUM)
 
 	//Proyek
-
 	//Create
 	pryk.POST("/input-proyek", controllers.InputProyek)
 
@@ -67,12 +66,8 @@ func Init() *echo.Echo {
 	pv.POST("/input-pv", controllers.InputPembayaranVendor)
 	//read
 	pv.GET("/read-pv", controllers.ReadPembayaranVendor)
-	//update
-	//delete
 	//upload-foto-invoice
 	pv.POST("/upload-fi", controllers.UploadInvoice)
-	//read-foto-invoice
-	pv.GET("/read-fi", controllers.Foto_Invoice)
 
 	//laporan-vendor
 	//Create
@@ -80,7 +75,13 @@ func Init() *echo.Echo {
 	//read
 	LV.GET("/Read-lv", controllers.ReadLaporanVendor)
 	//update
-	LP.PUT("/update-lv", controllers.UpdateLaporanVendor)
+	LV.PUT("/update-lv", controllers.UpdateLaporanVendor)
+	//upload foto
+	LV.POST("/upload-foto", controllers.UploadFotolaporanVendor)
+	//Read-foto-laporan
+	LV.GET("/read-path-foto", controllers.ReadFotolaporanVendor)
+	//update_status_laporan_vendor
+	LV.PUT("/update-status", controllers.UpdateStatusLaporanVendor)
 
 	//Penawaran(header)
 	//create
@@ -94,23 +95,28 @@ func Init() *echo.Echo {
 	pen.POST("/input-pen", controllers.InputPenawaran)
 	//read
 	pen.GET("/read-pen", controllers.ReadPenawaran)
-	//update
+	//update kop
+
+	//update item
 
 	//Penjadwalan
-	//create jadwal
-	PJDL.POST("/input-task-penjadwalan", controllers.InputTaskPenjadwalan)
-	//add dependentcies
-	PJDL.PUT("/input-depedentcies", controllers.Inputdepedentcies)
-	//edit
-
-	//read
-
-	//generate jadwal cpm
-	PJDL.GET("/gene", controllers.GenerateJadwal)
 	//input tanggal mulai
 	PJDL.PUT("/tgl-ml", controllers.InputTanggalMulai)
 	//read tanggal mulai
 	PJDL.GET("/read-tgl-ml", controllers.ReadTanggalMulai)
+	//read_judul_penawaran
+	PJDL.GET("/read-judul-penawaran", controllers.ReadJudulPenawaran)
+	//create task
+	PJDL.POST("/input-task-penjadwalan", controllers.InputTaskPenjadwalan)
+	//read task
+	PJDL.GET("/read-task", controllers.ReadTask)
+	//add dependentcies
+	PJDL.PUT("/input-depedentcies", controllers.Inputdepedentcies)
+	//generate jadwal cpm
+	PJDL.GET("/generate-jadwal", controllers.GenerateJadwal)
+	//Read_Jadwal
+	PJDL.GET("/read-jadwal", controllers.ReadJadwal)
+	//edit
 
 	//Laporan
 	//create
@@ -119,6 +125,18 @@ func Init() *echo.Echo {
 	LP.GET("/read-lp", controllers.ReadLaporan)
 	//update
 	LP.PUT("/update-lp", controllers.UpdateLaporan)
+	//upload-foto-laporan
+	LP.POST("upload-foto-laporan", controllers.UploadFotolaporan)
+	//Read-foto-laporan
+	LP.GET("/read-path-foto", controllers.ReadFotolaporan)
+	//update_status_laporan
+	LP.PUT("/update-status", controllers.UpdateStatusLaporan)
+
+	//foto
+	//get image foto
+	FT.GET("/read-foto", controllers.ReadFoto)
+
+	//PENDUKUNG//
 
 	//Budgeting
 	//input
@@ -126,8 +144,6 @@ func Init() *echo.Echo {
 	//read
 
 	//kwitansi-pembayaran
-
-	//PENDUKUNG//
 
 	//Analisa Budgeting(perkiraan budget mingguan)
 	//Read

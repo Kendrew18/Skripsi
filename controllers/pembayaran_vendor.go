@@ -48,7 +48,7 @@ func UploadInvoice(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func Foto_Invoice(c echo.Context) error {
+func ReadFoto(c echo.Context) error {
 	path := c.FormValue("path")
 	return c.File(path)
 }

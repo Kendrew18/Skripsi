@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+//data
 func InputLaporanVendor(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
 	id_kontrak := c.FormValue("id_kontrak")
@@ -35,9 +36,46 @@ func ReadLaporanVendor(c echo.Context) error {
 
 func UpdateLaporanVendor(c echo.Context) error {
 	id_laporan_vendor := c.FormValue("id_laporan_vendor")
-	laporan := c.FormValue("total_nilai_kontrak")
+	laporan := c.FormValue("laporan")
 
-	result, err := models.Update_Laporan(id_laporan_vendor, laporan)
+	result, err := models.Update_Laporan_Vendor(id_laporan_vendor, laporan)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+func UpdateStatusLaporanVendor(c echo.Context) error {
+	id_laporan_vendor := c.FormValue("id_laporan_vendor")
+
+	result, err := models.Update_Status_Laporan_Vendor(id_laporan_vendor)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//foto
+func UploadFotolaporanVendor(c echo.Context) error {
+	id_laporan_vendor := c.FormValue("id_laporan_vendor")
+
+	result, err := models.Upload_Foto_laporan_vendor(id_laporan_vendor, c.Response(), c.Request())
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+func ReadFotolaporanVendor(c echo.Context) error {
+	id_laporan_vendor := c.FormValue("id_laporan_vendor")
+
+	result, err := models.Read_Foto_Laporan_Vendor(id_laporan_vendor)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

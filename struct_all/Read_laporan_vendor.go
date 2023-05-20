@@ -6,5 +6,5 @@ type Read_Laporan_Vendor struct {
 	Pekerjaan_vendor  string `json:"pekerjaan_vendor"`
 	Laporan           string `json:"laporan"`
 	Tanggal_laporan   string `json:"tanggal_laporan"`
-	Foto_laporan      string `json:"foto_laporan"`
+	Status_laporan    int    `json:"status_laporan"`
 }

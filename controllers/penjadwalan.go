@@ -7,6 +7,46 @@ import (
 	"strconv"
 )
 
+//input tanggal mulai
+func InputTanggalMulai(c echo.Context) error {
+	id_proyek := c.FormValue("id_proyek")
+	tanggal := c.FormValue("tanggal")
+	result, err := models.Input_Tanggal_Mulai(id_proyek, tanggal)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//read tanggal mulai
+func ReadTanggalMulai(c echo.Context) error {
+	id_proyek := c.FormValue("id_proyek")
+
+	result, err := models.Read_Tanggal_Mulai(id_proyek)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//read judul penawaran
+func ReadJudulPenawaran(c echo.Context) error {
+	id_proyek := c.FormValue("id_proyek")
+
+	result, err := models.Read_Judul_Penawaran(id_proyek)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//input task penjadwalan
 func InputTaskPenjadwalan(c echo.Context) error {
 	id_penawaran := c.FormValue("id_penawaran")
 	id_proyek := c.FormValue("id_proyek")
@@ -28,6 +68,21 @@ func InputTaskPenjadwalan(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+//read task
+func ReadTask(c echo.Context) error {
+	id_proyek := c.FormValue("id_proyek")
+	id_penawaran := c.FormValue("id_penawaran")
+
+	result, err := models.Read_Task(id_proyek, id_penawaran)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//input dependentcies
 func Inputdepedentcies(c echo.Context) error {
 	id_jadwal := c.FormValue("id_jadwal")
 	depedentcies := c.FormValue("depedentcies")
@@ -41,6 +96,7 @@ func Inputdepedentcies(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+//generate jadwal
 func GenerateJadwal(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
 	result, err := models.Generate_Jadwal(id_proyek)
@@ -51,22 +107,13 @@ func GenerateJadwal(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, result)
 }
-func InputTanggalMulai(c echo.Context) error {
+
+//read_jadwal
+func ReadJadwal(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
-	tanggal := c.FormValue("tanggal")
-	result, err := models.Input_Tanggal_Mulai(id_proyek, tanggal)
+	id_penawaran := c.FormValue("id_penawaran")
 
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
-	}
-
-	return c.JSON(http.StatusOK, result)
-}
-
-func ReadTanggalMulai(c echo.Context) error {
-	id_proyek := c.FormValue("id_proyek")
-
-	result, err := models.Read_Tanggal_Mulai(id_proyek)
+	result, err := models.Read_Jadwal(id_proyek, id_penawaran)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
