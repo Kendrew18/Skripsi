@@ -95,9 +95,14 @@ func Init() *echo.Echo {
 	pen.POST("/input-pen", controllers.InputPenawaran)
 	//read
 	pen.GET("/read-pen", controllers.ReadPenawaran)
+	//Update Status Penawaran
+	pen.PUT("/update-status", controllers.UpdateStatusPenawaran)
 	//update kop
-
+	pen.PUT("/UpdateHeaderPenawaran", controllers.UpdateHeaderPenawaran)
+	//update_judul
+	pen.PUT("/update-judul", controllers.UpdateJudulPenawaran)
 	//update item
+	pen.PUT("/update-item", controllers.UpdateItemPenawaran)
 
 	//Penjadwalan
 	//input tanggal mulai

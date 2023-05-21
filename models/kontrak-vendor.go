@@ -146,65 +146,6 @@ func Read_Kontrak_Vendor(id_Proyek string) (tools.Response, error) {
 	return res, nil
 }
 
-/*
-func Edit_Kontrak_Vendor(id_kontrak string, nomor_kontrak string, nama_vendor string,
-	total_nilai_kontrak int64, jenis_pekerjaan string, tanggal_dimulai string,
-	tanggal_selesai string) (tools.Response, error) {
-	var res tools.Response
-
-	con := db.CreateCon()
-
-	sqlstatement := "UPDATE kontrak_vendor SET nomor_kontrak=?,nama_vendor=?,total_nilai_kontrak=?,jenis_pekerjaan=?,tanggal_mulai_kontrak=?,tanggal_berakhir_kontrak=? WHERE id_kontrak=?"
-
-	date, _ := time.Parse("02-01-2006", tanggal_dimulai)
-	date_sql := date.Format("2006-01-02")
-	dm := date.Format("200601")
-
-	date2, _ := time.Parse("02-01-2006", tanggal_selesai)
-	date_sql2 := date2.Format("2006-01-02")
-	dt := date2.Format("200601")
-
-	fmt.Println(dm)
-	fmt.Println(dt)
-
-	sqlStatement2 := "SELECT period_diff( " + dt + ", " + dm + ")"
-
-	var temp int64
-
-	temp = 0
-
-	_ = con.QueryRow(sqlStatement2).Scan(&temp)
-
-	nominal_pembayaran := total_nilai_kontrak / temp
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return res, err
-	}
-
-	result, err := stmt.Exec(id_kontrak, nomor_kontrak, nama_vendor, total_nilai_kontrak,
-		nominal_pembayaran, jenis_pekerjaan, date_sql, date_sql2, 0)
-
-	if err != nil {
-		return res, err
-	}
-
-	rowschanged, err := result.RowsAffected()
-
-	if err != nil {
-		return res, err
-	}
-
-	res.Status = http.StatusOK
-	res.Message = "Suksess"
-	res.Data = map[string]int64{
-		"rows": rowschanged,
-	}
-
-	return res, nil
-}*/
-
 func Delete_Kontrak_Vendor(id_kontrak string) (tools.Response, error) {
 	var res tools.Response
 	var arrobj []str.Read_id_pv

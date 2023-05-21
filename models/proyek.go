@@ -74,7 +74,7 @@ func Read_Nama_Proyek() (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT nama_proyek FROM proyek where status_proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_proyek,nama_proyek FROM proyek where status_proyek=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, 0)
 
@@ -85,7 +85,7 @@ func Read_Nama_Proyek() (tools.Response, error) {
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&invent.Nama_proyek)
+		err = rows.Scan(&invent.Id_proyek, &invent.Nama_proyek)
 		if err != nil {
 			return res, err
 		}
