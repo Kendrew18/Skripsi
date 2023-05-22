@@ -14,7 +14,7 @@ func Login(username string, password string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT kode_user,status FROM user where username=? && password_user=?"
+	sqlStatement := "SELECT kode_user,status_user FROM user where username=? && password_user=?"
 
 	err := con.QueryRow(sqlStatement, username, password).Scan(&arr.Id_user, &arr.Status_akun)
 

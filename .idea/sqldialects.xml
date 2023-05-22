@@ -8,5 +8,6 @@
     <file url="file://$PROJECT_DIR$/models/penawaran.go" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/models/penjadwalan.go" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/models/proyek.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/models/user_management.go" dialect="MariaDB" />
   </component>
 </project>
