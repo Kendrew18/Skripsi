@@ -68,6 +68,8 @@ func Init() *echo.Echo {
 	pv.GET("/read-pv", controllers.ReadPembayaranVendor)
 	//upload-foto-invoice
 	pv.POST("/upload-fi", controllers.UploadInvoice)
+	//Read-foto-laporan
+	pv.GET("/read-path-foto", controllers.ReadFotoPembayaranvendor)
 
 	//laporan-vendor
 	//Create

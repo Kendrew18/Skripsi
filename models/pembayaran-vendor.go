@@ -73,16 +73,16 @@ func Input_Pembayaran_Vendor(id_kontrak string, nomor_invoice string,
 	return res, nil
 }
 
-func Read_Pembayaran_Vendor(id_Proyek string) (tools.Response, error) {
+func Read_Pembayaran_Vendor(id_kontrak string) (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []str.Read_Pembayaran_Vendor
 	var invent str.Read_Pembayaran_Vendor
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_PV, nomor_invoice, jumlah_pembayaran, tanggal_pembayaran,foto_invoice FROM pembayaran_vendor WHERE id_Proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_PV, nomor_invoice, jumlah_pembayaran, tanggal_pembayaran FROM pembayaran_vendor WHERE id_kontrak=? ORDER BY co ASC "
 
-	rows, err := con.Query(sqlStatement, id_Proyek)
+	rows, err := con.Query(sqlStatement, id_kontrak)
 
 	defer rows.Close()
 
@@ -193,6 +193,36 @@ func Upload_Invoice(id_PV string, writer http.ResponseWriter, request *http.Requ
 
 	res.Status = http.StatusOK
 	res.Message = "Sukses"
+
+	return res, nil
+}
+
+func Read_Foto_Pembayaran_vendor(id_pembayaran_vendor string) (tools.Response, error) {
+	var res tools.Response
+	var arr_invent []str.Foto
+	var invent str.Foto
+
+	con := db.CreateCon()
+
+	sqlStatement := "SELECT foto_invoice FROM pembayaran_vendor WHERE id_PV=? "
+
+	err := con.QueryRow(sqlStatement, id_pembayaran_vendor).Scan(&invent.Path_foto)
+
+	if err != nil {
+		return res, err
+	}
+
+	arr_invent = append(arr_invent, invent)
+
+	if arr_invent == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr_invent
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = arr_invent
+	}
 
 	return res, nil
 }

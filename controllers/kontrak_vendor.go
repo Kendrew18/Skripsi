@@ -34,7 +34,7 @@ func InputKontrakVendor(c echo.Context) error {
 }
 
 func ReadKontrakVendor(c echo.Context) error {
-	id_proyek := c.FormValue("id_user")
+	id_proyek := c.FormValue("id_proyek")
 
 	result, err := models.Read_Kontrak_Vendor(id_proyek)
 
@@ -49,6 +49,18 @@ func DeleteKontrakVendor(c echo.Context) error {
 	id_kontrak := c.FormValue("id_kontrak")
 
 	result, err := models.Delete_Kontrak_Vendor(id_kontrak)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+func ReadFotoPembayaranVendor(c echo.Context) error {
+	id_pembayaran_vendor := c.FormValue("id_pembayaran_vendor")
+
+	result, err := models.Read_Foto_Laporan_Vendor(id_pembayaran_vendor)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
