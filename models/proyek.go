@@ -134,10 +134,10 @@ func Read_Proyek(id_proyek string) (tools.Response, error) {
 
 	sqlStatement = "SELECT id_penawaran, status_penawaran FROM penawaran WHERE id_proyek=? limit 1"
 
-	_ = con.QueryRow(sqlStatement, id_proyek).Scan(&tmp, &invent.Status_penawaran)
+	_ = con.QueryRow(sqlStatement, id_proyek).Scan(&tmp, &arr_invent[0].Status_penawaran)
 
 	if tmp == "" {
-		invent.Status_penawaran = 0
+		arr_invent[0].Status_penawaran = 0
 	}
 
 	if arr_invent == nil {
