@@ -185,10 +185,10 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string,
 
 	sqlStatement := "INSERT INTO penawaran (id_penawaran,id_proyek,judul,id_sub_pekerjaan,sub_pekerjaan,keterangan,jumlah,satuan,harga,total,sub_total,status_penawaran) values(?,?,?,?,?,?,?,?,?,?,?,?)"
 
-	ttl := tools.String_Separator_To_Int64(total)
+	ttl := tools.String_Separator_To_float64(total)
 
-	var sub_total int64
-	sub_total = 0
+	var sub_total float64
+	sub_total = 0.0
 
 	for i := 0; i < len(ttl); i++ {
 		sub_total += ttl[i]
@@ -238,8 +238,8 @@ func Read_Penawaran(id_Proyek string) (tools.Response, error) {
 		invent.Keterangan = tools.String_Separator_To_String(tmp.Keterangan)
 		invent.Jumlah = tools.String_Separator_To_float64(tmp.Jumlah)
 		invent.Satuan = tools.String_Separator_To_String(tmp.Satuan)
-		invent.Harga = tools.String_Separator_To_Int64(tmp.Harga)
-		invent.Total = tools.String_Separator_To_Int64(tmp.Total)
+		invent.Harga = tools.String_Separator_To_float64(tmp.Harga)
+		invent.Total = tools.String_Separator_To_float64(tmp.Total)
 
 		if err != nil {
 			return res, err
@@ -395,8 +395,8 @@ func Update_Item_Penawaran(id_penawaran string, id_sub_pekerjaan string, sub_pek
 	invent.Keterangan = tools.String_Separator_To_String(tmp.Keterangan)
 	invent.Jumlah = tools.String_Separator_To_float64(tmp.Jumlah)
 	invent.Satuan = tools.String_Separator_To_String(tmp.Satuan)
-	invent.Harga = tools.String_Separator_To_Int64(tmp.Harga)
-	invent.Total = tools.String_Separator_To_Int64(tmp.Total)
+	invent.Harga = tools.String_Separator_To_float64(tmp.Harga)
+	invent.Total = tools.String_Separator_To_float64(tmp.Total)
 
 	sp := ""
 	kt := ""
@@ -404,8 +404,11 @@ func Update_Item_Penawaran(id_penawaran string, id_sub_pekerjaan string, sub_pek
 	st := ""
 	hg := ""
 	tt := ""
-	var stt int64
+	var stt float64
 	stt = 0
+
+	har := float64(harga)
+	tot := float64(total)
 
 	for i := 0; i < len(id_sub_pekerjaan); i++ {
 		if invent.Id_sub_pekerjaan[i] == id_sub_pekerjaan {
@@ -413,8 +416,8 @@ func Update_Item_Penawaran(id_penawaran string, id_sub_pekerjaan string, sub_pek
 			invent.Keterangan[i] = keterangan
 			invent.Jumlah[i] = jumlah
 			invent.Satuan[i] = satuan
-			invent.Harga[i] = harga
-			invent.Total[i] = total
+			invent.Harga[i] = har
+			invent.Total[i] = tot
 
 		}
 		stt = stt + invent.Total[i]
@@ -422,8 +425,8 @@ func Update_Item_Penawaran(id_penawaran string, id_sub_pekerjaan string, sub_pek
 		kt = kt + "|" + invent.Keterangan[i] + "|"
 		jmlh = jmlh + "|" + strconv.FormatFloat(invent.Jumlah[i], 'E', -1, 64) + "|"
 		st = st + "|" + invent.Satuan[i] + "|"
-		hg = hg + "|" + strconv.FormatInt(invent.Harga[i], 64) + "|"
-		tt = tt + "|" + strconv.FormatInt(invent.Total[i], 64) + "|"
+		hg = hg + "|" + strconv.FormatFloat(invent.Harga[i], 'E', -1, 64) + "|"
+		tt = tt + "|" + strconv.FormatFloat(invent.Total[i], 'E', -1, 64) + "|"
 	}
 
 	sqlstatement := "UPDATE penawaran SET id_sub_pekerjaan=?, sub_pekerjaan=?, keterangan=?, jumlah=?, satuan=?, harga=?, total=?,sub_total=? WHERE id_penawaran=?"

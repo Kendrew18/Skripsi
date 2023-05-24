@@ -18,7 +18,7 @@ type Read_Penawaran struct {
 	Keterangan       []string  `json:"keterangan"`
 	Jumlah           []float64 `json:"jumlah"`
 	Satuan           []string  `json:"satuan"`
-	Harga            []int64   `json:"harga"`
-	Total            []int64   `json:"total"`
+	Harga            []float64 `json:"harga"`
+	Total            []float64 `json:"total"`
 	Sub_total        int64     `json:"sub_total"`
 }
