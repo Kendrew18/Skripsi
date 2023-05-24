@@ -183,7 +183,7 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string,
 		id_sub_fix = id_sub_fix + id_sub
 	}
 
-	sqlStatement := "INSERT INTO penawaran (id_penawaran,id_proyek,judul,id_sub_pekerjaan,sub_pekerjaan,keterangan,jumlah,satuan,harga,total,sub_total,status_penawaran) values(?,?,?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO penawaran (id_penawaran,id_proyek,judul,id_sub_pekerjaan,sub_pekerjaan,keterangan,jumlah,satuan,harga,total,sub_total,status_penawaran) values(?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	ttl := tools.String_Separator_To_Int64(total)
 
