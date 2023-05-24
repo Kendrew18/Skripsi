@@ -51,7 +51,7 @@ func UploadInvoice(c echo.Context) error {
 func ReadFotoPembayaranvendor(c echo.Context) error {
 	id_PV := c.FormValue("id_PV")
 
-	result, err := models.Read_Foto_Laporan_Vendor(id_PV)
+	result, err := models.Read_Foto_Pembayaran_vendor(id_PV)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
