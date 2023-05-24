@@ -36,8 +36,9 @@ func ReadLaporan(c echo.Context) error {
 func UpdateLaporan(c echo.Context) error {
 	id_laporan := c.FormValue("id_laporan")
 	laporan := c.FormValue("laporan")
+	tanggal_laporan := c.FormValue("tanggal_laporan")
 
-	result, err := models.Update_Laporan(id_laporan, laporan)
+	result, err := models.Update_Laporan(id_laporan, laporan, tanggal_laporan)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

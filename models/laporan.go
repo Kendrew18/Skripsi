@@ -134,7 +134,7 @@ func Read_Laporan(id_Proyek string) (tools.Response, error) {
 	return res, nil
 }
 
-func Update_Laporan(id_laporan string, laporan string) (tools.Response, error) {
+func Update_Laporan(id_laporan string, laporan string, tanggal_laporan string) (tools.Response, error) {
 
 	var res tools.Response
 	var st str.Status_laporan
@@ -147,7 +147,10 @@ func Update_Laporan(id_laporan string, laporan string) (tools.Response, error) {
 
 	if st.Status == 0 {
 
-		sqlStatement = "UPDATE laporan SET laporan=? WHERE id_laporan=?"
+		date, _ := time.Parse("02-01-2006", tanggal_laporan)
+		date_sql := date.Format("2006-01-02")
+
+		sqlStatement = "UPDATE laporan SET laporan=?,tanggal_laporan=? WHERE id_laporan=?"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -155,7 +158,7 @@ func Update_Laporan(id_laporan string, laporan string) (tools.Response, error) {
 			return res, err
 		}
 
-		result, err := stmt.Exec(laporan, id_laporan)
+		result, err := stmt.Exec(laporan, date_sql, id_laporan)
 
 		if err != nil {
 			return res, err
