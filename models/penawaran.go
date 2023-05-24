@@ -178,7 +178,7 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string,
 
 		nm_str_s := strconv.Itoa(nm_s)
 
-		id_sub := "S-" + nm_str_s
+		id_sub := "|" + "S-" + nm_str_s + "|"
 
 		id_sub_fix = id_sub_fix + id_sub
 	}
