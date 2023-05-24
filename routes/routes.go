@@ -123,6 +123,8 @@ func Init() *echo.Echo {
 	PJDL.GET("/generate-jadwal", controllers.GenerateJadwal)
 	//Read_Jadwal
 	PJDL.GET("/read-jadwal", controllers.ReadJadwal)
+	//read_dep
+	PJDL.GET("/read-dep", controllers.ReadDep)
 	//edit
 
 	//Laporan

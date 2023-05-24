@@ -228,6 +228,44 @@ func Read_Task(id_proyek string, id_penawaran string) (tools.Response, error) {
 	return res, nil
 }
 
+func Read_dep(id_proyek string) (tools.Response, error) {
+	var res tools.Response
+	var arr_invent []str.Read_dep
+	var invent str.Read_dep
+
+	con := db.CreateCon()
+
+	sqlStatement := "SELECT id_penjadwalan,nama_task FROM penjadwalan WHERE id_proyek=?"
+
+	rows, err := con.Query(sqlStatement, id_proyek)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&invent.Id_penjadwalan, &invent.Nama_penjadwalan)
+		if err != nil {
+			return res, err
+		}
+		arr_invent = append(arr_invent, invent)
+	}
+
+	if arr_invent == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr_invent
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = arr_invent
+	}
+
+	return res, nil
+}
+
 //input_depedenytcies
 func Input_Dependentcies(id_jadwal string, dep string) (tools.Response, error) {
 

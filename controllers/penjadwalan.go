@@ -121,3 +121,15 @@ func ReadJadwal(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, result)
 }
+
+func ReadDep(c echo.Context) error {
+	id_proyek := c.FormValue("id_proyek")
+
+	result, err := models.Read_dep(id_proyek)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
