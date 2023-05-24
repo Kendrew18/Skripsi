@@ -107,7 +107,7 @@ func Input_Header_Penawaran(id_proyek string, kode_surat string, tanggal_dibuat 
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_proyek, id_kontrak, kode_surat, date_sql, nama_perusahaan, alamat_perusahaan)
+	_, err = stmt.Exec(id_proyek, id_kontrak, kode_surat, date_sql, nama_perusahaan, alamat_perusahaan, 0)
 
 	stmt.Close()
 
@@ -124,7 +124,7 @@ func Read_Header_Penawaran(id_Proyek string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT  id_header_penawaran, kode_surat, tanggal_dibuat, nama_perusahaan, alamat_perusahaan FROM header_penawaran WHERE id_Proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_header_penawaran, kode_surat, tanggal_dibuat, nama_perusahaan, alamat_perusahaan FROM header_penawaran WHERE id_Proyek=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, id_Proyek)
 
