@@ -2,6 +2,10 @@ package routes
 
 import (
 	controllers "Skripsi/controllers"
+	"Skripsi/controllers/jadwal"
+	"Skripsi/controllers/penawaran"
+	"Skripsi/controllers/proyek"
+	"Skripsi/controllers/vendor_all"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"net/http"
@@ -33,117 +37,117 @@ func Init() *echo.Echo {
 
 	//Proyek
 	//Create
-	pryk.POST("/input-proyek", controllers.InputProyek)
+	pryk.POST("/input-proyek", proyek.InputProyek)
 
 	//Read Nama Proyek
-	pryk.GET("/Read-Nama", controllers.ReadNamaProyek)
+	pryk.GET("/Read-Nama", proyek.ReadNamaProyek)
 
 	//Read Detail
-	pryk.GET("/Read-proyek", controllers.ReadProyek)
+	pryk.GET("/Read-proyek", proyek.ReadProyek)
 
 	//Finish (bag 2)
-	pryk.PUT("/finish-proyek", controllers.FinishProyek)
+	pryk.PUT("/finish-proyek", proyek.FinishProyek)
 
 	//History Proyek (bag 2)
 	//Read Nama Proyek
-	pryk.GET("/Read-Nama-his", controllers.ReadNamaProyekHistory)
+	pryk.GET("/Read-Nama-his", proyek.ReadNamaProyekHistory)
 
 	//Read Detail
-	pryk.GET("/Read-proyek-his", controllers.ReadHistory)
+	pryk.GET("/Read-proyek-his", proyek.ReadHistory)
 
 	//Edit (bag 2)
 
 	//Kontrak-Vendor
 	//input
-	kv.POST("/input-kv", controllers.InputKontrakVendor)
+	kv.POST("/input-kv", vendor_all.InputKontrakVendor)
 	//read
-	kv.GET("/read-kv", controllers.ReadKontrakVendor)
+	kv.GET("/read-kv", vendor_all.ReadKontrakVendor)
 	//delete
-	kv.DELETE("/delete-kontrak", controllers.DeleteKontrakVendor)
+	kv.DELETE("/delete-kontrak", vendor_all.DeleteKontrakVendor)
 
 	//Pembayaran-Vendor
 	//input
-	pv.POST("/input-pv", controllers.InputPembayaranVendor)
+	pv.POST("/input-pv", vendor_all.InputPembayaranVendor)
 	//read
-	pv.GET("/read-pv", controllers.ReadPembayaranVendor)
+	pv.GET("/read-pv", vendor_all.ReadPembayaranVendor)
 	//upload-foto-invoice
-	pv.POST("/upload-fi", controllers.UploadInvoice)
+	pv.POST("/upload-fi", vendor_all.UploadInvoice)
 	//Read-foto-laporan
-	pv.GET("/read-path-foto", controllers.ReadFotoPembayaranvendor)
+	pv.GET("/read-path-foto", vendor_all.ReadFotoPembayaranvendor)
 
 	//laporan-vendor
 	//Create
-	LV.POST("/input-lv", controllers.InputLaporanVendor)
+	LV.POST("/input-lv", vendor_all.InputLaporanVendor)
 	//read
-	LV.GET("/Read-lv", controllers.ReadLaporanVendor)
+	LV.GET("/Read-lv", vendor_all.ReadLaporanVendor)
 	//update
-	LV.PUT("/update-lv", controllers.UpdateLaporanVendor)
+	LV.PUT("/update-lv", vendor_all.UpdateLaporanVendor)
 	//upload foto
-	LV.POST("/upload-foto", controllers.UploadFotolaporanVendor)
+	LV.POST("/upload-foto", vendor_all.UploadFotolaporanVendor)
 	//Read-foto-laporan
-	LV.GET("/read-path-foto", controllers.ReadFotolaporanVendor)
+	LV.GET("/read-path-foto", vendor_all.ReadFotolaporanVendor)
 	//update_status_laporan_vendor
-	LV.PUT("/update-status", controllers.UpdateStatusLaporanVendor)
+	LV.PUT("/update-status", vendor_all.UpdateStatusLaporanVendor)
 
 	//Penawaran(header)
 	//create
-	ph.POST("/input-ph", controllers.InputHeaderPenawaran)
+	ph.POST("/input-ph", penawaran.InputHeaderPenawaran)
 	//read
-	ph.GET("/read-ph", controllers.ReadHeaderPenawaran)
+	ph.GET("/read-ph", penawaran.ReadHeaderPenawaran)
 	//update
 
 	//Penawaran
 	//create
-	pen.POST("/input-pen", controllers.InputPenawaran)
+	pen.POST("/input-pen", penawaran.InputPenawaran)
 	//read
-	pen.GET("/read-pen", controllers.ReadPenawaran)
+	pen.GET("/read-pen", penawaran.ReadPenawaran)
 	//Update Status Penawaran
-	pen.PUT("/update-status", controllers.UpdateStatusPenawaran)
+	pen.PUT("/update-status", penawaran.UpdateStatusPenawaran)
 	//update kop
-	pen.PUT("/UpdateHeaderPenawaran", controllers.UpdateHeaderPenawaran)
+	pen.PUT("/UpdateHeaderPenawaran", penawaran.UpdateHeaderPenawaran)
 	//update_judul
-	pen.PUT("/update-judul", controllers.UpdateJudulPenawaran)
+	pen.PUT("/update-judul", penawaran.UpdateJudulPenawaran)
 	//update item
-	pen.PUT("/update-item", controllers.UpdateItemPenawaran)
+	pen.PUT("/update-item", penawaran.UpdateItemPenawaran)
 
 	//Penjadwalan
 	//input tanggal mulai
-	PJDL.PUT("/tgl-ml", controllers.InputTanggalMulai)
+	PJDL.PUT("/tgl-ml", jadwal.InputTanggalMulai)
 	//read tanggal mulai
-	PJDL.GET("/read-tgl-ml", controllers.ReadTanggalMulai)
+	PJDL.GET("/read-tgl-ml", jadwal.ReadTanggalMulai)
 	//read_judul_penawaran
-	PJDL.GET("/read-judul-penawaran", controllers.ReadJudulPenawaran)
+	PJDL.GET("/read-judul-penawaran", jadwal.ReadJudulPenawaran)
 	//create task
-	PJDL.POST("/input-task-penjadwalan", controllers.InputTaskPenjadwalan)
+	PJDL.POST("/input-task-penjadwalan", jadwal.InputTaskPenjadwalan)
 	//read task
-	PJDL.GET("/read-task", controllers.ReadTask)
+	PJDL.GET("/read-task", jadwal.ReadTask)
 	//add dependentcies
-	PJDL.PUT("/input-depedentcies", controllers.Inputdepedentcies)
+	PJDL.PUT("/input-depedentcies", jadwal.Inputdepedentcies)
 	//generate jadwal cpm
-	PJDL.GET("/generate-jadwal", controllers.GenerateJadwal)
+	PJDL.PUT("/generate-jadwal", jadwal.GenerateJadwal)
 	//Read_Jadwal
-	PJDL.GET("/read-jadwal", controllers.ReadJadwal)
+	PJDL.GET("/read-jadwal", jadwal.ReadJadwal)
 	//read_dep
-	PJDL.GET("/read-dep", controllers.ReadDep)
+	PJDL.GET("/read-dep", jadwal.ReadDep)
 	//edit
 
 	//Laporan
 	//create
-	LP.POST("/input-lp", controllers.InputLaporan)
+	LP.POST("/input-lp", jadwal.InputLaporan)
 	//read
-	LP.GET("/read-lp", controllers.ReadLaporan)
+	LP.GET("/read-lp", jadwal.ReadLaporan)
 	//update
-	LP.PUT("/update-lp", controllers.UpdateLaporan)
+	LP.PUT("/update-lp", jadwal.UpdateLaporan)
 	//upload-foto-laporan
-	LP.POST("upload-foto-laporan", controllers.UploadFotolaporan)
+	LP.POST("upload-foto-laporan", jadwal.UploadFotolaporan)
 	//Read-foto-laporan
-	LP.GET("/read-path-foto", controllers.ReadFotolaporan)
+	LP.GET("/read-path-foto", jadwal.ReadFotolaporan)
 	//update_status_laporan
-	LP.PUT("/update-status", controllers.UpdateStatusLaporan)
+	LP.PUT("/update-status", jadwal.UpdateStatusLaporan)
 
 	//foto
 	//get image foto
-	FT.GET("/read-foto", controllers.ReadFoto)
+	FT.GET("/read-foto", vendor_all.ReadFoto)
 
 	//PENDUKUNG//
 
