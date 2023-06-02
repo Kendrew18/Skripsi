@@ -38,9 +38,9 @@ func Generate_Id_Kotrak_Vendor() int {
 }
 
 //Input_Kontrak_Vendor
-func Input_Kontrak_Vendor(id_proyek string, nomor_kontrak string, nama_vendor string,
-	total_nilai_kontrak int64, jenis_pekerjaan_vendor string, pekerjaan_vendor string, tanggal_dimulai string,
-	tanggal_selesai string, date_pengiriman string, date_dimulai string, date_selesai string) (tools.Response, error) {
+func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string,
+	total_nilai_kontrak int64, tanggal_dimulai string, tanggal_selesai string,
+	date_pengiriman string, date_dimulai string, date_selesai string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -51,7 +51,7 @@ func Input_Kontrak_Vendor(id_proyek string, nomor_kontrak string, nama_vendor st
 
 	id_kontrak := "KV-" + nm_str
 
-	sqlStatement := "INSERT INTO kontrak_vendor (id_proyek,id_kontrak,nomor_kontrak,nama_vendor,total_nilai_kontrak ,nominal_pembayaran,jenis_pekerjaan_vendor,pekerjaan_vendor,tanggal_mulai_kontrak,tanggal_berakhir_kontrak,sisa_pembayaran,tanggal_pengiriman,tanggal_pengerjaan_dimulai,tanggal_pengerjaan_berakhir) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO kontrak_vendor (id_proyek, id_MV, id_kontrak, total_nilai_kontrak, nominal_pembayaran, tanggal_mulai_kontrak, tanggal_berakhir_kontrak, sisa_pembayaran, tanggal_pengiriman, tanggal_pengerjaan_dimulai, tanggal_pengerjaan_berakhir) values(?,?,?,?,?,?,?,?,?,?,?)"
 
 	date, _ := time.Parse("02-01-2006", tanggal_dimulai)
 	date_sql := date.Format("2006-01-02")
@@ -97,9 +97,9 @@ func Input_Kontrak_Vendor(id_proyek string, nomor_kontrak string, nama_vendor st
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_proyek, id_kontrak, nomor_kontrak, nama_vendor, total_nilai_kontrak,
-		nominal_pembayaran, jenis_pekerjaan_vendor, pekerjaan_vendor, date_sql, date_sql2,
-		total_nilai_kontrak, date_sql3, date_sql4, date_sql5)
+	_, err = stmt.Exec(id_proyek, id_master_vendor, id_kontrak, total_nilai_kontrak,
+		nominal_pembayaran, date_sql, date_sql2, total_nilai_kontrak, date_sql3,
+		date_sql4, date_sql5)
 
 	stmt.Close()
 
@@ -114,10 +114,11 @@ func Read_Kontrak_Vendor(id_Proyek string) (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []vendor_all.Read_Kontrak_Vendor
 	var invent vendor_all.Read_Kontrak_Vendor
+	var det_kon vendor_all.Detail_Kontrak_Vendor
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_proyek,id_kontrak,nomor_kontrak,nama_vendor,total_nilai_kontrak,nominal_pembayaran,pekerjaan_vendor,tanggal_mulai_kontrak,tanggal_berakhir_kontrak,sisa_pembayaran FROM kontrak_vendor WHERE id_Proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_kontrak,nama_vendor,penkerjaan_vendor,tanggal_mulai_kontrak,tanggal_berakhir_kontrak,total_nilai_kontrak,nominal_pembayaran,sisa_pembayaran,tanggal_pengiriman,tanggal_pengerjaan_dimulai,tanggal_pengerjaan_berakhir FROM kontrak_vendor JOIN vendor ON kontrak_vendor.id_MV = vendor.id_master_vendor WHERE id_Proyek=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, id_Proyek)
 
@@ -128,9 +129,11 @@ func Read_Kontrak_Vendor(id_Proyek string) (tools.Response, error) {
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&invent.Id_proyek, &invent.Id_kontak, &invent.Nomor_Kontrak, &invent.Nama_vendor,
-			&invent.Total_nilai_kontrak, &invent.Nomial_Pembayaran, &invent.Jenis_Pekerjaan,
-			&invent.Tanggal_mulai_kontrak, &invent.Tanggal_berakhir_kontrak, &invent.Sisa_pembayaran)
+		err = rows.Scan(&invent.Id_kontak, &invent.Nama_vendor, &invent.Pekerjaan_Vendor,
+			&invent.Tanggal_mulai_kontrak, &invent.Tanggal_berakhir_kontrak, &det_kon.Total_nilai_kontrak,
+			&det_kon.Nomial_Pembayaran, &det_kon.Sisa_pembayaran, &det_kon.Tanggal_Pengiriman,
+			&det_kon.Tanggal_mulai_pengerjaan, &det_kon.Tanggal_berakhir_pengerjaan)
+		invent.Detail_Kontrak_Vendor = det_kon
 		if err != nil {
 			return res, err
 		}
