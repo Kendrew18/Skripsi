@@ -2,165 +2,22 @@ package jadwal
 
 import (
 	"Skripsi/db"
-	str "Skripsi/struct_all"
 	"Skripsi/struct_all/jadwal"
-	"Skripsi/struct_all/penawaran"
 	"Skripsi/tools"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 )
 
-func Generate_Id_Jadwal() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_jadwal FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_jadwal=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
-//input_tanggal_mulai
-func Input_Tanggal_Mulai(id_proyek string, tanggal string) (tools.Response, error) {
-
-	var res tools.Response
-
-	con := db.CreateCon()
-
-	date, _ := time.Parse("02-01-2006", tanggal)
-	date_sql := date.Format("2006-01-02")
-
-	sqlStatement := "UPDATE proyek SET tanggal_mulai_kerja=? WHERE id_proyek=?"
-
-	stmt, err := con.Prepare(sqlStatement)
-
-	if err != nil {
-		return res, err
-	}
-
-	result, err := stmt.Exec(date_sql, id_proyek)
-
-	if err != nil {
-		return res, err
-	}
-
-	rowschanged, err := result.RowsAffected()
-
-	if err != nil {
-		return res, err
-	}
-
-	res.Status = http.StatusOK
-	res.Message = "Suksess"
-	res.Data = map[string]int64{
-		"rows": rowschanged,
-	}
-
-	return res, nil
-}
-
-//read_tanggal-mulai
-func Read_Tanggal_Mulai(id_proyek string) (tools.Response, error) {
-	var res tools.Response
-	var arr_invent []jadwal.Tanggal_mulai
-	var invent jadwal.Tanggal_mulai
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT tanggal_mulai_kerja FROM proyek WHERE id_proyek=?"
-
-	err := con.QueryRow(sqlStatement, id_proyek).Scan(&invent.Tanggal_mulai)
-
-	if err != nil {
-		return res, err
-	}
-
-	arr_invent = append(arr_invent, invent)
-
-	if arr_invent == nil {
-		res.Status = http.StatusNotFound
-		res.Message = "Not Found"
-		res.Data = arr_invent
-	} else {
-		res.Status = http.StatusOK
-		res.Message = "Sukses"
-		res.Data = arr_invent
-	}
-
-	return res, nil
-}
-
-//input_judul_penawaran
-func Read_Judul_Penawaran(id_proyek string) (tools.Response, error) {
-	var res tools.Response
-	var arr_invent []penawaran.Read_judul_penawaran
-	var invent penawaran.Read_judul_penawaran
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_penawaran,judul FROM penawaran WHERE id_proyek=?"
-
-	rows, err := con.Query(sqlStatement, id_proyek)
-
-	defer rows.Close()
-
-	if err != nil {
-		return res, err
-	}
-
-	for rows.Next() {
-		err = rows.Scan(&invent.Id_penawaran, &invent.Judul_penawaran)
-		if err != nil {
-			return res, err
-		}
-		arr_invent = append(arr_invent, invent)
-	}
-
-	if arr_invent == nil {
-		res.Status = http.StatusNotFound
-		res.Message = "Not Found"
-		res.Data = arr_invent
-	} else {
-		res.Status = http.StatusOK
-		res.Message = "Sukses"
-		res.Data = arr_invent
-	}
-
-	return res, nil
-}
-
-//input_task_penjadwalan
-func Input_Task_Penjadwalan(Id_penawaran string, id_proyek string, nama_task string, waktu_optimis float64,
+//input_Durasi_task(done)
+func Input_Durasi_task(Id_penjadwalan string, waktu_optimis float64,
 	waktu_pesimis float64, waktu_realistic float64) (tools.Response, error) {
 
 	var res tools.Response
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Jadwal()
-
-	nm_str := strconv.Itoa(nm)
-
-	id_pjd := "PJD-" + nm_str
-
-	sqlStatement := "INSERT INTO penjadwalan (id_penjadwalan, id_proyek, id_penawaran, nama_task, durasi,dependencies) values(?,?,?,?,?,?)"
+	sqlStatement := "UPDATE penjadwalan SET durasi=?,dependencies=? WHERE id_penjadwalan=?"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -180,7 +37,7 @@ func Input_Task_Penjadwalan(Id_penawaran string, id_proyek string, nama_task str
 	} else {
 		real_durasi = durasi_int + 1
 	}
-	_, err = stmt.Exec(id_pjd, id_proyek, Id_penawaran, nama_task, real_durasi, "")
+	_, err = stmt.Exec(real_durasi, "", Id_penjadwalan)
 
 	stmt.Close()
 
@@ -190,17 +47,18 @@ func Input_Task_Penjadwalan(Id_penawaran string, id_proyek string, nama_task str
 	return res, nil
 }
 
-//read_task
-func Read_Task(id_proyek string, id_penawaran string) (tools.Response, error) {
+//read_task (done)
+func Read_Task(id_proyek string) (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []jadwal.Read_Task
 	var invent jadwal.Read_Task
+	var in jadwal.Sub_Task
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_penjadwalan,nama_task,durasi,dependencies FROM penjadwalan WHERE id_proyek=? && id_penawaran=?"
+	sqlStatement := "SELECT id_penawaran,judul FROM penawaran WHERE id_proyek=?"
 
-	rows, err := con.Query(sqlStatement, id_proyek, id_penawaran)
+	rows, err := con.Query(sqlStatement, id_proyek)
 
 	defer rows.Close()
 
@@ -209,8 +67,27 @@ func Read_Task(id_proyek string, id_penawaran string) (tools.Response, error) {
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&invent.Id_penjadwalan, &invent.Nama_Task, &invent.Durasi_Task,
-			&invent.Dependentcies)
+		err = rows.Scan(&invent.Id_penawaran, &invent.Judul_penawaran)
+
+		sqlStatement = "SELECT id_penjadwalan,nama_task,durasi,dependencies FROM penjadwalan WHERE id_proyek=? && id_penawaran=?"
+
+		rows, err = con.Query(sqlStatement, id_proyek, invent.Id_penawaran)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows.Next() {
+			err = rows.Scan(&in.Id_penjadwalan, &in.Nama_Task, &in.Durasi_Task,
+				&in.Dependentcies)
+			if err != nil {
+				return res, err
+			}
+			invent.Sub_task = append(invent.Sub_task, in)
+		}
+
 		if err != nil {
 			return res, err
 		}
@@ -230,16 +107,17 @@ func Read_Task(id_proyek string, id_penawaran string) (tools.Response, error) {
 	return res, nil
 }
 
-func Read_dep(id_proyek string) (tools.Response, error) {
+//read depedentcies (done)
+func Read_dep(id_proyek string, id_penjadwalan string) (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []jadwal.Read_dep
 	var invent jadwal.Read_dep
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_penjadwalan,nama_task FROM penjadwalan WHERE id_proyek=?"
+	sqlStatement := "SELECT id_penjadwalan,nama_task FROM penjadwalan WHERE id_proyek=? && id_penjadwalan!=?"
 
-	rows, err := con.Query(sqlStatement, id_proyek)
+	rows, err := con.Query(sqlStatement, id_proyek, id_penjadwalan)
 
 	defer rows.Close()
 
@@ -268,7 +146,7 @@ func Read_dep(id_proyek string) (tools.Response, error) {
 	return res, nil
 }
 
-//input_depedenytcies
+//input_depedentcies(done)
 func Input_Dependentcies(id_jadwal string, dep string) (tools.Response, error) {
 
 	var res tools.Response
@@ -304,7 +182,7 @@ func Input_Dependentcies(id_jadwal string, dep string) (tools.Response, error) {
 	return res, nil
 }
 
-//generate_jadwal
+//generate_jadwal(done)
 func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 	//urutno
 	var res tools.Response
@@ -495,7 +373,7 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 
 	_ = con.QueryRow(sqlStatement, id_proyek).Scan(&tgl.Tanggal_mulai)
 
-	//float
+	//float dan tanggal
 	for i := 0; i < len(arr_invent_fn); i++ {
 		arr_invent_fn[i].Tf = arr_invent_fn[i].Lf - arr_invent_fn[i].Ef
 		arr_invent_fn[i].Ff = arr_invent_fn[i].Ls - arr_invent_fn[i].Es
@@ -514,11 +392,9 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 
 	fmt.Println(arr_invent_fn)
 
-	//tanggal
-
 	for j := 0; j < len(arr_invent_fn); j++ {
 
-		sqlStatement = "UPDATE penjadwalan SET es=?,ls=?,ef=?,lf=?,tf=?,ff=?,tanggal_dimulai=?,tanggal_selesai=?,status_urutan=? WHERE id_penjadwalan=?"
+		sqlStatement = "UPDATE penjadwalan SET es=?,ls=?,ef=?,lf=?,tf=?,ff=?,tanggal_dimulai=?,tanggal_selesai=?,status_urutan=?,progress=? WHERE id_penjadwalan=?"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -528,7 +404,7 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 
 		_, err = stmt.Exec(arr_invent_fn[j].Es, arr_invent_fn[j].Ls, arr_invent_fn[j].Ef, arr_invent_fn[j].Lf,
 			arr_invent_fn[j].Tf, arr_invent_fn[j].Ff, arr_invent_fn[j].Tanggal_mulai,
-			arr_invent_fn[j].Tanggal_berakhir, arr_invent_fn[j].Status_urutan, arr_invent_fn[j].Id)
+			arr_invent_fn[j].Tanggal_berakhir, arr_invent_fn[j].Status_urutan, arr_invent_fn[j].Id, 0)
 
 		if err != nil {
 			return res, err
@@ -550,17 +426,18 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 
 }
 
-//Read_jadwal
-func Read_Jadwal(id_proyek string, id_penawaran string) (tools.Response, error) {
+//Read_jadwal (done)
+func Read_Jadwal(id_proyek string) (tools.Response, error) {
 	var res tools.Response
-	var arr_invent []jadwal.Read_Task
-	var invent jadwal.Read_Task
+	var arr_invent []jadwal.Read_Task_Jadwal
+	var invent jadwal.Read_Task_Jadwal
+	var in jadwal.Sub_Task_Jadwal
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_penjadwalan,nama_task,tanggal_dimulai,tanggal_selesai FROM penjadwalan WHERE id_proyek=? && id_penawaran=?"
+	sqlStatement := "SELECT id_penawaran,judul FROM penawaran WHERE id_proyek=?"
 
-	rows, err := con.Query(sqlStatement, id_proyek, id_penawaran)
+	rows, err := con.Query(sqlStatement, id_proyek)
 
 	defer rows.Close()
 
@@ -569,12 +446,202 @@ func Read_Jadwal(id_proyek string, id_penawaran string) (tools.Response, error) 
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&invent.Id_penjadwalan, &invent.Nama_Task, &invent.Durasi_Task,
-			&invent.Dependentcies)
+		err = rows.Scan(&invent.Id_penawaran, &invent.Judul_penawaran)
+
+		sqlStatement = "SELECT id_penjadwalan,nama_task,DATE_FORMAT(tanggal_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_selesai, '%d-%m%-%Y') FROM penjadwalan WHERE id_proyek=? && id_penawaran=?"
+
+		rows, err = con.Query(sqlStatement, id_proyek, invent.Id_penawaran)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows.Next() {
+			err = rows.Scan(&in.Id_penjadwalan, &in.Nama_Task, &in.Tanggal_Mulai,
+				&in.Tanggal_Selesai)
+			if err != nil {
+				return res, err
+			}
+			invent.Sub_task = append(invent.Sub_task, in)
+		}
+
 		if err != nil {
 			return res, err
 		}
 		arr_invent = append(arr_invent, invent)
+	}
+
+	if arr_invent == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr_invent
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = arr_invent
+	}
+
+	return res, nil
+}
+
+//edit jadwal tanggal mulai dan durasinya (done)
+func Edit_Dur_Tgl(id_penjadwalan string, tanggal_mulai string, durasi int) (tools.Response, error) {
+	var res tools.Response
+
+	con := db.CreateCon()
+
+	sqlstatement := " UPDATE penjadwalan SET tanggal_dimulai=?,durasi=?,tanggal_selesai=? WHERE id_penjadwalan=?"
+
+	date, _ := time.Parse("02-01-2006", tanggal_mulai)
+	date_sql := date.Format("2006-01-02")
+
+	date_a, _ := time.Parse("2006-01-02", tanggal_mulai)
+	date_awal := date_a.AddDate(0, 0, durasi-1)
+
+	tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
+
+	stmt, err := con.Prepare(sqlstatement)
+
+	result, err := stmt.Exec(date_sql, durasi, tanggal_Pekerjaan_Selesai, id_penjadwalan)
+
+	if err != nil {
+		return res, err
+	}
+
+	rowschanged, err := result.RowsAffected()
+
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Suksess"
+	res.Data = map[string]int64{
+		"rows": rowschanged,
+	}
+
+	return res, nil
+}
+
+//see_calender (done)
+func See_Calender(id_proyek string, status_user int) (tools.Response, error) {
+	var res tools.Response
+	var arr_invent []jadwal.See_Calender
+	var invent jadwal.See_Calender
+
+	var arr_vendor []jadwal.See_Calender_Vendor
+	var vendor jadwal.See_Calender_Vendor
+
+	con := db.CreateCon()
+
+	//Penjadwalan
+	sqlStatement := "SELECT nama_task,DATE_FORMAT(tanggal_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_selesai, '%d-%m%-%Y') FROM penjadwalan WHERE id_proyek=?"
+
+	rows, err := con.Query(sqlStatement, id_proyek)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&invent.Judul, &invent.Tanggal_mulai, &invent.Tanggal_selesai)
+		if err != nil {
+			return res, err
+		}
+		arr_invent = append(arr_invent, invent)
+	}
+
+	if status_user == 1 || status_user == 3 {
+		//Pembayaran Vendor
+		sqlStatement = "SELECT id_kontrak,nama_vendor,nominal_pembayaran,tanggal_mulai_kontrak,tanggal_berakhir_kontrak FROM kontrak_vendor JOIN vendor ON id_MV=id_master_vendor WHERE kontrak_vendor.id_proyek=?"
+
+		rows, err = con.Query(sqlStatement, id_proyek)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows.Next() {
+			err = rows.Scan(&vendor.Id_kontrak, &vendor.Nama_vendor, &vendor.Nominal_Pembayaran,
+				&vendor.Tanggal_mulai, &vendor.Tanggal_selesai)
+			if err != nil {
+				return res, err
+			}
+			arr_vendor = append(arr_vendor, vendor)
+		}
+
+		for i := 0; i < len(arr_vendor); i++ {
+			judul := arr_vendor[i].Id_kontrak + " | " + arr_vendor[i].Nama_vendor + " | " + arr_vendor[i].Nominal_Pembayaran
+			x := 0
+
+			date, _ := time.Parse("2006-01-02", arr_vendor[i].Tanggal_mulai)
+			dm := date.Format("200601")
+
+			date2, _ := time.Parse("2006-01-02", arr_vendor[i].Tanggal_selesai)
+			dt := date2.Format("200601")
+
+			sqlStatement2 := "SELECT period_diff( " + dt + ", " + dm + ")"
+
+			var temp int
+
+			temp = 0
+
+			_ = con.QueryRow(sqlStatement2).Scan(&temp)
+
+			temp += 1
+
+			for x < temp {
+				date_awal := date.AddDate(0, x, 0)
+				date_sql := date_awal.Format("02-01-2006")
+
+				invent.Judul = judul
+				invent.Tanggal_mulai = date_sql
+				invent.Tanggal_selesai = date_sql
+
+				arr_invent = append(arr_invent, invent)
+				x++
+			}
+		}
+	}
+
+	//kerja_vendor
+	sqlStatement = "SELECT id_kontrak,nama_vendor,tanggal_pengerjaan_dimulai,tanggal_pengerjaan_berakhir FROM kontrak_vendor JOIN vendor ON id_MV=id_master_vendor WHERE kontrak_vendor.id_proyek=?"
+
+	rows, err = con.Query(sqlStatement, id_proyek)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&vendor.Id_kontrak, &vendor.Nama_vendor,
+			&vendor.Tanggal_mulai, &vendor.Tanggal_selesai)
+		if err != nil {
+			return res, err
+		}
+		arr_vendor = append(arr_vendor, vendor)
+	}
+
+	for i := 0; i < len(arr_vendor); i++ {
+		judul := arr_vendor[i].Id_kontrak + " | " + arr_vendor[i].Nama_vendor
+
+		date, _ := time.Parse("2006-01-02", arr_vendor[i].Tanggal_mulai)
+		date_sql := date.Format("02-01-2006")
+
+		date2, _ := time.Parse("2006-01-02", arr_vendor[i].Tanggal_selesai)
+		date_sql2 := date2.Format("02-01-2006")
+
+		invent.Judul = judul
+		invent.Tanggal_mulai = date_sql
+		invent.Tanggal_selesai = date_sql2
 	}
 
 	if arr_invent == nil {

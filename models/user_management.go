@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+//Login
 func Login(username string, password string) (tools.Response, error) {
 	var arr struct_all.Id_user
 	var res tools.Response
@@ -34,3 +35,5 @@ func Login(username string, password string) (tools.Response, error) {
 	fmt.Println(arr)
 	return res, nil
 }
+
+//User Profile atas

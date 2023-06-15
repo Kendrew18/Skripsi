@@ -24,7 +24,6 @@ func Init() *echo.Echo {
 	pryk := e.Group("/pryk")
 	kv := e.Group("/kv")
 	pv := e.Group("/pv")
-	ph := e.Group("/ph")
 	pen := e.Group("/pen")
 	LV := e.Group("/LV")
 	LP := e.Group("/LP")
@@ -35,23 +34,18 @@ func Init() *echo.Echo {
 	//User_Management
 	um.GET("/login-user", controllers.LoginUM)
 
-	//Proyek
+	//Proyek(done)
 	//Create
 	pryk.POST("/input-proyek", proyek.InputProyek)
-
 	//Read Nama Proyek
 	pryk.GET("/Read-Nama", proyek.ReadNamaProyek)
-
 	//Read Detail
 	pryk.GET("/Read-proyek", proyek.ReadProyek)
-
 	//Finish (bag 2)
 	pryk.PUT("/finish-proyek", proyek.FinishProyek)
-
 	//History Proyek (bag 2)
 	//Read Nama Proyek
 	pryk.GET("/Read-Nama-his", proyek.ReadNamaProyekHistory)
-
 	//Read Detail
 	pryk.GET("/Read-proyek-his", proyek.ReadHistory)
 
@@ -88,48 +82,46 @@ func Init() *echo.Echo {
 	LV.GET("/read-path-foto", vendor_all.ReadFotolaporanVendor)
 	//update_status_laporan_vendor
 	LV.PUT("/update-status", vendor_all.UpdateStatusLaporanVendor)
+	//See Kontrak Vendor
+	LV.GET("/see-kontak-vendor", vendor_all.SeeTaskVendor)
 
-	//Penawaran(header)
-	//create
-	ph.POST("/input-ph", penawaran.InputHeaderPenawaran)
-	//read
-	ph.GET("/read-ph", penawaran.ReadHeaderPenawaran)
-	//update
-
-	//Penawaran
+	//Penawaran (done)
 	//create
 	pen.POST("/input-pen", penawaran.InputPenawaran)
+	//input_sub_penawaran
+	pen.POST("/input-sub-pen", penawaran.InputSubPekerjaan)
 	//read
 	pen.GET("/read-pen", penawaran.ReadPenawaran)
 	//Update Status Penawaran
 	pen.PUT("/update-status", penawaran.UpdateStatusPenawaran)
-	//update kop
-	pen.PUT("/UpdateHeaderPenawaran", penawaran.UpdateHeaderPenawaran)
 	//update_judul
 	pen.PUT("/update-judul", penawaran.UpdateJudulPenawaran)
 	//update item
 	pen.PUT("/update-item", penawaran.UpdateItemPenawaran)
+	//Input_Tambahan_Sub_Pekerjaan
+	pen.POST("/input-tambahan-sub-pekerjaan", penawaran.InputTambahanSubPekerjaan)
+	//Input_Tambahan_Pekerjaan_Tambah
+	pen.POST("input-tambahan-pekerjaan-tambah", penawaran.InputTambahanPekerjaanTambah)
+	//pilih_judul_pekerjaan
+	pen.GET("pilih-judul-pekerjaan", penawaran.PilihJudulPekerjaan)
 
 	//Penjadwalan
-	//input tanggal mulai
-	PJDL.PUT("/tgl-ml", jadwal.InputTanggalMulai)
-	//read tanggal mulai
-	PJDL.GET("/read-tgl-ml", jadwal.ReadTanggalMulai)
-	//read_judul_penawaran
-	PJDL.GET("/read-judul-penawaran", jadwal.ReadJudulPenawaran)
-	//create task
-	PJDL.POST("/input-task-penjadwalan", jadwal.InputTaskPenjadwalan)
+	//Input-Durasi-Task
+	PJDL.POST("/input-durasi-task", jadwal.InputDurasitask)
 	//read task
 	PJDL.GET("/read-task", jadwal.ReadTask)
+	//read_dep
+	PJDL.GET("/read-dep", jadwal.ReadDep)
 	//add dependentcies
 	PJDL.PUT("/input-depedentcies", jadwal.Inputdepedentcies)
 	//generate jadwal cpm
 	PJDL.PUT("/generate-jadwal", jadwal.GenerateJadwal)
 	//Read_Jadwal
 	PJDL.GET("/read-jadwal", jadwal.ReadJadwal)
-	//read_dep
-	PJDL.GET("/read-dep", jadwal.ReadDep)
-	//edit
+	//Edit-Durasi-Tanggal
+	PJDL.PUT("/edit-rur-tgl", jadwal.EditDurTgl)
+	//See-Calender-All
+	PJDL.GET("see-calender-all", jadwal.SeeCalenderAll)
 
 	//Laporan
 	//create
@@ -144,6 +136,8 @@ func Init() *echo.Echo {
 	LP.GET("/read-path-foto", jadwal.ReadFotolaporan)
 	//update_status_laporan
 	LP.PUT("/update-status", jadwal.UpdateStatusLaporan)
+	//See Task
+	LP.GET("/see-task", jadwal.SeeTask)
 
 	//foto
 	//get image foto

@@ -51,7 +51,7 @@ func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string,
 
 	id_kontrak := "KV-" + nm_str
 
-	sqlStatement := "INSERT INTO kontrak_vendor (id_proyek, id_MV, id_kontrak, total_nilai_kontrak, nominal_pembayaran, tanggal_mulai_kontrak, tanggal_berakhir_kontrak, sisa_pembayaran, tanggal_pengiriman, tanggal_pengerjaan_dimulai, tanggal_pengerjaan_berakhir) values(?,?,?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO kontrak_vendor (id_proyek, id_MV, id_kontrak, total_nilai_kontrak, nominal_pembayaran, tanggal_mulai_kontrak, tanggal_berakhir_kontrak, sisa_pembayaran, tanggal_pengiriman, tanggal_pengerjaan_dimulai, tanggal_pengerjaan_berakhir,working_progress,working_complate,kontrak_complate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	date, _ := time.Parse("02-01-2006", tanggal_dimulai)
 	date_sql := date.Format("2006-01-02")
@@ -85,11 +85,7 @@ func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string,
 
 	nominal_pembayaran = 0
 
-	if temp == 0 {
-		nominal_pembayaran = total_nilai_kontrak
-	} else {
-		nominal_pembayaran = total_nilai_kontrak / temp
-	}
+	temp += 1
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -99,7 +95,7 @@ func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string,
 
 	_, err = stmt.Exec(id_proyek, id_master_vendor, id_kontrak, total_nilai_kontrak,
 		nominal_pembayaran, date_sql, date_sql2, total_nilai_kontrak, date_sql3,
-		date_sql4, date_sql5)
+		date_sql4, date_sql5, 0, 0, 0)
 
 	stmt.Close()
 

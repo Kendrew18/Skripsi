@@ -7,50 +7,9 @@ import (
 	"strconv"
 )
 
-//input tanggal mulai
-func InputTanggalMulai(c echo.Context) error {
-	id_proyek := c.FormValue("id_proyek")
-	tanggal := c.FormValue("tanggal")
-	result, err := jadwal.Input_Tanggal_Mulai(id_proyek, tanggal)
-
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
-	}
-
-	return c.JSON(http.StatusOK, result)
-}
-
-//read tanggal mulai
-func ReadTanggalMulai(c echo.Context) error {
-	id_proyek := c.FormValue("id_proyek")
-
-	result, err := jadwal.Read_Tanggal_Mulai(id_proyek)
-
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
-	}
-
-	return c.JSON(http.StatusOK, result)
-}
-
-//read judul penawaran
-func ReadJudulPenawaran(c echo.Context) error {
-	id_proyek := c.FormValue("id_proyek")
-
-	result, err := jadwal.Read_Judul_Penawaran(id_proyek)
-
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
-	}
-
-	return c.JSON(http.StatusOK, result)
-}
-
 //input task penjadwalan
-func InputTaskPenjadwalan(c echo.Context) error {
-	id_penawaran := c.FormValue("id_penawaran")
-	id_proyek := c.FormValue("id_proyek")
-	nama_task := c.FormValue("nama_task")
+func InputDurasitask(c echo.Context) error {
+	id_penjadwalan := c.FormValue("id_penjadwalan")
 	waktu_optimis := c.FormValue("waktu_optimis")
 	waktu_pesimis := c.FormValue("waktu_pesimis")
 	waktu_realistis := c.FormValue("waktu_realistis")
@@ -59,7 +18,7 @@ func InputTaskPenjadwalan(c echo.Context) error {
 	WP, _ := strconv.ParseFloat(waktu_pesimis, 64)
 	WR, _ := strconv.ParseFloat(waktu_realistis, 64)
 
-	result, err := jadwal.Input_Task_Penjadwalan(id_penawaran, id_proyek, nama_task, WO, WP, WR)
+	result, err := jadwal.Input_Durasi_task(id_penjadwalan, WO, WP, WR)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -71,9 +30,22 @@ func InputTaskPenjadwalan(c echo.Context) error {
 //read task
 func ReadTask(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
-	id_penawaran := c.FormValue("id_penawaran")
 
-	result, err := jadwal.Read_Task(id_proyek, id_penawaran)
+	result, err := jadwal.Read_Task(id_proyek)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//Read_Depedentcies
+func ReadDep(c echo.Context) error {
+	id_penjadwalan := c.FormValue("id_penjadwalan")
+	id_proyek := c.FormValue("id_proyek")
+
+	result, err := jadwal.Read_dep(id_proyek, id_penjadwalan)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -111,9 +83,8 @@ func GenerateJadwal(c echo.Context) error {
 //read_jadwal
 func ReadJadwal(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
-	id_penawaran := c.FormValue("id_penawaran")
 
-	result, err := jadwal.Read_Jadwal(id_proyek, id_penawaran)
+	result, err := jadwal.Read_Jadwal(id_proyek)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -122,10 +93,31 @@ func ReadJadwal(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func ReadDep(c echo.Context) error {
-	id_proyek := c.FormValue("id_proyek")
+//Edit_Durasi_Tanggal
+func EditDurTgl(c echo.Context) error {
+	id_penjadwalan := c.FormValue("id_penjadwalan")
+	tanggal_pekerjaan_mulai := c.FormValue("tanggal_pekerjaan_mulai")
+	durasi := c.FormValue("durasi")
 
-	result, err := jadwal.Read_dep(id_proyek)
+	drs, _ := strconv.Atoi(durasi)
+
+	result, err := jadwal.Edit_Dur_Tgl(id_penjadwalan, tanggal_pekerjaan_mulai, drs)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//See_Calender_All
+func SeeCalenderAll(c echo.Context) error {
+	id_proyek := c.FormValue("id_proyek")
+	status_user := c.FormValue("status_user")
+
+	su, _ := strconv.Atoi(status_user)
+
+	result, err := jadwal.See_Calender(id_proyek, su)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
