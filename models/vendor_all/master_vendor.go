@@ -47,7 +47,7 @@ func Input_Vendor(nama_vendor string, Pekerjaan_Vendor string) (tools.Response, 
 
 	id_master := "V-" + nm_str
 
-	sqlStatement := "INSERT INTO vendor (id_master_vendor, nama_vendor, penkerjaan_vendor, proyek_selesai, proyek_berjalan, id_proyek, progres ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO vendor (id_master_vendor, nama_vendor, penkerjaan_vendor) values(?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -55,7 +55,7 @@ func Input_Vendor(nama_vendor string, Pekerjaan_Vendor string) (tools.Response, 
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_master, nama_vendor, Pekerjaan_Vendor, 0, 0, "", "")
+	_, err = stmt.Exec(id_master, nama_vendor, Pekerjaan_Vendor)
 
 	stmt.Close()
 
@@ -71,12 +71,11 @@ func Read_Vendor() (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []vendor_all.Read_Vendor
 	var invent vendor_all.Read_Vendor
-	var tp vendor_all.Detail_Read_Vendor
 	var tpf vendor_all.Detail_Read_Vendor_Fix
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_master_vendor, nama_vendor, penkerjaan_vendor, proyek_selesai, proyek_berjalan, id_proyek, progres FROM vendor ORDER BY co ASC "
+	sqlStatement := "SELECT id_master_vendor, nama_vendor, penkerjaan_vendor FROM vendor ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement)
 
@@ -87,19 +86,42 @@ func Read_Vendor() (tools.Response, error) {
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&invent.Id_Master_Vendor, &invent.Nama_Vendor, &invent.Pekerjaan_Vendor,
-			&invent.Pekerjaan_selesai, &invent.Pekerjaan_berjalan, &tp.Id_proyek, &tp.Nama_proyek, &tp.Progres)
+		var arr_tpf []vendor_all.Detail_Read_Vendor_Fix
 
-		ip := tools.String_Separator_To_String(tp.Id_proyek)
-		np := tools.String_Separator_To_String(tp.Nama_proyek)
-		pp := tools.String_Separator_To_Int(tp.Progres)
+		err = rows.Scan(&invent.Id_Master_Vendor, &invent.Nama_Vendor,
+			&invent.Pekerjaan_Vendor)
 
-		for i := 0; i < len(ip); i++ {
-			tpf.Id_proyek = ip[i]
-			tpf.Nama_proyek = np[i]
-			tpf.Progres = pp[i]
-			invent.Detail_Vendor = append(invent.Detail_Vendor, tpf)
+		sqlStatement = "SELECT COUNT(id_MV) FROM kontrak_vendor WHERE id_MV=? && kontrak_vendor.working_complate=?"
+		_ = con.QueryRow(sqlStatement, invent.Id_Master_Vendor, 1).Scan(&invent.Pekerjaan_selesai)
+
+		sqlStatement = "SELECT COUNT(id_MV) FROM kontrak_vendor WHERE id_MV=? && kontrak_vendor.working_complate=?"
+		_ = con.QueryRow(sqlStatement, invent.Id_Master_Vendor, 0).Scan(&invent.Pekerjaan_berjalan)
+
+		sqlStatement = "SELECT proyek.id_proyek,p.nama_proyek,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) FROM kontrak_vendor JOIN proyek join proyek p on kontrak_vendor.id_proyek = p.id_proyek ORDER BY co ASC "
+
+		rows, err = con.Query(sqlStatement)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
 		}
+
+		for rows.Next() {
+
+			durasi := 0
+
+			err = rows.Scan(&tpf.Id_proyek, &tpf.Nama_proyek,
+				&tpf.Progres, &durasi)
+			if err != nil {
+				return res, err
+			}
+
+			tpf.Progres = (tpf.Progres / durasi) * 100
+			arr_tpf = append(arr_tpf, tpf)
+		}
+
+		invent.Detail_Vendor = arr_tpf
 		if err != nil {
 			return res, err
 		}
@@ -126,9 +148,9 @@ func Delete_Vendor(id_vendor string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlstatement := "SELECT id_master_vendor FROM vendor WHERE proyek_berjalan=? && id_master_vendor=?"
+	sqlstatement := "SELECT id_kontrak FROM kontrak_vendor WHERE id_MV=?"
 
-	_ = con.QueryRow(sqlstatement, 0, id_vendor).Scan(&id_v.Id_vendor)
+	_ = con.QueryRow(sqlstatement, id_vendor).Scan(&id_v.Id_vendor)
 
 	if id_v.Id_vendor == id_vendor {
 

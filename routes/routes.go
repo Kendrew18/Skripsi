@@ -29,6 +29,7 @@ func Init() *echo.Echo {
 	LP := e.Group("/LP")
 	PJDL := e.Group("/PJDL")
 	FT := e.Group("/FT")
+	MV := e.Group("/MV")
 
 	//MAIN
 	//User_Management
@@ -52,12 +53,14 @@ func Init() *echo.Echo {
 	//Edit (bag 2)
 
 	//Kontrak-Vendor
-	//input
+	//Input_Kontrak_Vendor
 	kv.POST("/input-kv", vendor_all.InputKontrakVendor)
-	//read
+	//Read_Kontrak_Vendor
 	kv.GET("/read-kv", vendor_all.ReadKontrakVendor)
-	//delete
+	//Delete_Kontrak_Vendor
 	kv.DELETE("/delete-kontrak", vendor_all.DeleteKontrakVendor)
+	//Pick_Vendor
+	kv.GET("pick-vendor", vendor_all.PickVendor)
 
 	//Pembayaran-Vendor
 	//input
@@ -124,11 +127,11 @@ func Init() *echo.Echo {
 	PJDL.GET("see-calender-all", jadwal.SeeCalenderAll)
 
 	//Laporan
-	//create
+	//Input-Laporan
 	LP.POST("/input-lp", jadwal.InputLaporan)
-	//read
+	//Read-Laporan
 	LP.GET("/read-lp", jadwal.ReadLaporan)
-	//update
+	//Update-Laporan
 	LP.PUT("/update-lp", jadwal.UpdateLaporan)
 	//upload-foto-laporan
 	LP.POST("upload-foto-laporan", jadwal.UploadFotolaporan)
@@ -138,6 +141,16 @@ func Init() *echo.Echo {
 	LP.PUT("/update-status", jadwal.UpdateStatusLaporan)
 	//See Task
 	LP.GET("/see-task", jadwal.SeeTask)
+
+	//Master_Vendor
+	//input-master-vendor
+	MV.POST("/input-master-vendor", vendor_all.InputVendor)
+	//read-master-vendor
+	MV.GET("/read-master-vendor", vendor_all.ReadVendor)
+	//delete-master-vendor
+	MV.DELETE("/delete-master-vendor", vendor_all.DeleteVendor)
+	//edit-master-vendor
+	MV.PUT("/edit-master-vendor", vendor_all.EditVendor)
 
 	//foto
 	//get image foto

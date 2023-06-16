@@ -210,3 +210,45 @@ func Delete_Kontrak_Vendor(id_kontrak string) (tools.Response, error) {
 
 	return res, nil
 }
+
+//Pick_Vendor
+func Pick_Vendor() (tools.Response, error) {
+	var res tools.Response
+	var arr_invent []vendor_all.Pick_Vendor
+	var invent vendor_all.Pick_Vendor
+
+	con := db.CreateCon()
+
+	sqlStatement := "SELECT id_master_vendor, nama_vendor, penkerjaan_vendor FROM vendor ORDER BY co ASC "
+
+	rows, err := con.Query(sqlStatement)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+
+		err = rows.Scan(&invent.Id_Master_Vendor, &invent.Nama_Vendor,
+			&invent.Pekerjaan_Vendor)
+
+		if err != nil {
+			return res, err
+		}
+		arr_invent = append(arr_invent, invent)
+	}
+
+	if arr_invent == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr_invent
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = arr_invent
+	}
+
+	return res, nil
+}
