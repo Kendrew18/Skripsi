@@ -11,4 +11,5 @@ type Read_proyek struct {
 	Penangung_Jawab        string  `json:"penangung_jawab"`
 	Tanggal_mulai_kerja    string  `json:"tanggal_mulai_kerja"`
 	Status_penawaran       int     `json:"status_penawaran"`
+	Status_penjadwalan     int     `json:"status_penjadwalan"`
 }

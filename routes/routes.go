@@ -104,9 +104,9 @@ func Init() *echo.Echo {
 	//Input_Tambahan_Sub_Pekerjaan
 	pen.POST("/input-tambahan-sub-pekerjaan", penawaran.InputTambahanSubPekerjaan)
 	//Input_Tambahan_Pekerjaan_Tambah
-	pen.POST("input-tambahan-pekerjaan-tambah", penawaran.InputTambahanPekerjaanTambah)
+	pen.POST("/input-tambahan-pekerjaan-tambah", penawaran.InputTambahanPekerjaanTambah)
 	//pilih_judul_pekerjaan
-	pen.GET("pilih-judul-pekerjaan", penawaran.PilihJudulPekerjaan)
+	pen.GET("/pilih-judul-pekerjaan", penawaran.PilihJudulPekerjaan)
 
 	//Penjadwalan
 	//Input-Durasi-Task
@@ -124,7 +124,7 @@ func Init() *echo.Echo {
 	//Edit-Durasi-Tanggal
 	PJDL.PUT("/edit-rur-tgl", jadwal.EditDurTgl)
 	//See-Calender-All
-	PJDL.GET("see-calender-all", jadwal.SeeCalenderAll)
+	PJDL.GET("/see-calender-all", jadwal.SeeCalenderAll)
 
 	//Laporan
 	//Input-Laporan

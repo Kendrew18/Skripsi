@@ -149,7 +149,7 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string,
 
 	for i := 0; i < len(temp); i++ {
 
-		sqlStatement = "INSERT INTO penjadwalan (id_sub_pekerjaan,id_penjadwalan,id_proyek,id_penawaran,nama_task) values(?,?,?,?,?)"
+		sqlStatement = "INSERT INTO penjadwalan (id_sub_pekerjaan,id_penjadwalan,id_proyek,id_penawaran,nama_task,status_urutan) values(?,?,?,?,?,?)"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -157,7 +157,7 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string,
 			return res, err
 		}
 
-		_, err = stmt.Exec(idsf[i], id_pj_all[i], id_proyek, id_penawaran, temp[i])
+		_, err = stmt.Exec(idsf[i], id_pj_all[i], id_proyek, id_penawaran, temp[i], 0)
 
 	}
 
@@ -221,7 +221,7 @@ func Input_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan st
 
 	id_jdl := "PJ-" + nm_str_p
 
-	sqlStatement = "INSERT INTO penjadwalan (id_sub_pekerjaan,id_penjadwalan,id_proyek,id_penawaran,nama_task) values(?,?,?,?,?)"
+	sqlStatement = "INSERT INTO penjadwalan (id_sub_pekerjaan,id_penjadwalan,id_proyek,id_penawaran,nama_task,status_urutan) values(?,?,?,?,?,?)"
 
 	stmt, err = con.Prepare(sqlStatement)
 
@@ -229,7 +229,7 @@ func Input_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan st
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_sub, id_jdl, id_proyek, id_penawaran, sub_pekerjaan)
+	_, err = stmt.Exec(id_sub, id_jdl, id_proyek, id_penawaran, sub_pekerjaan, 0)
 
 	stmt.Close()
 

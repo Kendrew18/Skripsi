@@ -111,6 +111,14 @@ func Read_Proyek(id_proyek string) (tools.Response, error) {
 		arr_invent[0].Status_penawaran = 0
 	}
 
+	sqlStatement = "SELECT id_penjadwalan, status_urutan FROM penjadwalan WHERE id_proyek=? limit 1"
+
+	_ = con.QueryRow(sqlStatement, id_proyek).Scan(&tmp, &arr_invent[0].Status_penjadwalan)
+
+	if tmp == "" {
+		arr_invent[0].Status_penjadwalan = 0
+	}
+
 	if arr_invent == nil {
 		res.Status = http.StatusNotFound
 		res.Message = "Not Found"
