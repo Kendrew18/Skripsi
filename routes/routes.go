@@ -110,7 +110,7 @@ func Init() *echo.Echo {
 
 	//Penjadwalan
 	//Input-Durasi-Task
-	PJDL.POST("/input-durasi-task", jadwal.InputDurasitask)
+	PJDL.PUT("/input-durasi-task", jadwal.InputDurasitask)
 	//read task
 	PJDL.GET("/read-task", jadwal.ReadTask)
 	//read_dep
