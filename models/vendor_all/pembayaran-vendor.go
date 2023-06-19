@@ -81,7 +81,7 @@ func Read_Pembayaran_Vendor(id_kontrak string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_PV, nomor_invoice, jumlah_pembayaran, tanggal_pembayaran FROM pembayaran_vendor WHERE id_kontrak=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_PV, nomor_invoice, jumlah_pembayaran, DATE_FORMAT(tanggal_pembayaran, '%d-%m%-%Y') FROM pembayaran_vendor WHERE id_kontrak=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, id_kontrak)
 

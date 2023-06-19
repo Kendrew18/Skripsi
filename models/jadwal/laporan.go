@@ -157,7 +157,7 @@ func Read_Laporan(id_Proyek string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_laporan, laporan, tanggal_laporan,status_laporan,id_penjadwalan FROM laporan WHERE laporan.id_Proyek=? ORDER BY tanggal_laporan desc"
+	sqlStatement := "SELECT id_laporan, laporan, DATE_FORMAT(tanggal_laporan, '%d-%m%-%Y'),status_laporan,id_penjadwalan FROM laporan WHERE laporan.id_Proyek=? ORDER BY tanggal_laporan desc"
 
 	rows, err := con.Query(sqlStatement, id_Proyek)
 

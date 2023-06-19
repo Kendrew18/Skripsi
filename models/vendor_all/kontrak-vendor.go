@@ -114,7 +114,7 @@ func Read_Kontrak_Vendor(id_Proyek string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_kontrak,nama_vendor,penkerjaan_vendor,tanggal_mulai_kontrak,tanggal_berakhir_kontrak,total_nilai_kontrak,nominal_pembayaran,sisa_pembayaran,tanggal_pengiriman,tanggal_pengerjaan_dimulai,tanggal_pengerjaan_berakhir FROM kontrak_vendor JOIN vendor ON kontrak_vendor.id_MV = vendor.id_master_vendor WHERE id_Proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_kontrak,nama_vendor,penkerjaan_vendor,DATE_FORMAT(tanggal_mulai_kontrak, '%d-%m%-%Y'),DATE_FORMAT(tanggal_berakhir_kontrak, '%d-%m%-%Y'),total_nilai_kontrak,nominal_pembayaran,sisa_pembayaran,DATE_FORMAT(tanggal_pengiriman, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_berakhir, '%d-%m%-%Y') FROM kontrak_vendor JOIN vendor ON kontrak_vendor.id_MV = vendor.id_master_vendor WHERE id_Proyek=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, id_Proyek)
 

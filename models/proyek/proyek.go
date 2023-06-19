@@ -81,7 +81,7 @@ func Read_Proyek(id_proyek string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_proyek, nama_proyek, `nama_client/perusahaan`, jenis_gedung, alamat, luas_tanah, jumlah_lantai, penanggungjawab, tanggal_mulai_kerja FROM proyek WHERE status_proyek=? && id_proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_proyek, nama_proyek, `nama_client/perusahaan`, jenis_gedung, alamat, luas_tanah, jumlah_lantai, penanggungjawab, DATE_FORMAT(tanggal_mulai_kerja, '%d-%m%-%Y') FROM proyek WHERE status_proyek=? && id_proyek=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, 0, id_proyek)
 

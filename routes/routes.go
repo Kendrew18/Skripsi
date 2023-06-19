@@ -2,6 +2,7 @@ package routes
 
 import (
 	controllers "Skripsi/controllers"
+	"Skripsi/controllers/budgeting"
 	"Skripsi/controllers/jadwal"
 	"Skripsi/controllers/penawaran"
 	"Skripsi/controllers/proyek"
@@ -30,6 +31,7 @@ func Init() *echo.Echo {
 	PJDL := e.Group("/PJDL")
 	FT := e.Group("/FT")
 	MV := e.Group("/MV")
+	BU := e.Group("/BU")
 
 	//MAIN
 	//User_Management
@@ -156,12 +158,17 @@ func Init() *echo.Echo {
 	//get image foto
 	FT.GET("/read-foto", vendor_all.ReadFoto)
 
-	//PENDUKUNG//
-
 	//Budgeting
-	//input
-	//update
-	//read
+	//Input_Realisasi
+	BU.POST("/input-realisasi", budgeting.InputRealisasi)
+	//Read_Realisasi
+	BU.GET("/read-realisasi", budgeting.ReadRealisasi)
+	//Read_Realisasi
+	BU.DELETE("/delete-realisasi", budgeting.DeleteRealisasi)
+	//Read_Realisasi
+	BU.PUT("/edit-realisasi", budgeting.UpdateRealisasi)
+	//Read_Budgeting
+	BU.GET("/read-budgeting", budgeting.ReadBudgeting)
 
 	//kwitansi-pembayaran
 

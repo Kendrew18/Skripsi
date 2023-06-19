@@ -42,7 +42,7 @@ func UpdateLaporan(c echo.Context) error {
 	id_laporan := c.FormValue("id_laporan")
 	laporan := c.FormValue("laporan")
 	tanggal_laporan := c.FormValue("tanggal_laporan")
-	id_penjadwalan := c.FormValue("id-penjadwalan")
+	id_penjadwalan := c.FormValue("id_penjadwalan") //ganti
 	check := c.FormValue("check")
 
 	result, err := jadwal.Update_Laporan(id_laporan, laporan, tanggal_laporan, id_penjadwalan, check)

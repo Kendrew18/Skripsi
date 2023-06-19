@@ -13,8 +13,13 @@ func InputProyek(c echo.Context) error {
 	jumlah_lantai := c.FormValue("jumlah_lantai")
 	luas_tanah := c.FormValue("luas_tanah")
 	nama_penanggungjawab_proyek := c.FormValue("nama")
+	nama_client := c.FormValue("nama_client")
+	jenis_gedung := c.FormValue("jenis_gedung")
+	alamat := c.FormValue("alamat")
+	tanggal_mulai_kerja := c.FormValue("tanggal_mulai_kerja")
 
-	result, err := proyek.Input_Proyek(id_user, nama_proyek, jumlah_lantai, luas_tanah, nama_penanggungjawab_proyek)
+	result, err := proyek.Input_Proyek(id_user, nama_proyek, nama_client, jenis_gedung,
+		alamat, luas_tanah, jumlah_lantai, nama_penanggungjawab_proyek, tanggal_mulai_kerja)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
