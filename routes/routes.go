@@ -6,6 +6,7 @@ import (
 	"Skripsi/controllers/jadwal"
 	"Skripsi/controllers/penawaran"
 	"Skripsi/controllers/proyek"
+	"Skripsi/controllers/tagihan"
 	"Skripsi/controllers/vendor_all"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -32,6 +33,7 @@ func Init() *echo.Echo {
 	FT := e.Group("/FT")
 	MV := e.Group("/MV")
 	BU := e.Group("/BU")
+	TG := e.Group("/TG")
 
 	//MAIN
 	//User_Management
@@ -170,7 +172,17 @@ func Init() *echo.Echo {
 	//Read_Budgeting
 	BU.GET("/read-budgeting", budgeting.ReadBudgeting)
 
-	//kwitansi-pembayaran
+	//Tagihan
+	//Input_Tagihan
+	TG.POST("/input-tagihan", tagihan.InputTagihan)
+	//Read_Realisasi
+	TG.GET("/read-realisasi", tagihan.ReadRealisasi)
+	//Delete_Tagihan
+	TG.DELETE("/delete-tagihan", tagihan.DeleteTagihan)
+	//See_Judul
+	TG.GET("/see-judul", tagihan.SeeJudul)
+	//See_Sub_Pekerjaan
+	TG.GET("/see-sub-pekerjaan", tagihan.SeeSubPekerjaan)
 
 	//Analisa Budgeting(perkiraan budget mingguan)
 	//Read

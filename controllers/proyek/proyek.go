@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-//create
+//Input_Proyek
 func InputProyek(c echo.Context) error {
 	id_user := c.FormValue("id_user")
 	nama_proyek := c.FormValue("nama_proyek")
