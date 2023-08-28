@@ -2,38 +2,13 @@ package proyek
 
 import (
 	"Skripsi/db"
-	str "Skripsi/struct_all"
 	"Skripsi/struct_all/proyek"
 	"Skripsi/tools"
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 )
-
-//Generate-Id-Proyek
-func Generate_Id_Proyek() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_proyek FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_proyek=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
 
 //Input-Proyek
 func Input_Proyek(id_user string, nama_proyek string, nama_client string, jenis_gedung string,
@@ -44,25 +19,38 @@ func Input_Proyek(id_user string, nama_proyek string, nama_client string, jenis_
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Proyek()
+	nm_str := 0
 
-	nm_str := strconv.Itoa(nm)
+	Sqlstatement := "SELECT co FROM proyek ORDER BY co DESC Limit 1"
 
-	kode_proyek := "PRYK-" + nm_str
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
+
+	nm_str = nm_str + 1
+
+	kode_proyek := "PRYK-" + strconv.Itoa(nm_str)
 
 	jmlt, _ := strconv.Atoi(jumlah_lantai)
 	luas_tanah_dbl, _ := strconv.ParseFloat(luas_tanah, 64)
 
-	sqlStatement := "INSERT INTO proyek (id_proyek,id_user,nama_proyek,`nama_client/perusahaan`,alamat,jenis_gedung,luas_tanah,jumlah_lantai,penanggungjawab, tanggal_mulai_kerja) values(?,?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO proyek (co,id_proyek,id_user,nama_proyek,client,alamat,jenis_gedung,luas_tanah,jumlah_lantai,penanggungjawab, tanggal_mulai_kerja,status_proyek) values(?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
+
+	fmt.Println(err)
 
 	if err != nil {
 		return res, err
 	}
 
-	_, err = stmt.Exec(kode_proyek, id_user, nama_proyek, nama_client, alamat, jenis_gedung,
-		luas_tanah_dbl, jmlt, nama_penanggungjawab_proyek, tanggal_mulai_kerja, 0)
+	date, _ := time.Parse("02-01-2006", tanggal_mulai_kerja)
+	date_sql := date.Format("2006-01-02")
+
+	_, err = stmt.Exec(nm_str, kode_proyek, id_user, nama_proyek, nama_client, alamat, jenis_gedung,
+		luas_tanah_dbl, jmlt, nama_penanggungjawab_proyek, date_sql, 0)
+
+	if err != nil {
+		return res, err
+	}
 
 	stmt.Close()
 
@@ -81,7 +69,7 @@ func Read_Proyek(id_proyek string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_proyek, nama_proyek, `nama_client/perusahaan`, jenis_gedung, alamat, luas_tanah, jumlah_lantai, penanggungjawab, DATE_FORMAT(tanggal_mulai_kerja, '%d-%m%-%Y') FROM proyek WHERE status_proyek=? && id_proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_proyek, nama_proyek, client, jenis_gedung, alamat, luas_tanah, jumlah_lantai, penanggungjawab, DATE_FORMAT(tanggal_mulai_kerja, '%d-%m%-%Y') FROM proyek WHERE status_proyek=? && id_proyek=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, 0, id_proyek)
 

@@ -43,16 +43,17 @@ func Init() *echo.Echo {
 	//Create
 	pryk.POST("/input-proyek", proyek.InputProyek)
 	//Read Nama Proyek
-	pryk.GET("/Read-Nama", proyek.ReadNamaProyek)
+	pryk.GET("/read-nama", proyek.ReadNamaProyek)
 	//Read Detail
-	pryk.GET("/Read-proyek", proyek.ReadProyek)
+	pryk.GET("/read-proyek", proyek.ReadProyek)
 	//Finish (bag 2)
 	pryk.PUT("/finish-proyek", proyek.FinishProyek)
+
 	//History Proyek (bag 2)
 	//Read Nama Proyek
-	pryk.GET("/Read-Nama-his", proyek.ReadNamaProyekHistory)
-	//Read Detail
-	pryk.GET("/Read-proyek-his", proyek.ReadHistory)
+	pryk.GET("/read-nama-his", proyek.ReadNamaProyekHistory)
+	//Read detail history
+	pryk.GET("/read-proyek-his", proyek.ReadHistory)
 
 	//Edit (bag 2)
 

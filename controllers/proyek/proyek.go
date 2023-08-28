@@ -12,7 +12,7 @@ func InputProyek(c echo.Context) error {
 	nama_proyek := c.FormValue("nama_proyek")
 	jumlah_lantai := c.FormValue("jumlah_lantai")
 	luas_tanah := c.FormValue("luas_tanah")
-	nama_penanggungjawab_proyek := c.FormValue("nama")
+	nama_penanggungjawab_proyek := c.FormValue("nama_penanggungjawab")
 	nama_client := c.FormValue("nama_client")
 	jenis_gedung := c.FormValue("jenis_gedung")
 	alamat := c.FormValue("alamat")

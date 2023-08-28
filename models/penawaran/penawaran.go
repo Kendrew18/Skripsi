@@ -39,6 +39,10 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string,
 
 	_, err = stmt.Exec(nm_str, id_penawaran, id_proyek, judul, 0, 0)
 
+	if err != nil {
+		return res, err
+	}
+
 	//input sub pekerjaan dan input penjadwalan
 	var total int64
 	total = 0
@@ -100,8 +104,11 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string,
 		sbt_i := int64(math.Round(ttl[i]*100) / 100)
 		total += sbt_i
 
-		_, err = stmt.Exec(nm_str_DP, id_detail_penawaran, Sub_pekerjaan[i], id_penawaran, Jumlah, Harga, Satuan, sbt_i, Catatan[i])
+		_, err = stmt.Exec(nm_str_DP, id_detail_penawaran, Sub_pekerjaan[i], id_penawaran, Jumlah[i], Harga[i], Satuan[i], sbt_i, Catatan[i])
 
+		if err != nil {
+			return res, err
+		}
 	}
 
 	sqlStatement = "UPDATE penawaran SET total=? WHERE id_penawaran=?"
