@@ -205,7 +205,8 @@ func Read_Laporan_Vendor(id_Proyek string) (tools.Response, error) {
 }
 
 //Update-laporan-Vendor (done)
-func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, tanggal_laporan string, id_kontrak string, check_box string) (tools.Response, error) {
+func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, tanggal_laporan string,
+	id_kontrak string, check_box string) (tools.Response, error) {
 
 	var res tools.Response
 	var st jadwal.Status_laporan
@@ -568,6 +569,64 @@ func See_Task_Vendor(tanggal_laporan string) (tools.Response, error) {
 		res.Status = http.StatusOK
 		res.Message = "Sukses"
 		res.Data = arr_rt_lp
+	}
+
+	return res, nil
+}
+
+//delete laporan vendor (done)
+func Delete_laporan_Vendor(id_laporan_vendor string) (tools.Response, error) {
+	var res tools.Response
+	var read_dt_lp vendor_all.Read_Laporan_Vendor_String
+	var rp vendor_all.Progress_Vendor
+
+	con := db.CreateCon()
+
+	temp := ""
+
+	sqlStatement := "SELECT id_kontrak,check_box FROM laporan_vendor WHERE id_laporan_vendor=?"
+
+	_ = con.QueryRow(sqlStatement, id_laporan_vendor).Scan(&read_dt_lp.Id_Kontrak_Vendor, &temp)
+
+	id := tools.String_Separator_To_String(read_dt_lp.Id_Kontrak_Vendor)
+
+	for i := 0; i < len(id); i++ {
+		sqlStatement = "SELECT id_kontrak,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_complate FROM kontrak_vendor WHERE id_kontrak=?"
+
+		_ = con.QueryRow(sqlStatement, id[i]).Scan(&rp.Id_kontrak,
+			&rp.Working_Progess, rp.Durasi, rp.Working_Complate)
+
+		if rp.Working_Complate == 1 {
+			rp.Working_Complate = 0
+		} else if rp.Working_Complate == 0 {
+			rp.Working_Progess--
+		}
+	}
+
+	sqlstatement := "DELETE FROM laporan_vendor WHERE id_laporan_vendor=?"
+
+	stmt, err := con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	result, err := stmt.Exec(id_laporan_vendor)
+
+	if err != nil {
+		return res, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Suksess"
+	res.Data = map[string]int64{
+		"rows": rowsAffected,
 	}
 
 	return res, nil

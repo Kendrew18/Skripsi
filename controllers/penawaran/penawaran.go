@@ -38,9 +38,12 @@ func InputSubPekerjaan(c echo.Context) error {
 	harga := c.FormValue("harga")
 	sub_total := c.FormValue("sub_total")
 
+	jmlh, _ := strconv.ParseFloat(jumlah, 64)
+	hrg, _ := strconv.ParseInt(harga, 10, 64)
+
 	sbt_f, _ := strconv.ParseFloat(sub_total, 64)
 
-	result, err := penawaran.Input_Sub_Pekerjaan(id_proyek, id_penawaran, sub_pekerjaan, catatan, jumlah, satuan, harga, sbt_f)
+	result, err := penawaran.Input_Sub_Pekerjaan(id_proyek, id_penawaran, sub_pekerjaan, catatan, jmlh, satuan, hrg, sbt_f)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -98,11 +101,11 @@ func UpdateItemPenawaran(c echo.Context) error {
 	jumlah := c.FormValue("jumlah")
 	satuan := c.FormValue("satuan")
 	harga := c.FormValue("harga")
-	total := c.FormValue("total")
+	sub_total := c.FormValue("sub_total")
 
 	jm, _ := strconv.ParseFloat(jumlah, 64)
-	hg, _ := strconv.Atoi(harga)
-	tt, _ := strconv.ParseInt(total, 10, 64)
+	hg, _ := strconv.ParseInt(harga, 10, 64)
+	tt, _ := strconv.ParseFloat(sub_total, 64)
 
 	result, err := penawaran.Update_Item_Penawaran(id_penawaran, id_sub_pekerjaan, sub_pekerjaan, catatan, jm, satuan, hg, tt)
 
@@ -130,8 +133,11 @@ func InputTambahanSubPekerjaan(c echo.Context) error {
 
 	sbt_f, _ := strconv.ParseFloat(sub_total, 64)
 
-	result, err := penawaran.Input_Tambahan_Sub_Pekerjaan(id_proyek, id_penawaran, sub_pekerjaan, catatan, jumlah,
-		satuan, harga, sbt_f, tanggal_pekerjaan_dimulai, dr)
+	jmlh, _ := strconv.ParseFloat(jumlah, 64)
+	hrg, _ := strconv.ParseInt(harga, 10, 64)
+
+	result, err := penawaran.Input_Tambahan_Sub_Pekerjaan(id_proyek, id_penawaran, sub_pekerjaan, catatan, jmlh,
+		satuan, hrg, sbt_f, tanggal_pekerjaan_dimulai, dr)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

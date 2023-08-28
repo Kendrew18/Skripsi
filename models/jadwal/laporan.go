@@ -578,3 +578,61 @@ func See_Task(tanggal_laporan string) (tools.Response, error) {
 
 	return res, nil
 }
+
+//Delete-laporan
+func Delete_Laporan(id_laporan string) (tools.Response, error) {
+	var res tools.Response
+	var read_dt_lp jadwal.Read_Laporan_String
+	var rp jadwal.Progress
+
+	con := db.CreateCon()
+
+	temp := ""
+
+	sqlStatement := "SELECT id_penjadwalan,check_box FROM laporan WHERE id_laporan=?"
+
+	_ = con.QueryRow(sqlStatement, id_laporan).Scan(&read_dt_lp.Id_Penjadwalan, &temp)
+
+	id := tools.String_Separator_To_String(read_dt_lp.Id_Penjadwalan)
+
+	for i := 0; i < len(id); i++ {
+		sqlStatement = "SELECT id_penjadwalan,progress,durasi,complate FROM penjadwalan WHERE id_penjadwalan=?"
+
+		_ = con.QueryRow(sqlStatement, id[i]).Scan(&rp.Id_penjadwalan,
+			&rp.Progress, rp.Durasi, rp.Complate)
+
+		if rp.Complate == 1 {
+			rp.Complate = 0
+		} else if rp.Complate == 0 {
+			rp.Progress--
+		}
+	}
+
+	sqlstatement := "DELETE FROM laporan WHERE id_laporan=?"
+
+	stmt, err := con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	result, err := stmt.Exec(id_laporan)
+
+	if err != nil {
+		return res, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Suksess"
+	res.Data = map[string]int64{
+		"rows": rowsAffected,
+	}
+
+	return res, nil
+}

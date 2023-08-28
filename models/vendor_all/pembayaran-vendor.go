@@ -227,3 +227,84 @@ func Read_Foto_Pembayaran_vendor(id_pembayaran_vendor string) (tools.Response, e
 
 	return res, nil
 }
+
+func Delete_Pembayaran_Vendor(id_pembayaran_vendor string) (tools.Response, error) {
+	var res tools.Response
+	var obj vendor_all.Read_Pembayaran_Vendor
+
+	con := db.CreateCon()
+
+	temp := ""
+
+	sqlStatement := "SELECT id_PV,jumlah_pembayaran,id_kontrak FROM pembayaran_vendor WHERE id_PV=? "
+
+	err := con.QueryRow(sqlStatement, id_pembayaran_vendor).Scan(&obj.Id_PV,
+		&obj.Jumlah_Pembayaran, &temp)
+
+	if err != nil {
+		return res, err
+	}
+
+	if obj.Id_PV != "" {
+
+		temp_sisa_pembayaran := int64(0)
+
+		sqlStatement = "SELECT sisa_pembayaran FROM kontrak_vendor WHERE id_kontrak=? "
+
+		err = con.QueryRow(sqlStatement, temp).Scan(&temp_sisa_pembayaran)
+
+		temp_sisa_pembayaran = temp_sisa_pembayaran + obj.Jumlah_Pembayaran
+
+		sqlstatement := "UPDATE kontrak_vendor SET sisa_pembayaran=? WHERE id_kontrak=?"
+
+		stmt, err := con.Prepare(sqlstatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		result, err := stmt.Exec(temp_sisa_pembayaran, temp)
+
+		if err != nil {
+			return res, err
+		}
+
+		_, err = result.RowsAffected()
+
+		if err != nil {
+			return res, err
+		}
+
+		sqlstatement = "DELETE FROM pembayaran_vendor WHERE id_PV=?"
+
+		stmt, err = con.Prepare(sqlstatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		result, err = stmt.Exec(obj.Id_PV)
+
+		if err != nil {
+			return res, err
+		}
+
+		rowsAffected, err := result.RowsAffected()
+
+		if err != nil {
+			return res, err
+		}
+
+		res.Status = http.StatusOK
+		res.Message = "Suksess"
+		res.Data = map[string]int64{
+			"rows": rowsAffected,
+		}
+
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Tidak bisa di hapus"
+	}
+
+	return res, nil
+}
