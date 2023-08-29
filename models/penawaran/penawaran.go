@@ -4,6 +4,7 @@ import (
 	"Skripsi/db"
 	"Skripsi/struct_all/penawaran"
 	"Skripsi/tools"
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -293,7 +294,7 @@ func Update_Status_Penawaran(id_proyek string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlstatement := " UPDATE penawaran SET status_penawaran=? WHERE id_proyek=?"
+	sqlstatement := "UPDATE penawaran SET status_penawaran=? WHERE id_proyek=?"
 
 	stmt, err := con.Prepare(sqlstatement)
 
@@ -465,6 +466,10 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 
 	_, err = stmt.Exec(nm_str_DP, id_detail_penawaran, sub_pekerjaan, id_penawaran, jumlah, harga, satuan, sbt_i, catatan)
 
+	if err != nil {
+		return res, err
+	}
+
 	//update total
 	var temp penawaran.Read_Detail_Penawaran
 
@@ -513,12 +518,14 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 	date, _ := time.Parse("02-01-2006", tanggal_pekerjaan_mulai)
 	date_sql := date.Format("2006-01-02")
 
-	date_a, _ := time.Parse("2006-01-02", tanggal_pekerjaan_mulai)
+	date_a, _ := time.Parse("02-01-2006", tanggal_pekerjaan_mulai)
 	date_awal := date_a.AddDate(0, 0, durasi-1)
+
+	fmt.Println(date_a)
 
 	tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
 
-	sqlStatement = "INSERT INTO penjadwalan (id_penjadwalan,id_proyek,id_penawaran,nama_task,durasi,tanggal_dimulai,tanggal_selesai) values(?,?,?,?,?,?,?,?)"
+	sqlStatement = "INSERT INTO penjadwalan (id_penjadwalan,id_proyek,id_penawaran,nama_task,durasi,tanggal_dimulai,tanggal_selesai,status_urutan) values(?,?,?,?,?,?,?,?)"
 
 	stmt, err = con.Prepare(sqlStatement)
 
@@ -526,7 +533,7 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, durasi, date_sql, tanggal_Pekerjaan_Selesai)
+	_, err = stmt.Exec(id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, durasi, date_sql, tanggal_Pekerjaan_Selesai, -1)
 
 	stmt.Close()
 
@@ -569,6 +576,9 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 	var total int64
 	total = 0
 
+	fmt.Println(tanggal_mulai)
+	fmt.Println(durasi)
+
 	Sub_pekerjaan := tools.String_Separator_To_String(sub_pekerjaan)
 	Catatan := tools.String_Separator_To_String(catatan)
 	Jumlah := tools.String_Separator_To_float64(jumlah)
@@ -591,15 +601,17 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 
 		id_penjadwalan := "PJD-" + strconv.Itoa(nm_str)
 
+		fmt.Println(tm[i])
+
 		date, _ := time.Parse("02-01-2006", tm[i])
 		date_sql := date.Format("2006-01-02")
 
-		date_a, _ := time.Parse("2006-01-02", tm[i])
+		date_a, _ := time.Parse("02-01-2006", tm[i])
 		date_awal := date_a.AddDate(0, 0, dur[i]-1)
 
 		tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
 
-		sqlStatement = "INSERT INTO penjadwalan (id_penjadwalan,id_proyek,id_penawaran,nama_task,tanggal_dimulai,tanggal_selesai,durasi) values(?,?,?,?,?,?,?)"
+		sqlStatement = "INSERT INTO penjadwalan (id_penjadwalan,id_proyek,id_penawaran,nama_task,tanggal_dimulai,tanggal_selesai,durasi,status_urutan) values(?,?,?,?,?,?,?,?)"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -608,7 +620,11 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 		}
 
 		_, err = stmt.Exec(id_penjadwalan, id_proyek, id_penawaran, Sub_pekerjaan[i],
-			date_sql, tanggal_Pekerjaan_Selesai, dur[i])
+			date_sql, tanggal_Pekerjaan_Selesai, dur[i], -1)
+
+		if err != nil {
+			return res, err
+		}
 
 		//input sub pekerjaan
 		nm_str_DP := 0
@@ -632,7 +648,7 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 		sbt_i := int64(math.Round(ttl[i]*100) / 100)
 		total += sbt_i
 
-		_, err = stmt.Exec(nm_str_DP, id_detail_penawaran, Sub_pekerjaan[i], id_penawaran, Jumlah, Harga, Satuan, sbt_i, Catatan[i])
+		_, err = stmt.Exec(nm_str_DP, id_detail_penawaran, Sub_pekerjaan[i], id_penawaran, Jumlah[i], Harga[i], Satuan[i], sbt_i, Catatan[i])
 
 	}
 

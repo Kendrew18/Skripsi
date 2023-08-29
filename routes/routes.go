@@ -127,7 +127,7 @@ func Init() *echo.Echo {
 	//Read_Jadwal
 	PJDL.GET("/read-jadwal", jadwal.ReadJadwal)
 	//Edit-Durasi-Tanggal
-	PJDL.PUT("/edit-rur-tgl", jadwal.EditDurTgl)
+	PJDL.PUT("/edit-dur-tgl", jadwal.EditDurTgl)
 	//See-Calender-All
 	PJDL.GET("/see-calender-all", jadwal.SeeCalenderAll)
 

@@ -191,7 +191,7 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_penjadwalan,durasi,dependencies FROM penjadwalan WHERE id_proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_penjadwalan,durasi,dependencies FROM penjadwalan WHERE id_proyek=? && penjadwalan.status_urutan!=-1 ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, id_proyek)
 

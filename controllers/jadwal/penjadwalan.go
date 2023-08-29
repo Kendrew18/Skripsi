@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-//input task penjadwalan
+//input durasi (done)
 func InputDurasitask(c echo.Context) error {
 	id_penjadwalan := c.FormValue("id_penjadwalan")
 	waktu_optimis := c.FormValue("waktu_optimis")
