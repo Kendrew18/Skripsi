@@ -51,27 +51,27 @@ func Input_Durasi_task(Id_penjadwalan string, waktu_optimis float64,
 func Read_Task(id_proyek string) (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []jadwal.Read_Task
-	var invent jadwal.Read_Task
-	var in jadwal.Sub_Task
 
 	con := db.CreateCon()
 
 	sqlStatement := "SELECT id_penawaran,judul FROM penawaran WHERE id_proyek=?"
 
-	rows, err := con.Query(sqlStatement, id_proyek)
+	rows2, err := con.Query(sqlStatement, id_proyek)
 
-	defer rows.Close()
+	defer rows2.Close()
 
 	if err != nil {
 		return res, err
 	}
 
-	for rows.Next() {
-		err = rows.Scan(&invent.Id_penawaran, &invent.Judul_penawaran)
+	for rows2.Next() {
+		var invent jadwal.Read_Task
+		var in jadwal.Sub_Task
+		err = rows2.Scan(&invent.Id_penawaran, &invent.Judul_penawaran)
 
-		sqlStatement = "SELECT id_penjadwalan,nama_task,durasi,dependencies FROM penjadwalan WHERE id_proyek=? && id_penawaran=?"
+		sqlStatement = "SELECT id_penjadwalan,nama_task,durasi,dependencies FROM penjadwalan WHERE id_proyek=? && id_penawaran=? && penjadwalan.status_urutan!=-1"
 
-		rows, err = con.Query(sqlStatement, id_proyek, invent.Id_penawaran)
+		rows, err := con.Query(sqlStatement, id_proyek, invent.Id_penawaran)
 
 		defer rows.Close()
 
@@ -209,7 +209,7 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 		arr_invent = append(arr_invent, invent)
 	}
 
-	fmt.Println(arr_invent)
+	fmt.Println("AWAL:", arr_invent)
 
 	var arr_invent_fn []jadwal.Gene_JDL
 
@@ -227,7 +227,7 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 	}
 
 	arr_invent = arr_invent_blm
-	fmt.Println(arr_invent)
+	fmt.Println("seng gak onok dep:", arr_invent)
 	urt++
 
 	co := 0
@@ -390,7 +390,7 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 
 	}
 
-	fmt.Println(arr_invent_fn)
+	fmt.Println("Println:", arr_invent_fn)
 
 	for j := 0; j < len(arr_invent_fn); j++ {
 
@@ -399,12 +399,13 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 		stmt, err := con.Prepare(sqlStatement)
 
 		if err != nil {
+			fmt.Println(err)
 			return res, err
 		}
 
 		_, err = stmt.Exec(arr_invent_fn[j].Es, arr_invent_fn[j].Ls, arr_invent_fn[j].Ef, arr_invent_fn[j].Lf,
 			arr_invent_fn[j].Tf, arr_invent_fn[j].Ff, arr_invent_fn[j].Tanggal_mulai,
-			arr_invent_fn[j].Tanggal_berakhir, arr_invent_fn[j].Status_urutan, arr_invent_fn[j].Id, 0)
+			arr_invent_fn[j].Tanggal_berakhir, arr_invent_fn[j].Status_urutan, 0, arr_invent_fn[j].Id)
 
 		if err != nil {
 			return res, err
@@ -430,27 +431,27 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 func Read_Jadwal(id_proyek string) (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []jadwal.Read_Task_Jadwal
-	var invent jadwal.Read_Task_Jadwal
-	var in jadwal.Sub_Task_Jadwal
 
 	con := db.CreateCon()
 
 	sqlStatement := "SELECT id_penawaran,judul FROM penawaran WHERE id_proyek=?"
 
-	rows, err := con.Query(sqlStatement, id_proyek)
+	rows2, err := con.Query(sqlStatement, id_proyek)
 
-	defer rows.Close()
+	defer rows2.Close()
 
 	if err != nil {
 		return res, err
 	}
 
-	for rows.Next() {
-		err = rows.Scan(&invent.Id_penawaran, &invent.Judul_penawaran)
+	for rows2.Next() {
+		var invent jadwal.Read_Task_Jadwal
+		var in jadwal.Sub_Task_Jadwal
 
+		err = rows2.Scan(&invent.Id_penawaran, &invent.Judul_penawaran)
 		sqlStatement = "SELECT id_penjadwalan,nama_task,DATE_FORMAT(tanggal_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_selesai, '%d-%m%-%Y') FROM penjadwalan WHERE id_proyek=? && id_penawaran=?"
 
-		rows, err = con.Query(sqlStatement, id_proyek, invent.Id_penawaran)
+		rows, err := con.Query(sqlStatement, id_proyek, invent.Id_penawaran)
 
 		defer rows.Close()
 
@@ -466,7 +467,6 @@ func Read_Jadwal(id_proyek string) (tools.Response, error) {
 			}
 			invent.Sub_task = append(invent.Sub_task, in)
 		}
-
 		if err != nil {
 			return res, err
 		}
@@ -497,7 +497,7 @@ func Edit_Dur_Tgl(id_penjadwalan string, tanggal_mulai string, durasi int) (tool
 	date, _ := time.Parse("02-01-2006", tanggal_mulai)
 	date_sql := date.Format("2006-01-02")
 
-	date_a, _ := time.Parse("2006-01-02", tanggal_mulai)
+	date_a, _ := time.Parse("02-01-2006", tanggal_mulai)
 	date_awal := date_a.AddDate(0, 0, durasi-1)
 
 	tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
