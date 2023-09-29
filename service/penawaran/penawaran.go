@@ -1,9 +1,9 @@
 package penawaran
 
 import (
-	"Skripsi/db"
-	"Skripsi/struct_all/penawaran"
-	"Skripsi/tools"
+	"Skripsi/config/db"
+	"Skripsi/models/penawaran"
+	tools2 "Skripsi/service/tools"
 	"fmt"
 	"math"
 	"net/http"
@@ -12,10 +12,8 @@ import (
 )
 
 //Input Penawaran
-func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string,
-	catatan string, jumlah string, satuan string,
-	harga string, sub_total string) (tools.Response, error) {
-	var res tools.Response
+func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string, catatan string, jumlah string, satuan string, harga string, sub_total string) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -48,12 +46,12 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string,
 	var total int64
 	total = 0
 
-	Sub_pekerjaan := tools.String_Separator_To_String(sub_pekerjaan)
-	Catatan := tools.String_Separator_To_String(catatan)
-	Jumlah := tools.String_Separator_To_float64(jumlah)
-	Satuan := tools.String_Separator_To_String(satuan)
-	Harga := tools.String_Separator_To_Int64(harga)
-	ttl := tools.String_Separator_To_float64(sub_total)
+	Sub_pekerjaan := tools2.String_Separator_To_String(sub_pekerjaan)
+	Catatan := tools2.String_Separator_To_String(catatan)
+	Jumlah := tools2.String_Separator_To_float64(jumlah)
+	Satuan := tools2.String_Separator_To_String(satuan)
+	Harga := tools2.String_Separator_To_Int64(harga)
+	ttl := tools2.String_Separator_To_float64(sub_total)
 
 	for i := 0; i < len(ttl); i++ {
 		sbt_i := int64(math.Round(ttl[i]*100) / 100)
@@ -127,10 +125,8 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string,
 }
 
 //input_sub_pekerjaan
-func Input_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan string, catatan string,
-	jumlah float64, satuan string, harga int64,
-	sub_total float64) (tools.Response, error) {
-	var res tools.Response
+func Input_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan string, catatan string, jumlah float64, satuan string, harga int64, sub_total float64) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -221,8 +217,8 @@ func Input_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan st
 }
 
 //Read Penawaran
-func Read_Penawaran(id_Proyek string) (tools.Response, error) {
-	var res tools.Response
+func Read_Penawaran(id_Proyek string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []penawaran.Read_Penawaran
 	var invent penawaran.Read_Penawaran
 
@@ -289,8 +285,8 @@ func Read_Penawaran(id_Proyek string) (tools.Response, error) {
 }
 
 //Update status Penawaran
-func Update_Status_Penawaran(id_proyek string) (tools.Response, error) {
-	var res tools.Response
+func Update_Status_Penawaran(id_proyek string) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -320,8 +316,8 @@ func Update_Status_Penawaran(id_proyek string) (tools.Response, error) {
 }
 
 //Update judul Penawaran
-func Update_Judul_Penawaran(id_penawaran string, judul string) (tools.Response, error) {
-	var res tools.Response
+func Update_Judul_Penawaran(id_penawaran string, judul string) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -355,9 +351,8 @@ func Update_Judul_Penawaran(id_penawaran string, judul string) (tools.Response, 
 }
 
 //update item penawaran
-func Update_Item_Penawaran(id_penawaran string, id_sub_pekerjaan string, sub_pekerjaan string,
-	catatan string, jumlah float64, satuan string, harga int64, sub_total float64) (tools.Response, error) {
-	var res tools.Response
+func Update_Item_Penawaran(id_penawaran string, id_sub_pekerjaan string, sub_pekerjaan string, catatan string, jumlah float64, satuan string, harga int64, sub_total float64) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -436,10 +431,8 @@ func Update_Item_Penawaran(id_penawaran string, id_sub_pekerjaan string, sub_pek
 }
 
 //Input tambahan sub pekerjaan
-func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan string,
-	catatan string, jumlah float64, satuan string, harga int64, sub_total float64,
-	tanggal_pekerjaan_mulai string, durasi int) (tools.Response, error) {
-	var res tools.Response
+func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan string, catatan string, jumlah float64, satuan string, harga int64, sub_total float64, tanggal_pekerjaan_mulai string, durasi int) (tools2.Response, error) {
+	var res tools2.Response
 
 	//insert detail pekerjaan
 	con := db.CreateCon()
@@ -525,7 +518,7 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 
 	tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
 
-	sqlStatement = "INSERT INTO penjadwalan (id_penjadwalan,id_proyek,id_penawaran,nama_task,durasi,tanggal_dimulai,tanggal_selesai,status_urutan) values(?,?,?,?,?,?,?,?)"
+	sqlStatement = "INSERT INTO penjadwalan (id_penjadwalan,id_proyek,id_penawaran,nama_task,durasi,tanggal_dimulai,tanggal_selesai,status_urutan,progress) values(?,?,?,?,?,?,?,?,?)"
 
 	stmt, err = con.Prepare(sqlStatement)
 
@@ -533,7 +526,7 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, durasi, date_sql, tanggal_Pekerjaan_Selesai, -1)
+	_, err = stmt.Exec(id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, durasi, date_sql, tanggal_Pekerjaan_Selesai, -1, 0)
 
 	stmt.Close()
 
@@ -544,10 +537,8 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 }
 
 //input tambahan pekerjaan tambah
-func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerjaan string,
-	catatan string, jumlah string, satuan string, harga string, sub_total string,
-	tanggal_mulai string, durasi string) (tools.Response, error) {
-	var res tools.Response
+func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerjaan string, catatan string, jumlah string, satuan string, harga string, sub_total string, tanggal_mulai string, durasi string) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -579,14 +570,14 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 	fmt.Println(tanggal_mulai)
 	fmt.Println(durasi)
 
-	Sub_pekerjaan := tools.String_Separator_To_String(sub_pekerjaan)
-	Catatan := tools.String_Separator_To_String(catatan)
-	Jumlah := tools.String_Separator_To_float64(jumlah)
-	Satuan := tools.String_Separator_To_String(satuan)
-	Harga := tools.String_Separator_To_Int64(harga)
-	ttl := tools.String_Separator_To_float64(sub_total)
-	tm := tools.String_Separator_To_String(tanggal_mulai)
-	dur := tools.String_Separator_To_Int(durasi)
+	Sub_pekerjaan := tools2.String_Separator_To_String(sub_pekerjaan)
+	Catatan := tools2.String_Separator_To_String(catatan)
+	Jumlah := tools2.String_Separator_To_float64(jumlah)
+	Satuan := tools2.String_Separator_To_String(satuan)
+	Harga := tools2.String_Separator_To_Int64(harga)
+	ttl := tools2.String_Separator_To_float64(sub_total)
+	tm := tools2.String_Separator_To_String(tanggal_mulai)
+	dur := tools2.String_Separator_To_Int(durasi)
 
 	for i := 0; i < len(ttl); i++ {
 
@@ -611,7 +602,7 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 
 		tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
 
-		sqlStatement = "INSERT INTO penjadwalan (id_penjadwalan,id_proyek,id_penawaran,nama_task,tanggal_dimulai,tanggal_selesai,durasi,status_urutan) values(?,?,?,?,?,?,?,?)"
+		sqlStatement = "INSERT INTO penjadwalan (id_penjadwalan,id_proyek,id_penawaran,nama_task,tanggal_dimulai,tanggal_selesai,durasi,status_urutan,progress) values(?,?,?,?,?,?,?,?,?)"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -620,7 +611,7 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 		}
 
 		_, err = stmt.Exec(id_penjadwalan, id_proyek, id_penawaran, Sub_pekerjaan[i],
-			date_sql, tanggal_Pekerjaan_Selesai, dur[i], -1)
+			date_sql, tanggal_Pekerjaan_Selesai, dur[i], -1, 0)
 
 		if err != nil {
 			return res, err
@@ -667,8 +658,8 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 }
 
 //pilih judul pekerjaan
-func Pilih_Judul_Pekerjaan(id_proyek string) (tools.Response, error) {
-	var res tools.Response
+func Pilih_Judul_Pekerjaan(id_proyek string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []penawaran.Pilih_Judul_Penawaran
 	var invent penawaran.Pilih_Judul_Penawaran
 

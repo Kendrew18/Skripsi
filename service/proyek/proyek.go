@@ -1,9 +1,9 @@
 package proyek
 
 import (
-	"Skripsi/db"
-	"Skripsi/struct_all/proyek"
-	"Skripsi/tools"
+	"Skripsi/config/db"
+	"Skripsi/models/proyek"
+	"Skripsi/service/tools"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -11,9 +11,7 @@ import (
 )
 
 //Input-Proyek
-func Input_Proyek(id_user string, nama_proyek string, nama_client string, jenis_gedung string,
-	alamat string, luas_tanah string, jumlah_lantai string, nama_penanggungjawab_proyek string,
-	tanggal_mulai_kerja string) (tools.Response, error) {
+func Input_Proyek(id_user string, nama_proyek string, nama_client string, jenis_gedung string, alamat string, luas_tanah string, jumlah_lantai string, nama_penanggungjawab_proyek string, tanggal_mulai_kerja string) (tools.Response, error) {
 
 	var res tools.Response
 

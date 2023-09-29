@@ -1,10 +1,10 @@
 package tagihan
 
 import (
-	"Skripsi/db"
-	str "Skripsi/struct_all"
-	"Skripsi/struct_all/tagihan"
-	"Skripsi/tools"
+	"Skripsi/config/db"
+	str "Skripsi/models"
+	"Skripsi/models/tagihan"
+	tools2 "Skripsi/service/tools"
 	"net/http"
 	"strconv"
 	"time"
@@ -39,8 +39,8 @@ func Generate_Id_Tagihan() int {
 //Input-Tagihan
 func Input_Tagihan(id_proyek string, perihal string, tanggal_pembarian_kwitansi string,
 	tanggal_pembayaran string, nominal_keseluruhan int64, id_penawaran string,
-	id_sub_pekerjaan string, nominal string) (tools.Response, error) {
-	var res tools.Response
+	id_sub_pekerjaan string, nominal string) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -76,8 +76,8 @@ func Input_Tagihan(id_proyek string, perihal string, tanggal_pembarian_kwitansi 
 }
 
 //Read-Tagihan
-func Read_Realisasi(id_proyek string) (tools.Response, error) {
-	var res tools.Response
+func Read_Realisasi(id_proyek string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []tagihan.Read_Tagihan
 	var invent tagihan.Read_Tagihan
 
@@ -102,9 +102,9 @@ func Read_Realisasi(id_proyek string) (tools.Response, error) {
 		err = rows.Scan(&invent.Id_Tagihan, &invent.Perihal_Tagihan, &invent.Tanggal_Pemberian_Kwitansi,
 			&invent.Tanggal_Pembayaran, &invent.Nominal_Keseluruhan, &ip, &isp, &nm)
 
-		temp_ip := tools.String_Separator_To_String(ip)
-		temp_isp := tools.String_Separator_To_String(isp)
-		temp_nm := tools.String_Separator_To_Int64(nm)
+		temp_ip := tools2.String_Separator_To_String(ip)
+		temp_isp := tools2.String_Separator_To_String(isp)
+		temp_nm := tools2.String_Separator_To_Int64(nm)
 
 		for i := 0; i < len(temp_isp); i++ {
 			rtf.Id_Penawaran = temp_ip[i]
@@ -138,8 +138,8 @@ func Read_Realisasi(id_proyek string) (tools.Response, error) {
 }
 
 //Delete-Tagihan
-func Delete_Tagihan(id_tagihan string) (tools.Response, error) {
-	var res tools.Response
+func Delete_Tagihan(id_tagihan string) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -173,8 +173,8 @@ func Delete_Tagihan(id_tagihan string) (tools.Response, error) {
 }
 
 //See-Judul
-func See_Judul(id_proyek string) (tools.Response, error) {
-	var res tools.Response
+func See_Judul(id_proyek string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []tagihan.See_Judul
 	var invent tagihan.See_Judul
 
@@ -214,8 +214,8 @@ func See_Judul(id_proyek string) (tools.Response, error) {
 }
 
 //See-Sub-Pekerjaan
-func See_Sub_Pekerjaan(id_proyek string, id_penawaran string) (tools.Response, error) {
-	var res tools.Response
+func See_Sub_Pekerjaan(id_proyek string, id_penawaran string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []tagihan.See_Sub_Pekerjaan
 	var invent tagihan.See_Sub_Pekerjaan
 
@@ -232,8 +232,8 @@ func See_Sub_Pekerjaan(id_proyek string, id_penawaran string) (tools.Response, e
 		return res, err
 	}
 
-	tp := tools.String_Separator_To_String(temp)
-	tp2 := tools.String_Separator_To_String(temp2)
+	tp := tools2.String_Separator_To_String(temp)
+	tp2 := tools2.String_Separator_To_String(temp2)
 
 	for i := 0; i < len(tp); i++ {
 		invent.Sub_Pekerjaan = tp2[i]

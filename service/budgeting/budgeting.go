@@ -1,10 +1,10 @@
 package budgeting
 
 import (
-	"Skripsi/db"
-	str "Skripsi/struct_all"
-	"Skripsi/struct_all/budgeting"
-	"Skripsi/tools"
+	"Skripsi/config/db"
+	str "Skripsi/models"
+	"Skripsi/models/budgeting"
+	tools2 "Skripsi/service/tools"
 	"net/http"
 	"strconv"
 	"time"
@@ -39,9 +39,9 @@ func Generate_Id_Realisasi() int {
 //Input-Realisasi
 func Input_Realisasi(id_proyek string, id_sub_pekerjaan string, id_kontrak string,
 	perihal_pengeluaran string, tanggal_pembayaran string,
-	nominal_pembayaran int64, catatan string) (tools.Response, error) {
+	nominal_pembayaran int64, catatan string) (tools2.Response, error) {
 
-	var res tools.Response
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -75,8 +75,8 @@ func Input_Realisasi(id_proyek string, id_sub_pekerjaan string, id_kontrak strin
 }
 
 //Read-Realisasi
-func Read_Realisasi(id_proyek string, id_sub_pekerjaan string) (tools.Response, error) {
-	var res tools.Response
+func Read_Realisasi(id_proyek string, id_sub_pekerjaan string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []budgeting.Read_Realisasi
 	var invent budgeting.Read_Realisasi
 
@@ -127,8 +127,8 @@ func Read_Realisasi(id_proyek string, id_sub_pekerjaan string) (tools.Response, 
 }
 
 //Delete-Realisasi
-func Delete_Realisasi(id_realisasi string) (tools.Response, error) {
-	var res tools.Response
+func Delete_Realisasi(id_realisasi string) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -164,8 +164,8 @@ func Delete_Realisasi(id_realisasi string) (tools.Response, error) {
 //Update-Realisasi
 func Update_Realisasi(id_realisasi string, id_kontrak string,
 	perihal_pengeluaran string, tanggal_pembayaran string, nominal_pembayaran int64,
-	catatan string) (tools.Response, error) {
-	var res tools.Response
+	catatan string) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -203,8 +203,8 @@ func Update_Realisasi(id_realisasi string, id_kontrak string,
 }
 
 //Read-Budgeting
-func Read_Budgeting(id_proyek string) (tools.Response, error) {
-	var res tools.Response
+func Read_Budgeting(id_proyek string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []budgeting.Read_Budgeting
 	var invent budgeting.Read_Budgeting
 	var tmp budgeting.Read_Sub_Pekerjaan
@@ -227,9 +227,9 @@ func Read_Budgeting(id_proyek string) (tools.Response, error) {
 		st := ""
 
 		err = rows.Scan(&invent.Id_penawaran, &invent.Judul, &id_sp, &sp, &st)
-		id_sub_pekerjaan := tools.String_Separator_To_String(id_sp)
-		sub_pekerjaan := tools.String_Separator_To_String(sp)
-		sub_total := tools.String_Separator_To_Int64(st)
+		id_sub_pekerjaan := tools2.String_Separator_To_String(id_sp)
+		sub_pekerjaan := tools2.String_Separator_To_String(sp)
+		sub_total := tools2.String_Separator_To_Int64(st)
 
 		for i := 0; i < len(id_sub_pekerjaan); i++ {
 			tmp.Id_sub_pekerjaan = id_sub_pekerjaan[i]

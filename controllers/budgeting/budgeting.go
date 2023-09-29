@@ -1,7 +1,7 @@
 package budgeting
 
 import (
-	"Skripsi/models/budgeting"
+	"Skripsi/service/budgeting"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"

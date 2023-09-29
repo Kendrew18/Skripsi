@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Skripsi/db"
+	"Skripsi/config/db"
 	"Skripsi/routes"
 )
 

@@ -1,11 +1,11 @@
 package vendor_all
 
 import (
-	"Skripsi/db"
-	str "Skripsi/struct_all"
-	"Skripsi/struct_all/jadwal"
-	"Skripsi/struct_all/vendor_all"
-	"Skripsi/tools"
+	"Skripsi/config/db"
+	str "Skripsi/models"
+	"Skripsi/models/jadwal"
+	"Skripsi/models/vendor_all"
+	tools2 "Skripsi/service/tools"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -68,8 +68,8 @@ func Generate_Id_Foto_Laporan_Vendor() int {
 }
 
 //input-laporan-Vendor (done)
-func Input_Laporan_Vendor(id_proyek string, laporan string, tanggal_laporan string, id_kontrak string, check_box string) (tools.Response, error) {
-	var res tools.Response
+func Input_Laporan_Vendor(id_proyek string, laporan string, tanggal_laporan string, id_kontrak string, check_box string) (tools2.Response, error) {
+	var res tools2.Response
 	var RP vendor_all.Progress_Vendor
 
 	con := db.CreateCon()
@@ -85,8 +85,8 @@ func Input_Laporan_Vendor(id_proyek string, laporan string, tanggal_laporan stri
 	date, _ := time.Parse("02-01-2006", tanggal_laporan)
 	date_sql := date.Format("2006-01-02")
 
-	ip := tools.String_Separator_To_String(id_kontrak)
-	ck := tools.String_Separator_To_Int(check_box)
+	ip := tools2.String_Separator_To_String(id_kontrak)
+	ck := tools2.String_Separator_To_Int(check_box)
 
 	for i := 0; i < len(ip); i++ {
 		if ck[i] == 1 {
@@ -144,8 +144,8 @@ func Input_Laporan_Vendor(id_proyek string, laporan string, tanggal_laporan stri
 }
 
 //read-laporan-Vendor(done)
-func Read_Laporan_Vendor(id_Proyek string) (tools.Response, error) {
-	var res tools.Response
+func Read_Laporan_Vendor(id_Proyek string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []vendor_all.Read_Laporan_Vendor
 	var invent vendor_all.Read_Laporan_Vendor
 	var RlV vendor_all.Read_Laporan_Vendor_String
@@ -166,7 +166,7 @@ func Read_Laporan_Vendor(id_Proyek string) (tools.Response, error) {
 	for rows.Next() {
 		err = rows.Scan(&invent.Id_laporan_vendor, &invent.Laporan,
 			&invent.Tanggal_laporan, &invent.Status_laporan, &RlV.Id_Kontrak_Vendor)
-		kv := tools.String_Separator_To_String(RlV.Id_Kontrak_Vendor)
+		kv := tools2.String_Separator_To_String(RlV.Id_Kontrak_Vendor)
 
 		for i := 0; i < len(kv); i++ {
 			durasi := 0
@@ -206,9 +206,9 @@ func Read_Laporan_Vendor(id_Proyek string) (tools.Response, error) {
 
 //Update-laporan-Vendor (done)
 func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, tanggal_laporan string,
-	id_kontrak string, check_box string) (tools.Response, error) {
+	id_kontrak string, check_box string) (tools2.Response, error) {
 
-	var res tools.Response
+	var res tools2.Response
 	var st jadwal.Status_laporan
 
 	con := db.CreateCon()
@@ -228,7 +228,7 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, tanggal_lap
 
 		_ = con.QueryRow(sqlStatement, id_laporan_vendor).Scan(&read_dt_lp.Id_Kontrak_Vendor, &temp)
 
-		id := tools.String_Separator_To_String(read_dt_lp.Id_Kontrak_Vendor)
+		id := tools2.String_Separator_To_String(read_dt_lp.Id_Kontrak_Vendor)
 
 		for i := 0; i < len(id); i++ {
 			sqlStatement = "SELECT id_kontrak,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_complate FROM kontrak_vendor WHERE id_kontrak=?"
@@ -243,8 +243,8 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, tanggal_lap
 			}
 		}
 
-		ip := tools.String_Separator_To_String(id_kontrak)
-		ck := tools.String_Separator_To_Int(check_box)
+		ip := tools2.String_Separator_To_String(id_kontrak)
+		ck := tools2.String_Separator_To_Int(check_box)
 
 		for i := 0; i < len(ip); i++ {
 			if ck[i] == 1 {
@@ -322,8 +322,8 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, tanggal_lap
 }
 
 //Update-Status-laporan-Vendor(done)
-func Update_Status_Laporan_Vendor(id_laporan_vendor string) (tools.Response, error) {
-	var res tools.Response
+func Update_Status_Laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
+	var res tools2.Response
 	var RP vendor_all.Progress_Vendor
 
 	con := db.CreateCon()
@@ -354,7 +354,7 @@ func Update_Status_Laporan_Vendor(id_laporan_vendor string) (tools.Response, err
 
 	_ = con.QueryRow(sqlStatement, id_laporan_vendor).Scan(&id_jdl)
 
-	id := tools.String_Separator_To_String(id_jdl)
+	id := tools2.String_Separator_To_String(id_jdl)
 
 	for i := 0; i < len(id); i++ {
 		sqlstatemen_jdl := "SELECT id_kontrak,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_complate FROM kontrak_vendor WHERE id_kontrak=?"
@@ -387,8 +387,8 @@ func Update_Status_Laporan_Vendor(id_laporan_vendor string) (tools.Response, err
 }
 
 //Upload_Foto_Laporan(done)
-func Upload_Foto_laporan_vendor(id_laporan_vendor string, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
-	var res tools.Response
+func Upload_Foto_laporan_vendor(id_laporan_vendor string, writer http.ResponseWriter, request *http.Request) (tools2.Response, error) {
+	var res tools2.Response
 	var foto str.Foto
 
 	con := db.CreateCon()
@@ -489,8 +489,8 @@ func Upload_Foto_laporan_vendor(id_laporan_vendor string, writer http.ResponseWr
 }
 
 //Read_Foto_Laporan(done)
-func Read_Foto_Laporan_Vendor(id_laporan_vendor string) (tools.Response, error) {
-	var res tools.Response
+func Read_Foto_Laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []str.Foto
 	var invent str.Foto
 
@@ -504,7 +504,7 @@ func Read_Foto_Laporan_Vendor(id_laporan_vendor string) (tools.Response, error) 
 		return res, err
 	}
 
-	foto_sp := tools.String_Separator_To_String(invent.Path_foto)
+	foto_sp := tools2.String_Separator_To_String(invent.Path_foto)
 
 	for i := 0; i < len(foto_sp); i++ {
 		invent.Path_foto = foto_sp[i]
@@ -525,8 +525,8 @@ func Read_Foto_Laporan_Vendor(id_laporan_vendor string) (tools.Response, error) 
 }
 
 //See-Task-Di-Input-Laporan (done)
-func See_Task_Vendor(tanggal_laporan string) (tools.Response, error) {
-	var res tools.Response
+func See_Task_Vendor(tanggal_laporan string) (tools2.Response, error) {
+	var res tools2.Response
 
 	var rt_lp vendor_all.Read_Task_Laporan_Vendor
 	var arr_rt_lp []vendor_all.Read_Task_Laporan_Vendor
@@ -575,8 +575,8 @@ func See_Task_Vendor(tanggal_laporan string) (tools.Response, error) {
 }
 
 //delete laporan vendor (done)
-func Delete_laporan_Vendor(id_laporan_vendor string) (tools.Response, error) {
-	var res tools.Response
+func Delete_laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
+	var res tools2.Response
 	var read_dt_lp vendor_all.Read_Laporan_Vendor_String
 	var rp vendor_all.Progress_Vendor
 
@@ -588,7 +588,7 @@ func Delete_laporan_Vendor(id_laporan_vendor string) (tools.Response, error) {
 
 	_ = con.QueryRow(sqlStatement, id_laporan_vendor).Scan(&read_dt_lp.Id_Kontrak_Vendor, &temp)
 
-	id := tools.String_Separator_To_String(read_dt_lp.Id_Kontrak_Vendor)
+	id := tools2.String_Separator_To_String(read_dt_lp.Id_Kontrak_Vendor)
 
 	for i := 0; i < len(id); i++ {
 		sqlStatement = "SELECT id_kontrak,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_complate FROM kontrak_vendor WHERE id_kontrak=?"

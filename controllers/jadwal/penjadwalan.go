@@ -1,7 +1,7 @@
 package jadwal
 
 import (
-	"Skripsi/models/jadwal"
+	"Skripsi/service/jadwal"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"

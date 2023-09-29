@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/models/budgeting/budgeting.go" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/models/jadwal/laporan.go" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/models/jadwal/penjadwalan.go" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/models/penawaran/penawaran.go" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/models/proyek/proyek.go" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/models/tagihan/tagihan.go" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/models/user_management.go" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/models/vendor_all/kontrak-vendor.go" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/models/vendor_all/laporan-vendor.go" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/models/vendor_all/master_vendor.go" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/models/vendor_all/pembayaran-vendor.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/budgeting/budgeting.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/jadwal/laporan.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/jadwal/penjadwalan.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/penawaran/penawaran.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/proyek/proyek.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/tagihan/tagihan.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/user_management.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/vendor_all/kontrak-vendor.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/vendor_all/laporan-vendor.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/vendor_all/master_vendor.go" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/service/vendor_all/pembayaran-vendor.go" dialect="MariaDB" />
   </component>
 </project>

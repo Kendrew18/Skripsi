@@ -1,7 +1,7 @@
 package vendor_all
 
 import (
-	"Skripsi/models/vendor_all"
+	"Skripsi/service/vendor_all"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )

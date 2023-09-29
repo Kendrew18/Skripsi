@@ -1,4 +1,4 @@
-package struct_all
+package models
 
 type Id_user struct {
 	Id_user     string `json:"id_user"`

@@ -22,24 +22,21 @@ func Init() *echo.Echo {
 		return c.String(http.StatusOK, "Project-NDL")
 	})
 
-	um := e.Group("/um")
-	pryk := e.Group("/pryk")
 	kv := e.Group("/kv")
 	pv := e.Group("/pv")
-	pen := e.Group("/pen")
 	LV := e.Group("/LV")
-	LP := e.Group("/LP")
-	PJDL := e.Group("/PJDL")
 	FT := e.Group("/FT")
 	MV := e.Group("/MV")
 	BU := e.Group("/BU")
 	TG := e.Group("/TG")
 
 	//MAIN
-	//User_Management
+	//User_Management(Ready)
+	um := e.Group("/um")
 	um.GET("/login-user", controllers.LoginUM)
 
-	//Proyek(done)
+	//Proyek(Ready)
+	pryk := e.Group("/pryk")
 	//Create
 	pryk.POST("/input-proyek", proyek.InputProyek)
 	//Read Nama Proyek
@@ -93,7 +90,8 @@ func Init() *echo.Echo {
 	//See Kontrak Vendor
 	LV.GET("/see-kontak-vendor", vendor_all.SeeTaskVendor)
 
-	//Penawaran (done)
+	//Penawaran (Ready)
+	pen := e.Group("/pen")
 	//create
 	pen.POST("/input-pen", penawaran.InputPenawaran)
 	//input_sub_penawaran
@@ -113,7 +111,8 @@ func Init() *echo.Echo {
 	//pilih_judul_pekerjaan
 	pen.GET("/pilih-judul-pekerjaan", penawaran.PilihJudulPekerjaan)
 
-	//Penjadwalan
+	//Penjadwalan (Ready)
+	PJDL := e.Group("/PJDL")
 	//Input-Durasi-Task
 	PJDL.PUT("/input-durasi-task", jadwal.InputDurasitask)
 	//read task
@@ -132,20 +131,23 @@ func Init() *echo.Echo {
 	PJDL.GET("/see-calender-all", jadwal.SeeCalenderAll)
 
 	//Laporan
+	LP := e.Group("/LP")
 	//Input-Laporan
 	LP.POST("/input-lp", jadwal.InputLaporan)
 	//Read-Laporan
 	LP.GET("/read-lp", jadwal.ReadLaporan)
 	//Update-Laporan
-	LP.PUT("/update-lp", jadwal.UpdateLaporan)
+	LP.POST("/update-lp", jadwal.UpdateLaporan)
 	//upload-foto-laporan
-	LP.POST("upload-foto-laporan", jadwal.UploadFotolaporan)
+	LP.POST("/upload-foto-laporan", jadwal.UploadFotolaporan)
 	//Read-foto-laporan
 	LP.GET("/read-path-foto", jadwal.ReadFotolaporan)
 	//update_status_laporan
 	LP.PUT("/update-status", jadwal.UpdateStatusLaporan)
 	//See Task
 	LP.GET("/see-task", jadwal.SeeTask)
+	//Delete_Laporan
+	LP.DELETE("/delete-laporan", jadwal.DeleteLaporan)
 
 	//Master_Vendor
 	//input-master-vendor

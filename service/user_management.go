@@ -1,16 +1,16 @@
-package models
+package service
 
 import (
-	"Skripsi/db"
-	"Skripsi/struct_all"
-	"Skripsi/tools"
+	"Skripsi/config/db"
+	"Skripsi/models"
+	"Skripsi/service/tools"
 	"fmt"
 	"net/http"
 )
 
 //Login
 func Login(username string, password string) (tools.Response, error) {
-	var arr struct_all.Id_user
+	var arr models.Id_user
 	var res tools.Response
 
 	con := db.CreateCon()

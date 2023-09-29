@@ -1,57 +1,32 @@
 package vendor_all
 
 import (
-	"Skripsi/db"
-	str "Skripsi/struct_all"
-	"Skripsi/struct_all/vendor_all"
-	"Skripsi/tools"
+	"Skripsi/config/db"
+	"Skripsi/models/vendor_all"
+	"Skripsi/service/tools"
 	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 )
 
-//Generate_Id_Kontrak_Vendor
-func Generate_Id_Kotrak_Vendor() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_kv FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_kv=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
 //Input_Kontrak_Vendor
-func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string,
-	total_nilai_kontrak int64, tanggal_dimulai string, tanggal_selesai string,
-	date_pengiriman string, date_dimulai string, date_selesai string) (tools.Response, error) {
+func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string, total_nilai_kontrak int64, tanggal_dimulai string, tanggal_selesai string, date_pengiriman string, date_dimulai string, date_selesai string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Kotrak_Vendor()
+	nm_str := 0
 
-	nm_str := strconv.Itoa(nm)
+	Sqlstatement := "SELECT co FROM kontrak_vendor ORDER BY co DESC Limit 1"
 
-	id_kontrak := "KV-" + nm_str
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
-	sqlStatement := "INSERT INTO kontrak_vendor (id_proyek, id_MV, id_kontrak, total_nilai_kontrak, nominal_pembayaran, tanggal_mulai_kontrak, tanggal_berakhir_kontrak, sisa_pembayaran, tanggal_pengiriman, tanggal_pengerjaan_dimulai, tanggal_pengerjaan_berakhir,working_progress,working_complate,kontrak_complate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	nm_str = nm_str + 1
+
+	id_kontrak := "KV-" + strconv.Itoa(nm_str)
+
+	sqlStatement := "INSERT INTO kontrak_vendor (co,id_proyek, id_MV, id_kontrak, total_nilai_kontrak, nominal_pembayaran, tanggal_mulai_kontrak, tanggal_berakhir_kontrak, sisa_pembayaran, tanggal_pengiriman, tanggal_pengerjaan_dimulai, tanggal_pengerjaan_berakhir,working_progress,working_complate,kontrak_complate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	date, _ := time.Parse("02-01-2006", tanggal_dimulai)
 	date_sql := date.Format("2006-01-02")
@@ -93,7 +68,7 @@ func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string,
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_proyek, id_master_vendor, id_kontrak, total_nilai_kontrak,
+	_, err = stmt.Exec(nm_str, id_proyek, id_master_vendor, id_kontrak, total_nilai_kontrak,
 		nominal_pembayaran, date_sql, date_sql2, total_nilai_kontrak, date_sql3,
 		date_sql4, date_sql5, 0, 0, 0)
 

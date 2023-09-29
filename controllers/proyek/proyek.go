@@ -1,7 +1,7 @@
 package proyek
 
 import (
-	"Skripsi/models/proyek"
+	"Skripsi/service/proyek"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )

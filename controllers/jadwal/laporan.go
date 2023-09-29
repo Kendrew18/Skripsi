@@ -1,7 +1,7 @@
 package jadwal
 
 import (
-	"Skripsi/models/jadwal"
+	"Skripsi/service/jadwal"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -11,7 +11,7 @@ func InputLaporan(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
 	laporan := c.FormValue("laporan")
 	tanggal_laporan := c.FormValue("tanggal_laporan")
-	id_penjadwalan := c.FormValue("id-penjadwalan")
+	id_penjadwalan := c.FormValue("id_penjadwalan")
 	check := c.FormValue("check")
 
 	result, err := jadwal.Input_Laporan(id_proyek, laporan, tanggal_laporan,
@@ -41,11 +41,10 @@ func ReadLaporan(c echo.Context) error {
 func UpdateLaporan(c echo.Context) error {
 	id_laporan := c.FormValue("id_laporan")
 	laporan := c.FormValue("laporan")
-	tanggal_laporan := c.FormValue("tanggal_laporan")
-	id_penjadwalan := c.FormValue("id_penjadwalan") //ganti
+	id_penjadwalan := c.FormValue("id_penjadwalan")
 	check := c.FormValue("check")
 
-	result, err := jadwal.Update_Laporan(id_laporan, laporan, tanggal_laporan, id_penjadwalan, check)
+	result, err := jadwal.Update_Laporan(id_laporan, laporan, id_penjadwalan, check)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -59,6 +58,19 @@ func UpdateStatusLaporan(c echo.Context) error {
 	id_laporan := c.FormValue("id_laporan")
 
 	result, err := jadwal.Update_Status_Laporan(id_laporan)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//Delete_Laporan
+func DeleteLaporan(c echo.Context) error {
+	id_laporan := c.FormValue("id_laporan")
+
+	result, err := jadwal.Delete_Laporan(id_laporan)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

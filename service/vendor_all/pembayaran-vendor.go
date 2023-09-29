@@ -1,10 +1,10 @@
 package vendor_all
 
 import (
-	"Skripsi/db"
-	str "Skripsi/struct_all"
-	"Skripsi/struct_all/vendor_all"
-	"Skripsi/tools"
+	"Skripsi/config/db"
+	str "Skripsi/models"
+	"Skripsi/models/vendor_all"
+	"Skripsi/service/tools"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -14,46 +14,23 @@ import (
 	"time"
 )
 
-func Generate_Id_Pembayaran_Vendor() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_pv FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_pv=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
 func Input_Pembayaran_Vendor(id_kontrak string, nomor_invoice string,
 	jumlah_pembayaran int64, tanggal_pembayaran string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Pembayaran_Vendor()
+	nm_str := 0
 
-	nm_str := strconv.Itoa(nm)
+	Sqlstatement := "SELECT co FROM pembayaran_vendor ORDER BY co DESC Limit 1"
 
-	id_PV := "PV-" + nm_str
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
-	foto := "uploads/images.png"
+	nm_str = nm_str + 1
 
-	sqlStatement := "INSERT INTO pembayaran_vendor (id_PV,id_kontrak,nomor_invoice,jumlah_pembayaran,tanggal_pembayaran ,foto_invoice) values(?,?,?,?,?,?)"
+	id_PV := "PV-" + strconv.Itoa(nm_str)
+
+	sqlStatement := "INSERT INTO pembayaran_vendor (co,id_PV,id_kontrak,nomor_invoice,jumlah_pembayaran,tanggal_pembayaran ,foto_invoice) values(?,?,?,?,?,?,?)"
 
 	date, _ := time.Parse("02-01-2006", tanggal_pembayaran)
 	date_sql := date.Format("2006-01-02")
@@ -64,7 +41,7 @@ func Input_Pembayaran_Vendor(id_kontrak string, nomor_invoice string,
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_PV, id_kontrak, nomor_invoice, jumlah_pembayaran, date_sql, foto)
+	_, err = stmt.Exec(nm_str, id_PV, id_kontrak, nomor_invoice, jumlah_pembayaran, date_sql, "")
 
 	stmt.Close()
 
@@ -134,16 +111,16 @@ func Upload_Invoice(id_PV string, writer http.ResponseWriter, request *http.Requ
 	path := ""
 
 	if strings.Contains(handler.Filename, "jpg") {
-		path = "uploads/" + id_PV + ".jpg"
-		tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.jpg")
+		path = "uploads/foto_pembayaran_vendor" + id_PV + ".jpg"
+		tempFile, err = ioutil.TempFile("uploads/foto_pembayaran_vendor", "Read"+"*.jpg")
 	}
 	if strings.Contains(handler.Filename, "jpeg") {
-		path = "uploads/" + id_PV + ".jpeg"
-		tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.jpeg")
+		path = "uploads/foto_pembayaran_vendor" + id_PV + ".jpeg"
+		tempFile, err = ioutil.TempFile("uploads/foto_pembayaran_vendor", "Read"+"*.jpeg")
 	}
 	if strings.Contains(handler.Filename, "png") {
-		path = "uploads/" + id_PV + ".png"
-		tempFile, err = ioutil.TempFile("uploads/", "Read"+"*.png")
+		path = "uploads/foto_pembayaran_vendor" + id_PV + ".png"
+		tempFile, err = ioutil.TempFile("uploads/foto_pembayaran_vendor", "Read"+"*.png")
 	}
 
 	if err != nil {

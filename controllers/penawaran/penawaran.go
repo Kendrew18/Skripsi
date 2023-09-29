@@ -1,7 +1,7 @@
 package penawaran
 
 import (
-	"Skripsi/models/penawaran"
+	"Skripsi/service/penawaran"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"

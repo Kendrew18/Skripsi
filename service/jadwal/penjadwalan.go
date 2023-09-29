@@ -1,9 +1,9 @@
 package jadwal
 
 import (
-	"Skripsi/db"
-	"Skripsi/struct_all/jadwal"
-	"Skripsi/tools"
+	"Skripsi/config/db"
+	"Skripsi/models/jadwal"
+	tools2 "Skripsi/service/tools"
 	"fmt"
 	"net/http"
 	"time"
@@ -11,9 +11,9 @@ import (
 
 //input_Durasi_task(done)
 func Input_Durasi_task(Id_penjadwalan string, waktu_optimis float64,
-	waktu_pesimis float64, waktu_realistic float64) (tools.Response, error) {
+	waktu_pesimis float64, waktu_realistic float64) (tools2.Response, error) {
 
-	var res tools.Response
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -48,8 +48,8 @@ func Input_Durasi_task(Id_penjadwalan string, waktu_optimis float64,
 }
 
 //read_task (done)
-func Read_Task(id_proyek string) (tools.Response, error) {
-	var res tools.Response
+func Read_Task(id_proyek string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []jadwal.Read_Task
 
 	con := db.CreateCon()
@@ -108,8 +108,8 @@ func Read_Task(id_proyek string) (tools.Response, error) {
 }
 
 //read depedentcies (done)
-func Read_dep(id_proyek string, id_penjadwalan string) (tools.Response, error) {
-	var res tools.Response
+func Read_dep(id_proyek string, id_penjadwalan string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []jadwal.Read_dep
 	var invent jadwal.Read_dep
 
@@ -147,9 +147,9 @@ func Read_dep(id_proyek string, id_penjadwalan string) (tools.Response, error) {
 }
 
 //input_depedentcies(done)
-func Input_Dependentcies(id_jadwal string, dep string) (tools.Response, error) {
+func Input_Dependentcies(id_jadwal string, dep string) (tools2.Response, error) {
 
-	var res tools.Response
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -183,9 +183,9 @@ func Input_Dependentcies(id_jadwal string, dep string) (tools.Response, error) {
 }
 
 //generate_jadwal(done)
-func Generate_Jadwal(id_proyek string) (tools.Response, error) {
+func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 	//urutno
-	var res tools.Response
+	var res tools2.Response
 	var arr_invent []jadwal.Gene_JDL
 	var invent jadwal.Gene_JDL
 
@@ -237,7 +237,7 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 	for 0 < len(arr_invent) {
 		i++
 
-		arr_dep := tools.String_Separator_To_String(arr_invent[i].Dependentcies)
+		arr_dep := tools2.String_Separator_To_String(arr_invent[i].Dependentcies)
 		co_dep := len(arr_dep)
 
 		for j := 0; j < len(arr_invent_fn); j++ {
@@ -302,7 +302,7 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 		x++
 		for i := 0; i < len(arr_invent_fn); i++ {
 			if arr_invent_fn[i].Status_urutan == x {
-				dep := tools.String_Separator_To_String(arr_invent_fn[i].Dependentcies)
+				dep := tools2.String_Separator_To_String(arr_invent_fn[i].Dependentcies)
 				max := 0
 				for k := 0; k < len(arr_invent_fn); k++ {
 					for j := 0; j < len(dep); j++ {
@@ -347,7 +347,7 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 					arr_invent_fn[i].Ls = arr_invent_fn[i].Ef - arr_invent_fn[i].Durasi
 				}
 
-				dep := tools.String_Separator_To_String(arr_invent_fn[i].Dependentcies)
+				dep := tools2.String_Separator_To_String(arr_invent_fn[i].Dependentcies)
 
 				for k := 0; k < len(arr_invent_fn); k++ {
 					for j := 0; j < len(dep); j++ {
@@ -394,7 +394,7 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 
 	for j := 0; j < len(arr_invent_fn); j++ {
 
-		sqlStatement = "UPDATE penjadwalan SET es=?,ls=?,ef=?,lf=?,tf=?,ff=?,tanggal_dimulai=?,tanggal_selesai=?,status_urutan=?,progress=? WHERE id_penjadwalan=?"
+		sqlStatement = "UPDATE penjadwalan SET status_urutan=?,tanggal_dimulai=?,tanggal_selesai=?,progress=? WHERE id_penjadwalan=?"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -404,12 +404,13 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 		}
 
 		_, err = stmt.Exec(arr_invent_fn[j].Es, arr_invent_fn[j].Ls, arr_invent_fn[j].Ef, arr_invent_fn[j].Lf,
-			arr_invent_fn[j].Tf, arr_invent_fn[j].Ff, arr_invent_fn[j].Tanggal_mulai,
-			arr_invent_fn[j].Tanggal_berakhir, arr_invent_fn[j].Status_urutan, 0, arr_invent_fn[j].Id)
+			arr_invent_fn[j].Tf, arr_invent_fn[j].Ff, arr_invent_fn[j].Status_urutan, arr_invent_fn[j].Tanggal_mulai, arr_invent_fn[j].Tanggal_berakhir, 0, arr_invent_fn[j].Id)
 
 		if err != nil {
 			return res, err
 		}
+
+		stmt.Close()
 
 	}
 
@@ -428,8 +429,8 @@ func Generate_Jadwal(id_proyek string) (tools.Response, error) {
 }
 
 //Read_jadwal (done)
-func Read_Jadwal(id_proyek string) (tools.Response, error) {
-	var res tools.Response
+func Read_Jadwal(id_proyek string) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []jadwal.Read_Task_Jadwal
 
 	con := db.CreateCon()
@@ -486,9 +487,9 @@ func Read_Jadwal(id_proyek string) (tools.Response, error) {
 	return res, nil
 }
 
-//edit jadwal tanggal mulai dan durasinya (done)
-func Edit_Dur_Tgl(id_penjadwalan string, tanggal_mulai string, durasi int) (tools.Response, error) {
-	var res tools.Response
+//edit jadwal tanggal mulai dan durasinya (done) / split time
+func Edit_Dur_Tgl(id_penjadwalan string, tanggal_mulai string, durasi int) (tools2.Response, error) {
+	var res tools2.Response
 
 	con := db.CreateCon()
 
@@ -526,8 +527,8 @@ func Edit_Dur_Tgl(id_penjadwalan string, tanggal_mulai string, durasi int) (tool
 }
 
 //see_calender (done)
-func See_Calender(id_proyek string, status_user int) (tools.Response, error) {
-	var res tools.Response
+func See_Calender(id_proyek string, status_user int) (tools2.Response, error) {
+	var res tools2.Response
 	var arr_invent []jadwal.See_Calender
 	var invent jadwal.See_Calender
 

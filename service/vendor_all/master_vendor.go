@@ -1,39 +1,13 @@
 package vendor_all
 
 import (
-	"Skripsi/db"
-	str "Skripsi/struct_all"
-	"Skripsi/struct_all/vendor_all"
-	"Skripsi/tools"
+	"Skripsi/config/db"
+	"Skripsi/models/vendor_all"
+	"Skripsi/service/tools"
+	"fmt"
 	"net/http"
 	"strconv"
 )
-
-//Generate_id_vendor
-func Generate_Id_Vendor() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_MV FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_MV=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
 
 //Input_vendor
 func Input_Vendor(nama_vendor string, Pekerjaan_Vendor string) (tools.Response, error) {
@@ -41,13 +15,17 @@ func Input_Vendor(nama_vendor string, Pekerjaan_Vendor string) (tools.Response, 
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Vendor()
+	nm_str := 0
 
-	nm_str := strconv.Itoa(nm)
+	Sqlstatement := "SELECT co FROM vendor ORDER BY co DESC Limit 1"
 
-	id_master := "V-" + nm_str
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
-	sqlStatement := "INSERT INTO vendor (id_master_vendor, nama_vendor, penkerjaan_vendor) values(?,?,?)"
+	nm_str = nm_str + 1
+
+	id_master := "V-" + strconv.Itoa(nm_str)
+
+	sqlStatement := "INSERT INTO vendor (co,id_master_vendor, nama_vendor, penkerjaan_vendor) values(?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -55,7 +33,7 @@ func Input_Vendor(nama_vendor string, Pekerjaan_Vendor string) (tools.Response, 
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_master, nama_vendor, Pekerjaan_Vendor)
+	_, err = stmt.Exec(nm_str, id_master, nama_vendor, Pekerjaan_Vendor)
 
 	stmt.Close()
 
@@ -97,7 +75,7 @@ func Read_Vendor() (tools.Response, error) {
 		sqlStatement = "SELECT COUNT(id_MV) FROM kontrak_vendor WHERE id_MV=? && kontrak_vendor.working_complate=?"
 		_ = con.QueryRow(sqlStatement, invent.Id_Master_Vendor, 0).Scan(&invent.Pekerjaan_berjalan)
 
-		sqlStatement = "SELECT proyek.id_proyek,p.nama_proyek,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) FROM kontrak_vendor JOIN proyek join proyek p on kontrak_vendor.id_proyek = p.id_proyek ORDER BY co ASC "
+		sqlStatement = "SELECT proyek.id_proyek,p.nama_proyek,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) FROM kontrak_vendor JOIN proyek join proyek p on kontrak_vendor.id_proyek = p.id_proyek ORDER BY kontrak_vendor.co ASC "
 
 		rows, err = con.Query(sqlStatement)
 
@@ -111,8 +89,7 @@ func Read_Vendor() (tools.Response, error) {
 
 			durasi := 0
 
-			err = rows.Scan(&tpf.Id_proyek, &tpf.Nama_proyek,
-				&tpf.Progres, &durasi)
+			err = rows.Scan(&tpf.Id_proyek, &tpf.Nama_proyek, &tpf.Progres, &durasi)
 			if err != nil {
 				return res, err
 			}
@@ -150,9 +127,15 @@ func Delete_Vendor(id_vendor string) (tools.Response, error) {
 
 	sqlstatement := "SELECT id_kontrak FROM kontrak_vendor WHERE id_MV=?"
 
-	_ = con.QueryRow(sqlstatement, id_vendor).Scan(&id_v.Id_vendor)
+	err := con.QueryRow(sqlstatement, id_vendor).Scan(&id_v.Id_vendor)
 
-	if id_v.Id_vendor == id_vendor {
+	if err != nil {
+		return res, err
+	}
+
+	fmt.Println(id_v.Id_vendor)
+
+	if id_v.Id_vendor == "" {
 
 		sqlstatement = "DELETE FROM vendor WHERE id_master_vendor=?"
 
@@ -179,6 +162,10 @@ func Delete_Vendor(id_vendor string) (tools.Response, error) {
 		res.Data = map[string]int64{
 			"rows": rowsAffected,
 		}
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Dalate tidak dapat dilakukan"
+		res.Data = id_v
 	}
 	return res, nil
 }

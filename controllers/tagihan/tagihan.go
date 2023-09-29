@@ -1,7 +1,7 @@
 package tagihan
 
 import (
-	"Skripsi/models/tagihan"
+	"Skripsi/service/tagihan"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
