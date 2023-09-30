@@ -136,8 +136,7 @@ func InputTambahanSubPekerjaan(c echo.Context) error {
 	jmlh, _ := strconv.ParseFloat(jumlah, 64)
 	hrg, _ := strconv.ParseInt(harga, 10, 64)
 
-	result, err := penawaran.Input_Tambahan_Sub_Pekerjaan(id_proyek, id_penawaran, sub_pekerjaan, catatan, jmlh,
-		satuan, hrg, sbt_f, tanggal_pekerjaan_dimulai, dr)
+	result, err := penawaran.Input_Tambahan_Sub_Pekerjaan(id_proyek, id_penawaran, sub_pekerjaan, catatan, jmlh, satuan, hrg, sbt_f, tanggal_pekerjaan_dimulai, dr)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -159,8 +158,7 @@ func InputTambahanPekerjaanTambah(c echo.Context) error {
 	tanggal_mulai := c.FormValue("tanggal_mulai")
 	durasi := c.FormValue("durasi")
 
-	result, err := penawaran.Input_Tambahan_Pekerjaan_Tambah(id_proyek, judul, sub_pekerjaan, catatan, jumlah,
-		satuan, harga, sub_total, tanggal_mulai, durasi)
+	result, err := penawaran.Input_Tambahan_Pekerjaan_Tambah(id_proyek, judul, sub_pekerjaan, catatan, jumlah, satuan, harga, sub_total, tanggal_mulai, durasi)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
