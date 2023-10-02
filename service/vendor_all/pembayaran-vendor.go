@@ -14,8 +14,8 @@ import (
 	"time"
 )
 
-func Input_Pembayaran_Vendor(id_kontrak string, nomor_invoice string,
-	jumlah_pembayaran int64, tanggal_pembayaran string) (tools.Response, error) {
+//Input Pembayaran Vendor
+func Input_Pembayaran_Vendor(id_kontrak string, nomor_invoice string, jumlah_pembayaran int64, tanggal_pembayaran string) (tools.Response, error) {
 	var res tools.Response
 
 	con := db.CreateCon()
@@ -43,6 +43,30 @@ func Input_Pembayaran_Vendor(id_kontrak string, nomor_invoice string,
 
 	_, err = stmt.Exec(nm_str, id_PV, id_kontrak, nomor_invoice, jumlah_pembayaran, date_sql, "")
 
+	if err != nil {
+		return res, err
+	}
+
+	Sisa := int64(0)
+
+	sqlStatement = "SELECT sisa_pembayaran FROM kontrak_vendor WHERE id_kontrak=?"
+	err = con.QueryRow(sqlStatement, id_kontrak).Scan(&Sisa)
+	if err != nil {
+		return res, err
+	}
+
+	Sisa_sekarang := Sisa - jumlah_pembayaran
+
+	sqlStatement = "UPDATE kontrak_vendor SET sisa_pembayaran=? WHERE id_kontrak=?"
+	stmt, err = con.Prepare(sqlStatement)
+	if err != nil {
+		return res, err
+	}
+	_, err = stmt.Exec(Sisa_sekarang, id_kontrak)
+	if err != nil {
+		return res, err
+	}
+
 	stmt.Close()
 
 	res.Status = http.StatusOK
@@ -51,6 +75,7 @@ func Input_Pembayaran_Vendor(id_kontrak string, nomor_invoice string,
 	return res, nil
 }
 
+//Read Pembayaran Vendor
 func Read_Pembayaran_Vendor(id_kontrak string) (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []vendor_all.Read_Pembayaran_Vendor
@@ -89,6 +114,7 @@ func Read_Pembayaran_Vendor(id_kontrak string) (tools.Response, error) {
 	return res, nil
 }
 
+//Upload Vendor
 func Upload_Invoice(id_PV string, writer http.ResponseWriter, request *http.Request) (tools.Response, error) {
 	var res tools.Response
 
@@ -111,16 +137,16 @@ func Upload_Invoice(id_PV string, writer http.ResponseWriter, request *http.Requ
 	path := ""
 
 	if strings.Contains(handler.Filename, "jpg") {
-		path = "uploads/foto_pembayaran_vendor" + id_PV + ".jpg"
-		tempFile, err = ioutil.TempFile("uploads/foto_pembayaran_vendor", "Read"+"*.jpg")
+		path = "uploads/foto_pembayaran_vendor/" + id_PV + ".jpg"
+		tempFile, err = ioutil.TempFile("uploads/foto_pembayaran_vendor/", "Read"+"*.jpg")
 	}
 	if strings.Contains(handler.Filename, "jpeg") {
-		path = "uploads/foto_pembayaran_vendor" + id_PV + ".jpeg"
-		tempFile, err = ioutil.TempFile("uploads/foto_pembayaran_vendor", "Read"+"*.jpeg")
+		path = "uploads/foto_pembayaran_vendor/" + id_PV + ".jpeg"
+		tempFile, err = ioutil.TempFile("uploads/foto_pembayaran_vendor/", "Read"+"*.jpeg")
 	}
 	if strings.Contains(handler.Filename, "png") {
-		path = "uploads/foto_pembayaran_vendor" + id_PV + ".png"
-		tempFile, err = ioutil.TempFile("uploads/foto_pembayaran_vendor", "Read"+"*.png")
+		path = "uploads/foto_pembayaran_vendor/" + id_PV + ".png"
+		tempFile, err = ioutil.TempFile("uploads/foto_pembayaran_vendor/", "Read"+"*.png")
 	}
 
 	if err != nil {
@@ -175,6 +201,7 @@ func Upload_Invoice(id_PV string, writer http.ResponseWriter, request *http.Requ
 	return res, nil
 }
 
+//Read Foto Pembayarn Vendor
 func Read_Foto_Pembayaran_vendor(id_pembayaran_vendor string) (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []str.Foto
@@ -205,82 +232,76 @@ func Read_Foto_Pembayaran_vendor(id_pembayaran_vendor string) (tools.Response, e
 	return res, nil
 }
 
+//Delete Pembayaran Vendor
 func Delete_Pembayaran_Vendor(id_pembayaran_vendor string) (tools.Response, error) {
 	var res tools.Response
 	var obj vendor_all.Read_Pembayaran_Vendor
 
 	con := db.CreateCon()
 
-	temp := ""
+	ID_Kontrak := ""
 
 	sqlStatement := "SELECT id_PV,jumlah_pembayaran,id_kontrak FROM pembayaran_vendor WHERE id_PV=? "
 
 	err := con.QueryRow(sqlStatement, id_pembayaran_vendor).Scan(&obj.Id_PV,
-		&obj.Jumlah_Pembayaran, &temp)
+		&obj.Jumlah_Pembayaran, &ID_Kontrak)
 
 	if err != nil {
 		return res, err
 	}
 
-	if obj.Id_PV != "" {
+	temp_sisa_pembayaran := int64(0)
 
-		temp_sisa_pembayaran := int64(0)
+	sqlStatement = "SELECT sisa_pembayaran FROM kontrak_vendor WHERE id_kontrak=? "
 
-		sqlStatement = "SELECT sisa_pembayaran FROM kontrak_vendor WHERE id_kontrak=? "
+	err = con.QueryRow(sqlStatement, ID_Kontrak).Scan(&temp_sisa_pembayaran)
 
-		err = con.QueryRow(sqlStatement, temp).Scan(&temp_sisa_pembayaran)
+	temp_sisa_pembayaran = temp_sisa_pembayaran + obj.Jumlah_Pembayaran
 
-		temp_sisa_pembayaran = temp_sisa_pembayaran + obj.Jumlah_Pembayaran
+	sqlstatement := "UPDATE kontrak_vendor SET sisa_pembayaran=? WHERE id_kontrak=?"
 
-		sqlstatement := "UPDATE kontrak_vendor SET sisa_pembayaran=? WHERE id_kontrak=?"
+	stmt, err := con.Prepare(sqlstatement)
 
-		stmt, err := con.Prepare(sqlstatement)
+	if err != nil {
+		return res, err
+	}
 
-		if err != nil {
-			return res, err
-		}
+	result, err := stmt.Exec(temp_sisa_pembayaran, ID_Kontrak)
 
-		result, err := stmt.Exec(temp_sisa_pembayaran, temp)
+	if err != nil {
+		return res, err
+	}
 
-		if err != nil {
-			return res, err
-		}
+	_, err = result.RowsAffected()
 
-		_, err = result.RowsAffected()
+	if err != nil {
+		return res, err
+	}
 
-		if err != nil {
-			return res, err
-		}
+	sqlstatement = "DELETE FROM pembayaran_vendor WHERE id_PV=?"
 
-		sqlstatement = "DELETE FROM pembayaran_vendor WHERE id_PV=?"
+	stmt, err = con.Prepare(sqlstatement)
 
-		stmt, err = con.Prepare(sqlstatement)
+	if err != nil {
+		return res, err
+	}
 
-		if err != nil {
-			return res, err
-		}
+	result, err = stmt.Exec(obj.Id_PV)
 
-		result, err = stmt.Exec(obj.Id_PV)
+	if err != nil {
+		return res, err
+	}
 
-		if err != nil {
-			return res, err
-		}
+	rowsAffected, err := result.RowsAffected()
 
-		rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return res, err
+	}
 
-		if err != nil {
-			return res, err
-		}
-
-		res.Status = http.StatusOK
-		res.Message = "Suksess"
-		res.Data = map[string]int64{
-			"rows": rowsAffected,
-		}
-
-	} else {
-		res.Status = http.StatusNotFound
-		res.Message = "Tidak bisa di hapus"
+	res.Status = http.StatusOK
+	res.Message = "Suksess"
+	res.Data = map[string]int64{
+		"rows": rowsAffected,
 	}
 
 	return res, nil

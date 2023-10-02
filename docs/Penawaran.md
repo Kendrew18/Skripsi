@@ -2,7 +2,7 @@
 __________
 ##  Input Penawaran
 
-Link: kostsoda.onthewifi.com:3333/pen/input-pen
+Link: kostsoda.onthewifi.com:38600/pen/input-pen
 
 Method: POST
 
@@ -10,34 +10,35 @@ Controllers:
 
     id_proyek := c.FormValue("id_proyek")
 	judul := c.FormValue("judul")
-	catatan := c.FormValue("catatan")
-	jumlah := c.FormValue("jumlah")
 	sub_pekerjaan := c.FormValue("sub_pekerjaan")
+	catatan := c.FormValue("catatan")
+	jumlah := c.FormValue("jumlah") (double)
 	satuan := c.FormValue("satuan")
 	harga := c.FormValue("harga")
+	sub_total := c.FormValue("sub_total") (double)
 
 NB: sub_pekerjaan, catatan, jumlah, satuan, sub_total berupa String Separator
 
 ##  Input Sub Penawaran
 
-Link: kostsoda.onthewifi.com:3333/pen/input-sub-pen
+Link: kostsoda.onthewifi.com:38600/pen/input-sub-pen
 
 Method: POST
 
 Controllers:
 
     id_proyek := c.FormValue("id_proyek")
-    id_penawaran := c.FormValue("id_penawaran")
-	judul := c.FormValue("judul")
-	catatan := c.FormValue("catatan")
-	jumlah := c.FormValue("jumlah")
+	id_penawaran := c.FormValue("id_penawaran")
 	sub_pekerjaan := c.FormValue("sub_pekerjaan")
+	catatan := c.FormValue("catatan")
+	jumlah := c.FormValue("jumlah") (double)
 	satuan := c.FormValue("satuan")
 	harga := c.FormValue("harga")
+	sub_total := c.FormValue("sub_total") (double)
 
 ##  Read Penawaran
 
-Link: kostsoda.onthewifi.com:3333/pen/read-pen
+Link: kostsoda.onthewifi.com:38600/pen/read-pen
 
 Method: GET
 
@@ -47,7 +48,7 @@ Controllers:
 
 ##  Pilih Judul Pekerjaan
 
-Link: kostsoda.onthewifi.com:3333/pen/pilih-judul-pekerjaan
+Link: kostsoda.onthewifi.com:38600/pen/pilih-judul-pekerjaan
 
 Method: GET
 
@@ -57,7 +58,7 @@ Controllers:
 
 ##  Update Status
 
-Link: kostsoda.onthewifi.com:3333/pen/update-status
+Link: kostsoda.onthewifi.com:38600/pen/update-status
 
 Method: PUT
 
@@ -67,7 +68,7 @@ Controllers:
 
 ##  Update Judul
 
-Link: kostsoda.onthewifi.com:3333/pen/update-judul
+Link: kostsoda.onthewifi.com:38600/pen/update-judul
 
 Method: PUT
 
@@ -78,7 +79,7 @@ Controllers:
 
 ##  Update Item
 
-Link: kostsoda.onthewifi.com:3333/pen/update-item
+Link: kostsoda.onthewifi.com:38600/pen/update-item
 
 Method: PUT
 
@@ -88,14 +89,14 @@ Controllers:
 	id_sub_pekerjaan := c.FormValue("id_sub_pekerjaan")
 	sub_pekerjaan := c.FormValue("sub_pekerjaan")
 	catatan := c.FormValue("catatan")
-	jumlah := c.FormValue("jumlah")
+	jumlah := c.FormValue("jumlah") (double)
 	satuan := c.FormValue("satuan")
 	harga := c.FormValue("harga")
-	sub_total := c.FormValue("sub_total")
+	sub_total := c.FormValue("sub_total")(double)
 
 ##  Input Tambahan Sub Pekerjaan
 
-Link: kostsoda.onthewifi.com:3333/pen/update-item
+Link: kostsoda.onthewifi.com:38600/pen/input-tambahan-sub-pekerjaan
 
 Method: POST
 
@@ -105,16 +106,16 @@ Controllers:
 	id_penawaran := c.FormValue("id_penawaran")
 	sub_pekerjaan := c.FormValue("sub_pekerjaan")
 	catatan := c.FormValue("catatan")
-	jumlah := c.FormValue("jumlah")
+	jumlah := c.FormValue("jumlah") (double)
 	satuan := c.FormValue("satuan")
 	harga := c.FormValue("harga")
-	sub_total := c.FormValue("sub_total")
+	sub_total := c.FormValue("sub_total") (double)
 	tanggal_pekerjaan_dimulai := c.FormValue("tanggal_pekerjaan_dimulai")
 	durasi := c.FormValue("durasi")
 
-##  Input Tambahan Sub Pekerjaan
+##  Input Tambahan Pekerjaan Tambah
 
-Link: kostsoda.onthewifi.com:3333/pen/input-tambahan-pekerjaan-tambah
+Link: kostsoda.onthewifi.com:38600/pen/input-tambahan-pekerjaan-tambah
 
 Method: POST
 
@@ -135,7 +136,7 @@ NB: sub_pekerjaan, catatan, jumlah, satuan, sub_total, tanggal_pekerjaan_dimulai
 
 ##  Pilih Judul Pekerjaan
 
-Link: kostsoda.onthewifi.com:3333/pen/pilih-judul-pekerjaan
+Link: kostsoda.onthewifi.com:38600/pen/pilih-judul-pekerjaan
 
 Method: GET
 

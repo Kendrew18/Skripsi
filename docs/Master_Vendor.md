@@ -2,7 +2,7 @@
 __________
 ##  Input Master Vendor
 
-Link: kostsoda.onthewifi.com:3333/MV/input-master-vendor
+Link: kostsoda.onthewifi.com:38600/MV/input-master-vendor
 
 Method: POST
 
@@ -13,7 +13,7 @@ Controllers:
 
 ##  Read Master Vendor
 
-Link: kostsoda.onthewifi.com:3333/MV/read-master-vendor
+Link: kostsoda.onthewifi.com:38600/MV/read-master-vendor
 
 Method: POST
 
@@ -21,7 +21,7 @@ Controllers: -
 
 ##  Edit Master Vendor
 
-Link: kostsoda.onthewifi.com:3333/MV/edit-master-vendor
+Link: kostsoda.onthewifi.com:38600/MV/edit-master-vendor
 
 Method: PUT
 
@@ -33,7 +33,7 @@ Controllers:
 
 ##  Delete Master Vendor
 
-Link: kostsoda.onthewifi.com:3333/MV/delete-master-vendor
+Link: kostsoda.onthewifi.com:38600/MV/delete-master-vendor
 
 Method: Delete
 

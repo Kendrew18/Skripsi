@@ -49,7 +49,6 @@ func Read_Vendor() (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []vendor_all.Read_Vendor
 	var invent vendor_all.Read_Vendor
-	var tpf vendor_all.Detail_Read_Vendor_Fix
 
 	con := db.CreateCon()
 
@@ -65,42 +64,59 @@ func Read_Vendor() (tools.Response, error) {
 
 	for rows.Next() {
 		var arr_tpf []vendor_all.Detail_Read_Vendor_Fix
+		var tpf vendor_all.Detail_Read_Vendor_Fix
 
-		err = rows.Scan(&invent.Id_Master_Vendor, &invent.Nama_Vendor,
-			&invent.Pekerjaan_Vendor)
+		err = rows.Scan(&invent.Id_Master_Vendor, &invent.Nama_Vendor, &invent.Pekerjaan_Vendor)
 
-		sqlStatement = "SELECT COUNT(id_MV) FROM kontrak_vendor WHERE id_MV=? && kontrak_vendor.working_complate=?"
-		_ = con.QueryRow(sqlStatement, invent.Id_Master_Vendor, 1).Scan(&invent.Pekerjaan_selesai)
+		fmt.Println(invent)
 
-		sqlStatement = "SELECT COUNT(id_MV) FROM kontrak_vendor WHERE id_MV=? && kontrak_vendor.working_complate=?"
-		_ = con.QueryRow(sqlStatement, invent.Id_Master_Vendor, 0).Scan(&invent.Pekerjaan_berjalan)
+		KTRK := ""
 
-		sqlStatement = "SELECT proyek.id_proyek,p.nama_proyek,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) FROM kontrak_vendor JOIN proyek join proyek p on kontrak_vendor.id_proyek = p.id_proyek ORDER BY kontrak_vendor.co ASC "
+		sqlStatement = "SELECT id_kontrak FROM kontrak_vendor WHERE id_MV=?"
 
-		rows, err = con.Query(sqlStatement)
+		_ = con.QueryRow(sqlStatement, invent.Id_Master_Vendor).Scan(&KTRK)
 
-		defer rows.Close()
+		if KTRK != "" {
 
-		if err != nil {
-			return res, err
-		}
+			sqlStatement = "SELECT COUNT(id_MV) FROM kontrak_vendor WHERE id_MV=? && kontrak_vendor.working_complate=?"
 
-		for rows.Next() {
+			_ = con.QueryRow(sqlStatement, invent.Id_Master_Vendor, 1).Scan(&invent.Pekerjaan_selesai)
 
-			durasi := 0
+			sqlStatement = "SELECT COUNT(id_MV) FROM kontrak_vendor WHERE id_MV=? && kontrak_vendor.working_complate=?"
 
-			err = rows.Scan(&tpf.Id_proyek, &tpf.Nama_proyek, &tpf.Progres, &durasi)
+			_ = con.QueryRow(sqlStatement, invent.Id_Master_Vendor, 0).Scan(&invent.Pekerjaan_berjalan)
+
+			sqlStatement = "SELECT proyek.id_proyek,p.nama_proyek,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) FROM kontrak_vendor JOIN proyek join proyek p on kontrak_vendor.id_proyek = p.id_proyek WHERE id_MV=? ORDER BY kontrak_vendor.co ASC"
+
+			rows2, err := con.Query(sqlStatement, invent.Id_Master_Vendor)
+
+			defer rows2.Close()
+
 			if err != nil {
 				return res, err
 			}
 
-			tpf.Progres = (tpf.Progres / durasi) * 100
-			arr_tpf = append(arr_tpf, tpf)
-		}
+			for rows2.Next() {
+				durasi := 0
 
-		invent.Detail_Vendor = arr_tpf
-		if err != nil {
-			return res, err
+				err = rows2.Scan(&tpf.Id_proyek, &tpf.Nama_proyek, &tpf.Progres, &durasi)
+				if err != nil {
+
+					return res, err
+				}
+
+				tpf.Progres = (tpf.Progres / durasi) * 100
+				arr_tpf = append(arr_tpf, tpf)
+			}
+
+			invent.Detail_Vendor = arr_tpf
+			if err != nil {
+				return res, err
+			}
+
+		} else {
+			arr_tpf = append(arr_tpf, tpf)
+			invent.Detail_Vendor = arr_tpf
 		}
 		arr_invent = append(arr_invent, invent)
 	}
@@ -164,7 +180,7 @@ func Delete_Vendor(id_vendor string) (tools.Response, error) {
 		}
 	} else {
 		res.Status = http.StatusNotFound
-		res.Message = "Dalate tidak dapat dilakukan"
+		res.Message = "Delete tidak dapat dilakukan"
 		res.Data = id_v
 	}
 	return res, nil

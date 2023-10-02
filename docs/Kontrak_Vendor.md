@@ -1,14 +1,49 @@
 # How TO Use API Kontrak Vendor
 __________
-##  Input Durasi Pekerjaan
+##  Input Kontrak Vendor
 
-Link: kostsoda.onthewifi.com:3333/PJDL/input-durasi-task
+Link: kostsoda.onthewifi.com:3333/kv/input-kv
 
-Method: PUT
+Method: POST
 
 Controllers:
 
-    id_penjadwalan := c.FormValue("id_penjadwalan")
-	waktu_optimis := c.FormValue("waktu_optimis")
-	waktu_pesimis := c.FormValue("waktu_pesimis")
-	waktu_realistis := c.FormValue("waktu_realistis")
+    id_proyek := c.FormValue("id_proyek")
+	id_master_vendor := c.FormValue("id_master_vendor")
+	total_nilai_kontrak := c.FormValue("total_nilai_kontrak")
+	tanggal_mulai_kontrak := c.FormValue("tanggal_mulai_kontrak")
+	tanggal_berakhir_kontrak := c.FormValue("tanggal_berakhir_kontrak")
+	tanggal_pengiriman := c.FormValue("tanggal_pengiriman")
+	tanggal_pengerjaan_dimulai := c.FormValue("tanggal_pengerjaan_dimulai")
+	tanggal_pengerjaan_selesai := c.FormValue("tanggal_pengerjaan_selesai")
+
+##  Read Kontrak Vendor
+
+Link: kostsoda.onthewifi.com:3333/kv/read-kv
+
+Method: GET
+
+Controllers:
+
+    id_proyek := c.FormValue("id_proyek")
+
+##  Delete Kontrak Vendor
+
+Link: kostsoda.onthewifi.com:3333/kv/delete-kontrak
+
+Method: DELETE
+
+Controllers:
+
+    id_kontrak := c.FormValue("id_kontrak")
+
+##  Pick Vendor
+
+Link: kostsoda.onthewifi.com:3333/kv/pick-vendor
+
+Method: GET
+
+Controllers:-
+
+
+

@@ -2,7 +2,7 @@
 __________
 ##  Input Durasi Pekerjaan
 
-Link: kostsoda.onthewifi.com:3333/LP/input-lp
+Link: kostsoda.onthewifi.com:38600/LP/input-lp
 
 Method: POST
 
@@ -16,7 +16,7 @@ Controllers:
 
 ##  Read Laporan
 
-Link: kostsoda.onthewifi.com:3333/LP/read-lp
+Link: kostsoda.onthewifi.com:38600/LP/read-lp
 
 Method: GET
 
@@ -26,7 +26,7 @@ Controllers:
 
 ##  Update Laporan
 
-Link: kostsoda.onthewifi.com:3333/LP/update-lp
+Link: kostsoda.onthewifi.com:38600/LP/update-lp
 
 Method: PUT
 
@@ -39,7 +39,7 @@ Controllers:
 
 ##  See Task
 
-Link: kostsoda.onthewifi.com:3333/LP/see-task
+Link: kostsoda.onthewifi.com:38600/LP/see-task
 
 Method: GET
 
@@ -49,7 +49,7 @@ Controllers:
 
 ##  Upload Foto Laporan
 
-Link: kostsoda.onthewifi.com:3333/LP/upload-foto-laporan
+Link: kostsoda.onthewifi.com:38600/LP/upload-foto-laporan
 
 Method: POST
 
@@ -60,7 +60,7 @@ Controllers:
 
 ## Delete Laporan
 
-Link: kostsoda.onthewifi.com:3333/LP/delete-laporan
+Link: kostsoda.onthewifi.com:38600/LP/delete-laporan
 
 Method: DELETE
 

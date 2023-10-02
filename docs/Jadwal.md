@@ -2,7 +2,7 @@
 __________
 ##  Input Durasi Pekerjaan
 
-Link: kostsoda.onthewifi.com:3333/PJDL/input-durasi-task
+Link: kostsoda.onthewifi.com:38600/PJDL/input-durasi-task
 
 Method: PUT
 
@@ -25,7 +25,7 @@ Controllers:
 
 ## Read Depedentcies
 
-Link: kostsoda.onthewifi.com:3333/PJDL/read-dep
+Link: kostsoda.onthewifi.com:38600/PJDL/read-dep
 
 Method: GET
 
@@ -36,7 +36,7 @@ Controllers:
 
 ## Input Depedentcies
 
-Link: kostsoda.onthewifi.com:3333/PJDL/input-depedentcies
+Link: kostsoda.onthewifi.com:38600/PJDL/input-depedentcies
 
 Method: PUT
 
@@ -49,7 +49,7 @@ NB: Contoh Depedentcies seperti -> |Task F|
 
 ##  Generate Jadwal
 
-Link: kostsoda.onthewifi.com:3333/PJDL/generate-jadwal
+Link: kostsoda.onthewifi.com:38600/PJDL/generate-jadwal
 
 Method: PUT
 
@@ -59,7 +59,7 @@ Controllers:
 
 ##  Read Jadwal
 
-Link: kostsoda.onthewifi.com:3333/PJDL/read-jadwal
+Link: kostsoda.onthewifi.com:38600/PJDL/read-jadwal
 
 Method: GET
 
@@ -69,7 +69,7 @@ Controllers:
 
 ##  Edit Durasi dan Tanggal
 
-Link: kostsoda.onthewifi.com:3333/PJDL/edit-dur-tgl
+Link: kostsoda.onthewifi.com:38600/PJDL/edit-dur-tgl
 
 Method: PUT
 
@@ -81,7 +81,7 @@ Controllers:
 
 ##  See Calender
 
-Link: kostsoda.onthewifi.com:3333/PJDL/see-calender-all
+Link: kostsoda.onthewifi.com:38600/PJDL/see-calender-all
 
 Method: GET
 

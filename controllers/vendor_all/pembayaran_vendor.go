@@ -60,6 +60,18 @@ func ReadFotoPembayaranvendor(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
+func DeletePembayaranVendor(c echo.Context) error {
+	id_PV := c.FormValue("id_PV")
+
+	result, err := vendor_all.Delete_Pembayaran_Vendor(id_PV)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
 func ReadFoto(c echo.Context) error {
 	path := c.FormValue("path")
 	return c.File(path)

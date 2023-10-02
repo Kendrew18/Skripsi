@@ -62,13 +62,15 @@ func Init() *echo.Echo {
 	//Delete_Kontrak_Vendor
 	kv.DELETE("/delete-kontrak", vendor_all.DeleteKontrakVendor)
 	//Pick_Vendor
-	kv.GET("pick-vendor", vendor_all.PickVendor)
+	kv.GET("/pick-vendor", vendor_all.PickVendor)
 
 	//Pembayaran-Vendor
 	//input
 	pv.POST("/input-pv", vendor_all.InputPembayaranVendor)
 	//read
 	pv.GET("/read-pv", vendor_all.ReadPembayaranVendor)
+	//Delete PEmbayaran Vendor
+	pv.DELETE("/delete-pembayaran-vendor", vendor_all.DeletePembayaranVendor)
 	//upload-foto-invoice
 	pv.POST("/upload-fi", vendor_all.UploadInvoice)
 	//Read-foto-laporan
@@ -89,6 +91,8 @@ func Init() *echo.Echo {
 	LV.PUT("/update-status", vendor_all.UpdateStatusLaporanVendor)
 	//See Kontrak Vendor
 	LV.GET("/see-kontak-vendor", vendor_all.SeeTaskVendor)
+	//Delete Laporan Vendor
+	LV.DELETE("/delete-laporan-vendor", vendor_all.DeleteLaporanVendor)
 
 	//Penawaran (Ready)
 	pen := e.Group("/pen")

@@ -29,38 +29,29 @@ func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string, total_nilai
 	sqlStatement := "INSERT INTO kontrak_vendor (co,id_proyek, id_MV, id_kontrak, total_nilai_kontrak, nominal_pembayaran, tanggal_mulai_kontrak, tanggal_berakhir_kontrak, sisa_pembayaran, tanggal_pengiriman, tanggal_pengerjaan_dimulai, tanggal_pengerjaan_berakhir,working_progress,working_complate,kontrak_complate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	date, _ := time.Parse("02-01-2006", tanggal_dimulai)
-	date_sql := date.Format("2006-01-02")
-	dm := date.Format("200601")
+	tanggal_dimulai_kontrak_SQL := date.Format("2006-01-02")
 
 	date2, _ := time.Parse("02-01-2006", tanggal_selesai)
-	date_sql2 := date2.Format("2006-01-02")
-	dt := date2.Format("200601")
+	tanggal_berakhir_kontrak_SQL := date2.Format("2006-01-02")
+
+	diff := date2.Sub(date)
+
+	month := int64(diff.Hours()/24/30) + 1
+
+	fmt.Println(month)
 
 	date3, _ := time.Parse("02-01-2006", date_pengiriman)
-	date_sql3 := date3.Format("2006-01-02")
+	Tanggal_Pengiriman_SQL := date3.Format("2006-01-02")
 
 	date4, _ := time.Parse("02-01-2006", date_dimulai)
-	date_sql4 := date4.Format("2006-01-02")
+	Tanggal_Pekerjaan_Dimulai := date4.Format("2006-01-02")
 
 	date5, _ := time.Parse("02-01-2006", date_selesai)
-	date_sql5 := date5.Format("2006-01-02")
-
-	fmt.Println(dm)
-	fmt.Println(dt)
-
-	sqlStatement2 := "SELECT period_diff( " + dt + ", " + dm + ")"
-
-	var temp int64
-
-	temp = 0
-
-	_ = con.QueryRow(sqlStatement2).Scan(&temp)
+	Tanggal_Pekerjaan_Berakhir := date5.Format("2006-01-02")
 
 	var nominal_pembayaran int64
 
-	nominal_pembayaran = 0
-
-	temp += 1
+	nominal_pembayaran = total_nilai_kontrak / month
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -68,9 +59,7 @@ func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string, total_nilai
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_proyek, id_master_vendor, id_kontrak, total_nilai_kontrak,
-		nominal_pembayaran, date_sql, date_sql2, total_nilai_kontrak, date_sql3,
-		date_sql4, date_sql5, 0, 0, 0)
+	_, err = stmt.Exec(nm_str, id_proyek, id_master_vendor, id_kontrak, total_nilai_kontrak, nominal_pembayaran, tanggal_dimulai_kontrak_SQL, tanggal_berakhir_kontrak_SQL, total_nilai_kontrak, Tanggal_Pengiriman_SQL, Tanggal_Pekerjaan_Dimulai, Tanggal_Pekerjaan_Berakhir, 0, 0, 0)
 
 	stmt.Close()
 
@@ -89,7 +78,7 @@ func Read_Kontrak_Vendor(id_Proyek string) (tools.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_kontrak,nama_vendor,penkerjaan_vendor,DATE_FORMAT(tanggal_mulai_kontrak, '%d-%m%-%Y'),DATE_FORMAT(tanggal_berakhir_kontrak, '%d-%m%-%Y'),total_nilai_kontrak,nominal_pembayaran,sisa_pembayaran,DATE_FORMAT(tanggal_pengiriman, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_berakhir, '%d-%m%-%Y') FROM kontrak_vendor JOIN vendor ON kontrak_vendor.id_MV = vendor.id_master_vendor WHERE id_Proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_kontrak,nama_vendor,penkerjaan_vendor,DATE_FORMAT(tanggal_mulai_kontrak, '%d-%m%-%Y'),DATE_FORMAT(tanggal_berakhir_kontrak, '%d-%m%-%Y'),total_nilai_kontrak,nominal_pembayaran,sisa_pembayaran,DATE_FORMAT(tanggal_pengiriman, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_berakhir, '%d-%m%-%Y') FROM kontrak_vendor JOIN vendor ON kontrak_vendor.id_MV = vendor.id_master_vendor WHERE id_Proyek=? ORDER BY kontrak_vendor.co ASC "
 
 	rows, err := con.Query(sqlStatement, id_Proyek)
 

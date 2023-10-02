@@ -2,7 +2,7 @@
 __________
 ##  Input Proyek
 
-Link: kostsoda.onthewifi.com:3333/pryk/input-proyek
+Link: kostsoda.onthewifi.com:38600/pryk/input-proyek
 
 Method: POST
 
@@ -20,7 +20,7 @@ Controllers:
 
 ##  Read Nama Proyek
 
-Link: kostsoda.onthewifi.com:3333/pryk/read-nama
+Link: kostsoda.onthewifi.com:38600/pryk/read-nama
 
 Method: GET
 
@@ -28,7 +28,7 @@ Controllers:
 
 ##  Read Detail Proyek
 
-Link: kostsoda.onthewifi.com:3333/pryk/read-proyek
+Link: kostsoda.onthewifi.com:38600/pryk/read-proyek
 
 Method: GET
 
@@ -38,7 +38,7 @@ Controllers:
 
 ##  Upadate Status Proyek
 
-Link: kostsoda.onthewifi.com:3333/pryk/finish-proyek
+Link: kostsoda.onthewifi.com:38600/pryk/finish-proyek
 
 Method: PUT
 

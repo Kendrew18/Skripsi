@@ -41,10 +41,9 @@ func UpdateLaporanVendor(c echo.Context) error {
 	id_laporan_vendor := c.FormValue("id_laporan_vendor")
 	id_kontrak := c.FormValue("id_kontrak")
 	laporan := c.FormValue("laporan")
-	tanggal_laporan := c.FormValue("tanggal_laporan")
 	check_Box := c.FormValue("check_Box")
 
-	result, err := vendor_all.Update_Laporan_Vendor(id_laporan_vendor, laporan, tanggal_laporan, id_kontrak, check_Box)
+	result, err := vendor_all.Update_Laporan_Vendor(id_laporan_vendor, laporan, id_kontrak, check_Box)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -97,6 +96,19 @@ func SeeTaskVendor(c echo.Context) error {
 	tanggal_laporan_vendor := c.FormValue("tanggal_laporan_vendor")
 
 	result, err := vendor_all.See_Task_Vendor(tanggal_laporan_vendor)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+//Delete_laporan_Vendor
+func DeleteLaporanVendor(c echo.Context) error {
+	id_laporan_vendor := c.FormValue("id_laporan_vendor")
+
+	result, err := vendor_all.Delete_laporan_Vendor(id_laporan_vendor)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
