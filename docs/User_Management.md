@@ -10,3 +10,14 @@ Controllers:
 
     username := c.FormValue("username")
 	password := c.FormValue("password")
+
+NB:
+- username Pemilik:
+  - username : Admin
+  - password : Admin
+- username Pemilik:
+    - username : ADMIN_F
+    - password : ADMIN_F
+- username Pemilik:
+    - username : ADMIN_L
+    - password : ADMIN_L

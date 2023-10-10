@@ -802,7 +802,7 @@ func Delete_Laporan(id_laporan string) (tools2.Response, error) {
 }
 
 //See-Task-Di-Input-Laporan (done)V
-func See_Task(tanggal_laporan string) (tools2.Response, error) {
+func See_Task(tanggal_laporan string, id_proyek string) (tools2.Response, error) {
 	var res tools2.Response
 
 	var rt_lp jadwal.Read_Task_Laporan
@@ -813,9 +813,9 @@ func See_Task(tanggal_laporan string) (tools2.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_penjadwalan,nama_task,durasi,progress FROM penjadwalan WHERE tanggal_dimulai<=? && tanggal_selesai>=? && penjadwalan.progress != penjadwalan.durasi"
+	sqlStatement := "SELECT id_penjadwalan,nama_task,durasi,progress FROM penjadwalan WHERE tanggal_dimulai<=? && tanggal_selesai>=? && penjadwalan.progress != penjadwalan.durasi && id_proyek=?"
 
-	rows, err := con.Query(sqlStatement, date_sql, date_sql)
+	rows, err := con.Query(sqlStatement, date_sql, date_sql, id_proyek)
 
 	defer rows.Close()
 
