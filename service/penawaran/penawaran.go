@@ -71,7 +71,7 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string, catat
 
 		id_penjadwalan := "PJD-" + strconv.Itoa(nm_str)
 
-		sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,status_urutan) values(?,?,?,?,?,?)"
+		sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,status_urutan,dependencies) values(?,?,?,?,?,?,?)"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -79,7 +79,7 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string, catat
 			return res, err
 		}
 
-		_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, Sub_pekerjaan[i], 0)
+		_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, Sub_pekerjaan[i], 0, "")
 
 		//input sub pekerjaan
 		nm_str_DP := 0
@@ -164,7 +164,7 @@ func Input_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan st
 
 	id_penjadwalan := "PJD-" + strconv.Itoa(nm_str)
 
-	sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,status_urutan) values(?,?,?,?,?,?)"
+	sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,status_urutan,dependencies) values(?,?,?,?,?,?,?)"
 
 	stmt, err = con.Prepare(sqlStatement)
 
@@ -172,7 +172,7 @@ func Input_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan st
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, 0)
+	_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, 0, "")
 
 	//update total
 	var temp penawaran.Read_Detail_Penawaran
@@ -224,7 +224,7 @@ func Read_Penawaran(id_Proyek string) (tools2.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_penawaran,judul, total FROM penawaran WHERE id_proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_penawaran,judul, total,status FROM penawaran WHERE id_proyek=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, id_Proyek)
 
@@ -235,7 +235,7 @@ func Read_Penawaran(id_Proyek string) (tools2.Response, error) {
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&invent.Id_penawaran, &invent.Judul, &invent.Total)
+		err = rows.Scan(&invent.Id_penawaran, &invent.Judul, &invent.Total, &invent.Status)
 
 		if err != nil {
 			return res, err
@@ -247,7 +247,7 @@ func Read_Penawaran(id_Proyek string) (tools2.Response, error) {
 		var temp penawaran.Read_Detail_Penawaran
 		var temp_arr []penawaran.Read_Detail_Penawaran
 
-		sqlStatement := "SELECT id_sub_pekerjaan, nama_sub_pekerjaan, jumlah, harga, satuan, sub_total, catatan FROM detail_penawaran WHERE id_penawaran=? ORDER BY co ASC "
+		sqlStatement := "SELECT id_sub_pekerjaan, nama_sub_pekerjaan, jumlah, harga, satuan, sub_total, catatan, status FROM detail_penawaran WHERE id_penawaran=? ORDER BY co ASC "
 
 		rows, err := con.Query(sqlStatement, arr_invent[i].Id_penawaran)
 
@@ -258,8 +258,7 @@ func Read_Penawaran(id_Proyek string) (tools2.Response, error) {
 		}
 
 		for rows.Next() {
-			err = rows.Scan(&temp.Id_sub_pekerjaan, &temp.Sub_pekerjaan, &temp.Jumlah,
-				&temp.Harga, &temp.Satuan, &temp.Sub_total, &temp.Catatan)
+			err = rows.Scan(&temp.Id_sub_pekerjaan, &temp.Sub_pekerjaan, &temp.Jumlah, &temp.Harga, &temp.Satuan, &temp.Sub_total, &temp.Catatan, &temp.Status)
 
 			if err != nil {
 				return res, err
@@ -447,7 +446,7 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 
 	id_detail_penawaran := "SP-" + strconv.Itoa(nm_str_DP)
 
-	sqlStatement := "INSERT INTO detail_penawaran (co, id_sub_pekerjaan, nama_sub_pekerjaan, id_penawaran, jumlah, harga, satuan, sub_total, catatan) values(?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO detail_penawaran (co, id_sub_pekerjaan, nama_sub_pekerjaan, id_penawaran, jumlah, harga, satuan, sub_total, catatan,status) values(?,?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -457,7 +456,7 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 
 	sbt_i := int64(math.Round(sub_total*100) / 100)
 
-	_, err = stmt.Exec(nm_str_DP, id_detail_penawaran, sub_pekerjaan, id_penawaran, jumlah, harga, satuan, sbt_i, catatan)
+	_, err = stmt.Exec(nm_str_DP, id_detail_penawaran, sub_pekerjaan, id_penawaran, jumlah, harga, satuan, sbt_i, catatan, 1)
 
 	if err != nil {
 		return res, err
@@ -518,7 +517,7 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 
 	tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
 
-	sqlStatement = "INSERT INTO penjadwalan (id_penjadwalan,id_proyek,id_penawaran,nama_task,durasi,tanggal_dimulai,tanggal_selesai,status_urutan,progress) values(?,?,?,?,?,?,?,?,?)"
+	sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,durasi,tanggal_dimulai,tanggal_selesai,status_urutan,progress) values(?,?,?,?,?,?,?,?,?,?)"
 
 	stmt, err = con.Prepare(sqlStatement)
 
@@ -526,7 +525,7 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, durasi, date_sql, tanggal_Pekerjaan_Selesai, -1, 0)
+	_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, durasi, date_sql, tanggal_Pekerjaan_Selesai, -1, 0)
 
 	stmt.Close()
 
@@ -553,7 +552,7 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 
 	id_penawaran := "P-" + strconv.Itoa(nm_str)
 
-	sqlStatement := "INSERT INTO penawaran (co,id_penawaran,id_proyek,judul,total,status_penawaran) values(?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO penawaran (co,id_penawaran,id_proyek,judul,total,status_penawaran,status) values(?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -561,7 +560,7 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_penawaran, id_proyek, judul, 0, 0)
+	_, err = stmt.Exec(nm_str, id_penawaran, id_proyek, judul, 0, 0, 1)
 
 	//input sub pekerjaan dan input penjadwalan
 	var total int64
@@ -602,7 +601,7 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 
 		tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
 
-		sqlStatement = "INSERT INTO penjadwalan (id_penjadwalan,id_proyek,id_penawaran,nama_task,tanggal_dimulai,tanggal_selesai,durasi,status_urutan,progress) values(?,?,?,?,?,?,?,?,?)"
+		sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,tanggal_dimulai,tanggal_selesai,durasi,status_urutan,progress) values(?,?,?,?,?,?,?,?,?,?)"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -610,8 +609,7 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 			return res, err
 		}
 
-		_, err = stmt.Exec(id_penjadwalan, id_proyek, id_penawaran, Sub_pekerjaan[i],
-			date_sql, tanggal_Pekerjaan_Selesai, dur[i], -1, 0)
+		_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, Sub_pekerjaan[i], date_sql, tanggal_Pekerjaan_Selesai, dur[i], -1, 0)
 
 		if err != nil {
 			return res, err
@@ -628,7 +626,7 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 
 		id_detail_penawaran := "SP-" + strconv.Itoa(nm_str_DP)
 
-		sqlStatement = "INSERT INTO detail_penawaran (co, id_sub_pekerjaan, nama_sub_pekerjaan, id_penawaran, jumlah, harga, satuan, sub_total, catatan) values(?,?,?,?,?,?,?,?,?)"
+		sqlStatement = "INSERT INTO detail_penawaran (co, id_sub_pekerjaan, nama_sub_pekerjaan, id_penawaran, jumlah, harga, satuan, sub_total, catatan,status) values(?,?,?,?,?,?,?,?,?,?)"
 
 		stmt, err = con.Prepare(sqlStatement)
 
@@ -639,7 +637,7 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 		sbt_i := int64(math.Round(ttl[i]*100) / 100)
 		total += sbt_i
 
-		_, err = stmt.Exec(nm_str_DP, id_detail_penawaran, Sub_pekerjaan[i], id_penawaran, Jumlah[i], Harga[i], Satuan[i], sbt_i, Catatan[i])
+		_, err = stmt.Exec(nm_str_DP, id_detail_penawaran, Sub_pekerjaan[i], id_penawaran, Jumlah[i], Harga[i], Satuan[i], sbt_i, Catatan[i], 1)
 
 	}
 

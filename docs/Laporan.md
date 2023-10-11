@@ -1,6 +1,6 @@
 # How TO Use API Laporan
 __________
-##  Input Durasi Pekerjaan
+##  Input Laporan
 
 Link: kostsoda.onthewifi.com:38600/LP/input-lp
 
@@ -37,6 +37,18 @@ Controllers:
     id_penjadwalan := c.FormValue("id_penjadwalan")
     check := c.FormValue("check")
 
+## Update Status Laporan
+
+Link: kostsoda.onthewifi.com:38600/LP/update-status
+
+Method: PUT
+
+Controllers:
+
+    id_laporan := c.FormValue("id_laporan")
+
+NB: kalo wes di setujui gak isa di edit dan gak isa di delete lagi.
+
 ##  See Task
 
 Link: kostsoda.onthewifi.com:38600/LP/see-task
@@ -58,6 +70,16 @@ Controllers:
     id_laporan := c.FormValue("id_laporan")
     photo := c.FormValue("photo")
 
+## Read Foto Laporan Vendor
+
+Link: kostsoda.onthewifi.com:38600/LP/read-path-foto
+
+Method: GET
+
+Controllers:
+
+    id_laporan := c.FormValue("id_laporan")
+
 ## Delete Laporan
 
 Link: kostsoda.onthewifi.com:38600/LP/delete-laporan
@@ -67,6 +89,8 @@ Method: DELETE
 Controllers:
 
     id_laporan := c.FormValue("id_laporan")
+
+
 
 
     
