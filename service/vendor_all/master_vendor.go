@@ -143,11 +143,7 @@ func Delete_Vendor(id_vendor string) (tools.Response, error) {
 
 	sqlstatement := "SELECT id_kontrak FROM kontrak_vendor WHERE id_MV=?"
 
-	err := con.QueryRow(sqlstatement, id_vendor).Scan(&id_v.Id_vendor)
-
-	if err != nil {
-		return res, err
-	}
+	_ = con.QueryRow(sqlstatement, id_vendor).Scan(&id_v.Id_vendor)
 
 	fmt.Println(id_v.Id_vendor)
 
