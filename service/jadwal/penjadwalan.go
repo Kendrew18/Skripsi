@@ -10,8 +10,7 @@ import (
 )
 
 //input_Durasi_task(done)
-func Input_Durasi_task(Id_penjadwalan string, waktu_optimis float64,
-	waktu_pesimis float64, waktu_realistic float64) (tools2.Response, error) {
+func Input_Durasi_task(Id_penjadwalan string, waktu_optimis float64, waktu_pesimis float64, waktu_realistic float64) (tools2.Response, error) {
 
 	var res tools2.Response
 
@@ -391,6 +390,21 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 	}
 
 	fmt.Println("Println:", arr_invent_fn)
+
+	sqlStatement = "UPDATE proyek SET status_penjadwalan=? WHERE id_proyek=?"
+
+	stmt, err := con.Prepare(sqlStatement)
+
+	if err != nil {
+		fmt.Println(err)
+		return res, err
+	}
+
+	_, err = stmt.Exec(1, id_proyek)
+
+	if err != nil {
+		return res, err
+	}
 
 	for j := 0; j < len(arr_invent_fn); j++ {
 

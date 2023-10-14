@@ -109,8 +109,9 @@ func ReadFotolaporan(c echo.Context) error {
 func SeeTask(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
 	tanggal_laporan := c.FormValue("tanggal_laporan")
+	id_laporan := c.FormValue("id_laporan")
 
-	result, err := jadwal.See_Task(tanggal_laporan, id_proyek)
+	result, err := jadwal.See_Task(tanggal_laporan, id_proyek, id_laporan)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

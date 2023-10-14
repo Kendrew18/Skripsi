@@ -265,6 +265,7 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 		fmt.Println(arr_read_dt_lp, len(arr_read_dt_lp))
 
 		for i := 0; i < len(arr_read_dt_lp); i++ {
+			//Update Penjadwalan
 			fmt.Println("masuk")
 
 			sqlStatement = "SELECT id_penjadwalan,progress,durasi,complate FROM penjadwalan WHERE id_penjadwalan=?"
@@ -281,25 +282,35 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 				rp.Progress--
 			}
 
+			sqlStatement = "UPDATE penjadwalan SET progress=?,complate=? WHERE id_penjadwalan=?"
+
+			stmt, err := con.Prepare(sqlStatement)
+
+			if err != nil {
+				return res, err
+			}
+
+			_, err = stmt.Exec(rp.Progress, rp.Complate, rp.Id_penjadwalan)
+
+			if err != nil {
+				return res, err
+			}
+
 			//update penjadwalan
 			var ARR_Id_Detail_Laporan []jadwal.Id_Detail_Laporan
 			var Id_Detail_Laporan jadwal.Id_Detail_Laporan
 
 			progres_lama := 0
 
-			sqlStatement = "SELECT COUNT(id_detail_laporan) FROM detail_laporan WHERE co < ? && id_jadwal=?"
+			sqlStatement = "SELECT COUNT(id_detail_laporan) FROM detail_laporan JOIN laporan JOIN laporan l on detail_laporan.id_laporan = l.id_laporan WHERE laporan.co < ? && id_jadwal=?"
 
 			err = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&progres_lama)
 
-			sqlStatement = "SELECT id_detail_laporan FROM detail_laporan WHERE co > ? && id_jadwal=? ORDER BY co ASC"
+			sqlStatement = "SELECT id_detail_laporan FROM detail_laporan JOIN laporan JOIN laporan l on detail_laporan.id_laporan = l.id_laporan WHERE l.co > ? && id_jadwal=? ORDER BY l.co ASC"
 
 			rows, err = con.Query(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Penjadwalan)
 
 			defer rows.Close()
-
-			if err != nil {
-				return res, err
-			}
 
 			for rows.Next() {
 				err = rows.Scan(&Id_Detail_Laporan.Id_detail_laporan)
@@ -350,7 +361,7 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 
 			fmt.Println(sqlstatement)
 
-			stmt, err := con.Prepare(sqlstatement)
+			stmt, err = con.Prepare(sqlstatement)
 
 			if err != nil {
 				return res, err
@@ -371,6 +382,9 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 
 		//mengurus detail laporan baru
 		for i := 0; i < len(id_br); i++ {
+
+			fmt.Println("Masuk 2")
+
 			id_detail_laporan := ""
 			check_box := 0
 
@@ -383,6 +397,7 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 			if id_detail_laporan == "" {
 				progress := 0
 				if ck[i] == 1 {
+					fmt.Println(id_br[i])
 					sqlstatemen_jdl := "SELECT id_penjadwalan,progress,durasi,complate FROM penjadwalan WHERE id_penjadwalan=?"
 
 					err = con.QueryRow(sqlstatemen_jdl, id_br[i]).Scan(&RP.Id_penjadwalan, &RP.Progress, &RP.Durasi, &RP.Complate)
@@ -412,10 +427,58 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 						return res, err
 					}
 
-					progress_float := float64(RP.Progress)
+					var ARR_Id_Detail_Laporan []jadwal.Id_Detail_Laporan
+					var Id_Detail_Laporan jadwal.Id_Detail_Laporan
+
+					progres_lama := 0
+
+					sqlStatement = "SELECT COUNT(id_detail_laporan) FROM detail_laporan JOIN laporan JOIN laporan l on detail_laporan.id_laporan = l.id_laporan WHERE laporan.co < ? && id_jadwal=?"
+
+					err = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&progres_lama)
+
+					progres_lama = progres_lama + 1
+
+					progress_float := float64(progres_lama)
 					durasi_float := float64(RP.Durasi)
 
 					progress = int(math.Round((progress_float / durasi_float) * 100))
+
+					sqlStatement = "SELECT id_detail_laporan FROM detail_laporan JOIN laporan JOIN laporan l on detail_laporan.id_laporan = l.id_laporan WHERE l.co > ? && id_jadwal=? ORDER BY l.co ASC"
+
+					rows, err = con.Query(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Penjadwalan)
+
+					defer rows.Close()
+
+					for rows.Next() {
+						err = rows.Scan(&Id_Detail_Laporan.Id_detail_laporan)
+
+						if err != nil {
+							return res, err
+						}
+						ARR_Id_Detail_Laporan = append(ARR_Id_Detail_Laporan, Id_Detail_Laporan)
+					}
+
+					for x := 0; x < len(ARR_Id_Detail_Laporan); x++ {
+						progres_lama++
+						progress_float := float64(progres_lama)
+						durasi_float := float64(rp.Durasi)
+
+						progress := int(math.Round((progress_float / durasi_float) * 100))
+
+						sqlStatement = "UPDATE detail_laporan SET progress=? WHERE id_detail_laporan=?"
+
+						stmt, err := con.Prepare(sqlStatement)
+
+						if err != nil {
+							return res, err
+						}
+
+						_, err = stmt.Exec(progress, ARR_Id_Detail_Laporan[x].Id_detail_laporan)
+
+						if err != nil {
+							return res, err
+						}
+					}
 
 				} else if ck[i] == 2 {
 
@@ -436,6 +499,7 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 					progress = 100
 				}
 
+				fmt.Println("MASUK 4")
 				nm_str_DLP := 0
 
 				Sqlstatement := "SELECT co FROM detail_laporan ORDER BY co DESC Limit 1"
@@ -443,7 +507,7 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 				err = con.QueryRow(Sqlstatement).Scan(&nm_str_DLP)
 
 				if err != nil {
-					return res, err
+					nm_str_DLP = 0
 				}
 
 				nm_str_DLP = nm_str_DLP + 1
@@ -500,7 +564,14 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 					}
 
 					prg_lama++
-					_, err = stmt.Exec(0, prg_lama, id_br[i])
+
+					cplt := 0
+
+					if prg_lama == durasi {
+						cplt = 1
+					}
+
+					_, err = stmt.Exec(cplt, prg_lama, id_br[i])
 
 					progress_float := float64(prg_lama)
 					durasi_float := float64(durasi)
@@ -693,25 +764,35 @@ func Delete_Laporan(id_laporan string) (tools2.Response, error) {
 				rp.Progress--
 			}
 
+			sqlStatement = "UPDATE penjadwalan SET progress=?,complate=? WHERE id_penjadwalan=?"
+
+			stmt, err := con.Prepare(sqlStatement)
+
+			if err != nil {
+				return res, err
+			}
+
+			_, err = stmt.Exec(rp.Progress, rp.Complate, rp.Id_penjadwalan)
+
+			if err != nil {
+				return res, err
+			}
+
 			//update penjadwalan
 			var ARR_Id_Detail_Laporan []jadwal.Id_Detail_Laporan
 			var Id_Detail_Laporan jadwal.Id_Detail_Laporan
 
 			progres_lama := 0
 
-			sqlStatement = "SELECT COUNT(id_detail_laporan) FROM detail_laporan WHERE co < ? && id_jadwal=?"
+			sqlStatement = "SELECT COUNT(id_detail_laporan) FROM detail_laporan JOIN laporan JOIN laporan l on detail_laporan.id_laporan = l.id_laporan WHERE laporan.co < ? && id_jadwal=?"
 
 			err = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&progres_lama)
 
-			sqlStatement = "SELECT id_detail_laporan FROM detail_laporan WHERE co > ? && id_jadwal=? ORDER BY co ASC"
+			sqlStatement = "SELECT id_detail_laporan FROM detail_laporan JOIN laporan JOIN laporan l on detail_laporan.id_laporan = l.id_laporan WHERE l.co > ? && id_jadwal=? ORDER BY l.co ASC"
 
 			rows, err = con.Query(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Penjadwalan)
 
 			defer rows.Close()
-
-			if err != nil {
-				return res, err
-			}
 
 			for rows.Next() {
 				err = rows.Scan(&Id_Detail_Laporan.Id_detail_laporan)
@@ -748,11 +829,9 @@ func Delete_Laporan(id_laporan string) (tools2.Response, error) {
 
 			sqlstatement := "DELETE FROM detail_laporan WHERE id_laporan=?"
 
-			sqlstatement = sqlstatement
+			fmt.Println("SQL:", sqlstatement)
 
-			fmt.Println(sqlstatement)
-
-			stmt, err := con.Prepare(sqlstatement)
+			stmt, err = con.Prepare(sqlstatement)
 
 			if err != nil {
 				return res, err
@@ -802,7 +881,7 @@ func Delete_Laporan(id_laporan string) (tools2.Response, error) {
 }
 
 //See-Task-Di-Input-Laporan (done)V
-func See_Task(tanggal_laporan string, id_proyek string) (tools2.Response, error) {
+func See_Task(tanggal_laporan string, id_proyek string, id_laporan string) (tools2.Response, error) {
 	var res tools2.Response
 
 	var rt_lp jadwal.Read_Task_Laporan
@@ -813,29 +892,57 @@ func See_Task(tanggal_laporan string, id_proyek string) (tools2.Response, error)
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_penjadwalan,nama_task,durasi,progress FROM penjadwalan WHERE tanggal_dimulai<=? && tanggal_selesai>=? && penjadwalan.progress != penjadwalan.durasi && id_proyek=?"
+	if id_laporan == "" {
+		sqlStatement := "SELECT id_penjadwalan,nama_task,durasi,progress FROM penjadwalan WHERE tanggal_dimulai<=? && tanggal_selesai>=? && penjadwalan.progress != penjadwalan.durasi && id_proyek=?"
 
-	rows, err := con.Query(sqlStatement, date_sql, date_sql, id_proyek)
+		rows, err := con.Query(sqlStatement, date_sql, date_sql, id_proyek)
 
-	defer rows.Close()
-
-	if err != nil {
-		return res, err
-	}
-
-	for rows.Next() {
-
-		durasi := 0
-
-		err = rows.Scan(&rt_lp.Id_penjadwalan, &rt_lp.Nama_Task, &durasi, &rt_lp.Progress)
-
-		rt_lp.Progress = (rt_lp.Progress / durasi) * 100
+		defer rows.Close()
 
 		if err != nil {
 			return res, err
 		}
 
-		arr_rt_lp = append(arr_rt_lp, rt_lp)
+		for rows.Next() {
+
+			durasi := 0
+
+			err = rows.Scan(&rt_lp.Id_penjadwalan, &rt_lp.Nama_Task, &durasi, &rt_lp.Progress)
+
+			rt_lp.Progress = (rt_lp.Progress / durasi) * 100
+
+			if err != nil {
+				return res, err
+			}
+
+			arr_rt_lp = append(arr_rt_lp, rt_lp)
+		}
+	} else {
+
+		sqlStatement := "SELECT id_penjadwalan,nama_task,durasi,penjadwalan.progress,ifnull(checkbox,0) FROM penjadwalan Left Join detail_laporan dl on penjadwalan.id_penjadwalan = dl.id_jadwal WHERE (tanggal_dimulai<=? && tanggal_selesai>=? && penjadwalan.progress != penjadwalan.durasi && id_proyek=?) || id_laporan=?"
+
+		rows, err := con.Query(sqlStatement, date_sql, date_sql, id_proyek, id_laporan)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows.Next() {
+
+			durasi := 0
+
+			err = rows.Scan(&rt_lp.Id_penjadwalan, &rt_lp.Nama_Task, &durasi, &rt_lp.Progress, &rt_lp.Check_box)
+
+			rt_lp.Progress = (rt_lp.Progress / durasi) * 100
+
+			if err != nil {
+				return res, err
+			}
+
+			arr_rt_lp = append(arr_rt_lp, rt_lp)
+		}
 	}
 
 	if arr_rt_lp == nil {

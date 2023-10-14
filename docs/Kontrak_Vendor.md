@@ -2,7 +2,7 @@
 __________
 ##  Input Kontrak Vendor
 
-Link: kostsoda.onthewifi.com:3333/kv/input-kv
+Link: kostsoda.onthewifi.com:38600/kv/input-kv
 
 Method: POST
 
@@ -19,7 +19,7 @@ Controllers:
 
 ##  Read Kontrak Vendor
 
-Link: kostsoda.onthewifi.com:3333/kv/read-kv
+Link: kostsoda.onthewifi.com:38600/kv/read-kv
 
 Method: GET
 
@@ -29,7 +29,7 @@ Controllers:
 
 ##  Delete Kontrak Vendor
 
-Link: kostsoda.onthewifi.com:3333/kv/delete-kontrak
+Link: kostsoda.onthewifi.com:38600/kv/delete-kontrak
 
 Method: DELETE
 
@@ -39,7 +39,7 @@ Controllers:
 
 ##  Pick Vendor
 
-Link: kostsoda.onthewifi.com:3333/kv/pick-vendor
+Link: kostsoda.onthewifi.com:38600/kv/pick-vendor
 
 Method: GET
 
