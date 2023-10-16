@@ -93,9 +93,11 @@ func ReadFotolaporanVendor(c echo.Context) error {
 
 //See_Task_Vendor
 func SeeTaskVendor(c echo.Context) error {
+	id_proyek := c.FormValue("id_proyek")
+	id_laporan_vendor := c.FormValue("id_laporan_vendor")
 	tanggal_laporan_vendor := c.FormValue("tanggal_laporan_vendor")
 
-	result, err := vendor_all.See_Task_Vendor(tanggal_laporan_vendor)
+	result, err := vendor_all.See_Task_Vendor(tanggal_laporan_vendor, id_proyek, id_laporan_vendor)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
