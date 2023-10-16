@@ -2,17 +2,53 @@
 __________
 ##  Input Pembayaran Vendor
 
-Link: kostsoda.onthewifi.com:38600/kv/input-kv
+Link: kostsoda.onthewifi.com:38600/pv/input-pv
 
 Method: POST
 
 Controllers:
 
-    id_proyek := c.FormValue("id_proyek")
-	id_master_vendor := c.FormValue("id_master_vendor")
-	total_nilai_kontrak := c.FormValue("total_nilai_kontrak")
-	tanggal_mulai_kontrak := c.FormValue("tanggal_mulai_kontrak")
-	tanggal_berakhir_kontrak := c.FormValue("tanggal_berakhir_kontrak")
-	tanggal_pengiriman := c.FormValue("tanggal_pengiriman")
-	tanggal_pengerjaan_dimulai := c.FormValue("tanggal_pengerjaan_dimulai")
-	tanggal_pengerjaan_selesai := c.FormValue("tanggal_pengerjaan_selesai")
+    id_kontrak := c.FormValue("id_kontrak")
+	nomor_invoice := c.FormValue("nomor_invoice")
+	jumlah_pembayaran := c.FormValue("jumlah_pembayaran")
+	tanggal_pembayaran := c.FormValue("tanggal_pembayaran")
+
+##  Read Pembayaran Vendor
+
+Link: kostsoda.onthewifi.com:38600/pv/read-pv
+
+Method: GET
+
+Controllers:
+
+    id_kontrak := c.FormValue("id_kontrak")
+
+##  Upload Bukti Pembayaran
+
+Link: kostsoda.onthewifi.com:38600/pv/read-pv
+
+Method: POST
+
+Controllers:
+
+    id_PV := c.FormValue("id_PV")
+
+##  Read Path Foto
+
+Link: kostsoda.onthewifi.com:38600/pv/read-path-foto
+
+Method: GET
+
+Controllers:
+
+    id_PV := c.FormValue("id_PV")
+
+##  Delete Pembayaran Vendor
+
+Link: kostsoda.onthewifi.com:38600/pv/delete-pembayaran-vendor
+
+Method: DELETE
+
+Controllers:
+
+    id_PV := c.FormValue("id_PV")

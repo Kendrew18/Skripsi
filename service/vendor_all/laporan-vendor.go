@@ -2,7 +2,6 @@ package vendor_all
 
 import (
 	"Skripsi/config/db"
-	str "Skripsi/models"
 	"Skripsi/models/jadwal"
 	"Skripsi/models/vendor_all"
 	tools2 "Skripsi/service/tools"
@@ -16,33 +15,7 @@ import (
 	"time"
 )
 
-//V(blm dicoba)
-
-//Generate-id-foto-vendor(done)
-func Generate_Id_Foto_Laporan_Vendor() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_ft_lpv FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_ft_lpv=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
+//(blm dicoba)
 
 //input-laporan-Vendor (done)V
 func Input_Laporan_Vendor(id_proyek string, laporan string, tanggal_laporan string, id_kontrak string, check_box string) (tools2.Response, error) {
@@ -261,7 +234,7 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, id_kontrak 
 		ip := tools2.String_Separator_To_String(id_kontrak)
 		ck := tools2.String_Separator_To_Int(check_box)
 
-		sqlStatement := "SELECT id_kontrak,check_box FROM detail_laporan_vendor"
+		sqlStatement := "SELECT co, id_detail_laporan_vendor,id_kontrak,check_box FROM detail_laporan_vendor"
 
 		q1 := " WHERE id_kontrak NOT IN ("
 
@@ -295,6 +268,7 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, id_kontrak 
 		fmt.Println(arr_read_dt_lp, len(arr_read_dt_lp))
 
 		for i := 0; i < len(arr_read_dt_lp); i++ {
+			//Update Penjadwalan
 			fmt.Println("Masuk")
 
 			sqlStatement = "SELECT id_kontrak,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_complate FROM kontrak_vendor WHERE id_kontrak=?"
@@ -310,25 +284,35 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, id_kontrak 
 				rp.Working_Progess--
 			}
 
+			sqlStatement = "UPDATE kontrak_vendor SET working_progress=?,working_complate=? WHERE id_kontrak=?"
+
+			stmt, err := con.Prepare(sqlStatement)
+
+			if err != nil {
+				return res, err
+			}
+
+			_, err = stmt.Exec(rp.Working_Progess, rp.Working_Complate, rp.Id_kontrak)
+
+			if err != nil {
+				return res, err
+			}
+
 			//update penjadwalan
 			var ARR_Id_Detail_Laporan []vendor_all.Id_Detail_Laporan_Vendor
 			var Id_Detail_Laporan vendor_all.Id_Detail_Laporan_Vendor
 
 			progres_lama := 0
 
-			sqlStatement = "SELECT COUNT(id_detail_laporan_vendor) FROM detail_laporan_vendor WHERE co < ? && id_kontrak=?"
+			sqlStatement = "SELECT COUNT(id_detail_laporan_vendor) FROM detail_laporan_vendor JOIN laporan_vendor lv on lv.id_laporan_vendor = detail_laporan_vendor.id_laporan_vendor WHERE lv.co < ? && id_kontrak=?"
 
 			err = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Kontrak_Vendor).Scan(&progres_lama)
 
-			sqlStatement = "SELECT id_detail_laporan_vendor FROM detail_laporan_vendor WHERE co > ? && id_kontrak=? ORDER BY co ASC"
+			sqlStatement = "SELECT id_detail_laporan_vendor FROM detail_laporan_vendor JOIN laporan_vendor lv on lv.id_laporan_vendor = detail_laporan_vendor.id_laporan_vendor WHERE lv.co > ? && id_kontrak=? ORDER BY lv.co ASC"
 
 			rows, err = con.Query(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Kontrak_Vendor)
 
 			defer rows.Close()
-
-			if err != nil {
-				return res, err
-			}
 
 			for rows.Next() {
 				err = rows.Scan(&Id_Detail_Laporan.Id_Detail_Laporan_Vendor)
@@ -379,7 +363,7 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, id_kontrak 
 
 			fmt.Println(sqlstatement)
 
-			stmt, err := con.Prepare(sqlstatement)
+			stmt, err = con.Prepare(sqlstatement)
 
 			if err != nil {
 				return res, err
@@ -396,44 +380,6 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, id_kontrak 
 			if err != nil {
 				return res, err
 			}
-		}
-
-		for i := 0; i < len(ip); i++ {
-			if ck[i] == 1 {
-
-				sqlstatemen_jdl := "SELECT id_kontrak,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_complate FROM kontrak_vendor WHERE id_kontrak=?"
-
-				_ = con.QueryRow(sqlstatemen_jdl, ip[i]).Scan(&RP.Id_kontrak, &RP.Working_Progess, &RP.Durasi, &RP.Working_Complate)
-
-				if RP.Durasi == RP.Working_Progess+1 {
-					RP.Working_Complate = 1
-				} else {
-					RP.Working_Progess = RP.Working_Progess + 1
-				}
-
-				sqlStatement = "UPDATE kontrak_vendor SET working_progress=?,working_complate=? WHERE id_kontrak=?"
-
-				stmt, err := con.Prepare(sqlStatement)
-
-				if err != nil {
-					return res, err
-				}
-
-				_, err = stmt.Exec(RP.Working_Progess, RP.Working_Complate, ip[i])
-
-			} else if ck[i] == 2 {
-
-				sqlStatement = "UPDATE kontrak_vendor SET working_complate=? WHERE id_kontrak=?"
-
-				stmt, err := con.Prepare(sqlStatement)
-
-				if err != nil {
-					return res, err
-				}
-
-				_, err = stmt.Exec(1, ip[i])
-			}
-
 		}
 
 		for i := 0; i < len(ip); i++ {
@@ -478,10 +424,58 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, id_kontrak 
 						return res, err
 					}
 
+					var ARR_Id_Detail_Laporan []vendor_all.Id_Detail_Laporan_Vendor
+					var Id_Detail_Laporan vendor_all.Id_Detail_Laporan_Vendor
+
+					progres_lama := 0
+
+					sqlStatement = "SELECT COUNT(id_detail_laporan_vendor) FROM detail_laporan_vendor JOIN laporan_vendor lv on lv.id_laporan_vendor = detail_laporan_vendor.id_laporan_vendor WHERE lv.co < ? && id_kontrak=?"
+
+					err = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Kontrak_Vendor).Scan(&progres_lama)
+
+					progres_lama = progres_lama + 1
+
 					progress_float := float64(RP.Working_Progess)
 					durasi_float := float64(RP.Durasi)
 
 					progress = int(math.Round((progress_float / durasi_float) * 100))
+
+					sqlStatement = "SELECT id_detail_laporan_vendor FROM detail_laporan_vendor JOIN laporan_vendor lv on lv.id_laporan_vendor = detail_laporan_vendor.id_laporan_vendor WHERE lv.co > ? && id_kontrak=? ORDER BY lv.co ASC"
+
+					rows, err = con.Query(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Kontrak_Vendor)
+
+					defer rows.Close()
+
+					for rows.Next() {
+						err = rows.Scan(&Id_Detail_Laporan.Id_Detail_Laporan_Vendor)
+
+						if err != nil {
+							return res, err
+						}
+						ARR_Id_Detail_Laporan = append(ARR_Id_Detail_Laporan, Id_Detail_Laporan)
+					}
+
+					for x := 0; x < len(ARR_Id_Detail_Laporan); x++ {
+						progres_lama++
+						progress_float := float64(progres_lama)
+						durasi_float := float64(rp.Durasi)
+
+						progress := int(math.Round((progress_float / durasi_float) * 100))
+
+						sqlStatement = "UPDATE detail_laporan SET progress=? WHERE id_detail_laporan=?"
+
+						stmt, err := con.Prepare(sqlStatement)
+
+						if err != nil {
+							return res, err
+						}
+
+						_, err = stmt.Exec(progress, ARR_Id_Detail_Laporan[x].Id_Detail_Laporan_Vendor)
+
+						if err != nil {
+							return res, err
+						}
+					}
 
 				} else if ck[i] == 2 {
 
@@ -566,7 +560,14 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, id_kontrak 
 					}
 
 					prg_lama++
-					_, err = stmt.Exec(0, prg_lama, ip[i])
+
+					cplt := 0
+
+					if prg_lama == durasi {
+						cplt = 1
+					}
+
+					_, err = stmt.Exec(cplt, prg_lama, ip[i])
 
 					progress_float := float64(prg_lama)
 					durasi_float := float64(durasi)
@@ -842,7 +843,7 @@ func Read_Foto_Laporan_Vendor(id_laporan_vendor string) (tools2.Response, error)
 }
 
 //See-Task-Di-Input-Laporan (done)
-func See_Task_Vendor(tanggal_laporan string) (tools2.Response, error) {
+func See_Task_Vendor(tanggal_laporan string, id_proyek string, id_laporan_vendor string) (tools2.Response, error) {
 	var res tools2.Response
 
 	var rt_lp vendor_all.Read_Task_Laporan_Vendor
@@ -853,29 +854,60 @@ func See_Task_Vendor(tanggal_laporan string) (tools2.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_kontrak,nama_vendor,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_progress FROM kontrak_vendor JOIN vendor v ON v.id_master_vendor=kontrak_vendor.id_MV WHERE tanggal_pengerjaan_dimulai<=? && tanggal_pengerjaan_berakhir>=? && working_progress != DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai)"
+	if id_laporan_vendor == "" {
 
-	rows, err := con.Query(sqlStatement, date_sql)
+		sqlStatement := "SELECT id_kontrak,nama_vendor,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_progress FROM kontrak_vendor JOIN vendor v ON v.id_master_vendor=kontrak_vendor.id_MV WHERE tanggal_pengerjaan_dimulai<=? && tanggal_pengerjaan_berakhir>=? && working_progress != DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) && id_proyek=?"
 
-	defer rows.Close()
+		rows, err := con.Query(sqlStatement, date_sql)
 
-	if err != nil {
-		return res, err
-	}
-
-	for rows.Next() {
-
-		durasi := 0
-
-		err = rows.Scan(&rt_lp.Id_Kontrak, &rt_lp.Nama_Vendor, &durasi, &rt_lp.Pekerjaan_Vendor, &rt_lp.Progress)
-
-		rt_lp.Progress = (rt_lp.Progress / durasi) * 100
+		defer rows.Close()
 
 		if err != nil {
 			return res, err
 		}
 
-		arr_rt_lp = append(arr_rt_lp, rt_lp)
+		for rows.Next() {
+
+			durasi := 0
+
+			err = rows.Scan(&rt_lp.Id_Kontrak, &rt_lp.Nama_Vendor, &durasi, &rt_lp.Pekerjaan_Vendor, &rt_lp.Progress)
+
+			rt_lp.Progress = (rt_lp.Progress / durasi) * 100
+
+			if err != nil {
+				return res, err
+			}
+
+			arr_rt_lp = append(arr_rt_lp, rt_lp)
+		}
+
+	} else {
+
+		sqlStatement := "SELECT kontrak_vendor.id_kontrak,nama_vendor,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_progress,check_box FROM kontrak_vendor JOIN vendor v ON v.id_master_vendor=kontrak_vendor.id_MV LEFT JOIN detail_laporan_vendor dlv on kontrak_vendor.id_kontrak = dlv.id_kontrak WHERE (tanggal_pengerjaan_dimulai<=? && tanggal_pengerjaan_berakhir>=? && working_progress != DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) && id_proyek=?) || id_laporan_vendor=?"
+
+		rows, err := con.Query(sqlStatement, date_sql)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows.Next() {
+
+			durasi := 0
+
+			err = rows.Scan(&rt_lp.Id_Kontrak, &rt_lp.Nama_Vendor, &durasi, &rt_lp.Pekerjaan_Vendor, &rt_lp.Progress, rt_lp.Check_Box)
+
+			rt_lp.Progress = (rt_lp.Progress / durasi) * 100
+
+			if err != nil {
+				return res, err
+			}
+
+			arr_rt_lp = append(arr_rt_lp, rt_lp)
+		}
+
 	}
 
 	if arr_rt_lp == nil {
@@ -891,7 +923,7 @@ func See_Task_Vendor(tanggal_laporan string) (tools2.Response, error) {
 	return res, nil
 }
 
-//delete laporan vendor (done)
+//delete laporan vendor (done) (grg done)
 func Delete_laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
 	var res tools2.Response
 	var st jadwal.Status_laporan
@@ -907,9 +939,9 @@ func Delete_laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
 		var arr_read_dt_lp []vendor_all.Detail_Laporan_Vendor_Update
 		var rp vendor_all.Progress_Vendor
 
-		sqlStatement := "SELECT id_kontrak,check_box FROM detail_laporan_vendor WHERE id_laporan_vendor=?"
+		sqlStatement := "SELECT co, id_detail_laporan_vendor,id_kontrak,check_box FROM detail_laporan_vendor WHERE id_laporan_vendor=?"
 
-		rows, err := con.Query(sqlStatement)
+		rows, err := con.Query(sqlStatement, id_laporan_vendor)
 
 		defer rows.Close()
 
@@ -929,6 +961,7 @@ func Delete_laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
 		fmt.Println(arr_read_dt_lp, len(arr_read_dt_lp))
 
 		for i := 0; i < len(arr_read_dt_lp); i++ {
+			//Update Penjadwalan
 			fmt.Println("Masuk")
 
 			sqlStatement = "SELECT id_kontrak,working_progress,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_complate FROM kontrak_vendor WHERE id_kontrak=?"
@@ -944,25 +977,35 @@ func Delete_laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
 				rp.Working_Progess--
 			}
 
+			sqlStatement = "UPDATE kontrak_vendor SET working_progress=?,working_complate=? WHERE id_kontrak=?"
+
+			stmt, err := con.Prepare(sqlStatement)
+
+			if err != nil {
+				return res, err
+			}
+
+			_, err = stmt.Exec(rp.Working_Progess, rp.Working_Complate, rp.Id_kontrak)
+
+			if err != nil {
+				return res, err
+			}
+
 			//update penjadwalan
 			var ARR_Id_Detail_Laporan []vendor_all.Id_Detail_Laporan_Vendor
 			var Id_Detail_Laporan vendor_all.Id_Detail_Laporan_Vendor
 
 			progres_lama := 0
 
-			sqlStatement = "SELECT COUNT(id_detail_laporan_vendor) FROM detail_laporan_vendor WHERE co < ? && id_kontrak=?"
+			sqlStatement = "SELECT COUNT(id_detail_laporan_vendor) FROM detail_laporan_vendor JOIN laporan_vendor lv on lv.id_laporan_vendor = detail_laporan_vendor.id_laporan_vendor WHERE lv.co < ? && id_kontrak=?"
 
 			err = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Kontrak_Vendor).Scan(&progres_lama)
 
-			sqlStatement = "SELECT id_detail_laporan_vendor FROM detail_laporan_vendor WHERE co > ? && id_kontrak=? ORDER BY co ASC"
+			sqlStatement = "SELECT id_detail_laporan_vendor FROM detail_laporan_vendor JOIN laporan_vendor lv on lv.id_laporan_vendor = detail_laporan_vendor.id_laporan_vendor WHERE lv.co > ? && id_kontrak=? ORDER BY lv.co ASC"
 
 			rows, err = con.Query(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Kontrak_Vendor)
 
 			defer rows.Close()
-
-			if err != nil {
-				return res, err
-			}
 
 			for rows.Next() {
 				err = rows.Scan(&Id_Detail_Laporan.Id_Detail_Laporan_Vendor)
@@ -995,48 +1038,58 @@ func Delete_laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
 				}
 			}
 
-			// menghilangkan detail laporan yang gak perlu --
-
-			q2 := " WHERE id_detail_laporan_vendor IN ("
-
-			for j := 0; j < len(arr_read_dt_lp); j++ {
-				if j == len(arr_read_dt_lp)-1 {
-					q2 = q2 + "'" + arr_read_dt_lp[i].Id_Detail_Laporan_Vendor + "') && id_laporan_vendor = " + "'" + id_laporan_vendor + "' "
-				} else {
-					q2 = q2 + "'" + arr_read_dt_lp[i].Id_Detail_Laporan_Vendor + "' , "
-				}
-			}
-
-			sqlstatement := "DELETE FROM detail_laporan_vendor"
-
-			sqlstatement = sqlstatement + q2
+			sqlstatement := "DELETE FROM detail_laporan_vendor WHERE id_laporan_vendor=?"
 
 			fmt.Println(sqlstatement)
 
-			stmt, err := con.Prepare(sqlstatement)
+			stmt, err = con.Prepare(sqlstatement)
 
 			if err != nil {
 				return res, err
 			}
 
-			result, err := stmt.Exec()
+			result, err := stmt.Exec(id_laporan_vendor)
 
 			if err != nil {
 				return res, err
 			}
 
-			rowsAffected, err := result.RowsAffected()
+			_, err = result.RowsAffected()
 
 			if err != nil {
 				return res, err
-			}
-
-			res.Status = http.StatusOK
-			res.Message = "Suksess"
-			res.Data = map[string]int64{
-				"rows": rowsAffected,
 			}
 		}
+
+		sqlstatement := "DELETE FROM laporan_vendor WHERE id_laporan_vendor=?"
+
+		stmt, err := con.Prepare(sqlstatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		result, err := stmt.Exec(id_laporan_vendor)
+
+		if err != nil {
+			return res, err
+		}
+
+		rowsAffected, err := result.RowsAffected()
+
+		if err != nil {
+			return res, err
+		}
+
+		res.Status = http.StatusOK
+		res.Message = "Suksess"
+		res.Data = map[string]int64{
+			"rows": rowsAffected,
+		}
+
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Suksess"
 	}
 
 	return res, nil

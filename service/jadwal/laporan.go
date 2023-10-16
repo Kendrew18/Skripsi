@@ -270,8 +270,7 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 
 			sqlStatement = "SELECT id_penjadwalan,progress,durasi,complate FROM penjadwalan WHERE id_penjadwalan=?"
 
-			_ = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&rp.Id_penjadwalan,
-				&rp.Progress, &rp.Durasi, &rp.Complate)
+			_ = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&rp.Id_penjadwalan, &rp.Progress, &rp.Durasi, &rp.Complate)
 
 			if rp.Complate == 1 && arr_read_dt_lp[i].Check_Box == 1 {
 				rp.Complate = 0
@@ -752,8 +751,7 @@ func Delete_Laporan(id_laporan string) (tools2.Response, error) {
 
 			sqlStatement = "SELECT id_penjadwalan,progress,durasi,complate FROM penjadwalan WHERE id_penjadwalan=?"
 
-			_ = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&rp.Id_penjadwalan,
-				&rp.Progress, &rp.Durasi, &rp.Complate)
+			_ = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&rp.Id_penjadwalan, &rp.Progress, &rp.Durasi, &rp.Complate)
 
 			if rp.Complate == 1 && arr_read_dt_lp[i].Check_Box == 1 {
 				rp.Complate = 0
@@ -875,6 +873,9 @@ func Delete_Laporan(id_laporan string) (tools2.Response, error) {
 		res.Data = map[string]int64{
 			"rows": rowsAffected,
 		}
+	} else {
+		res.Status = http.StatusNotFound
+		res.Message = "Suksess"
 	}
 
 	return res, nil
