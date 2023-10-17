@@ -19,7 +19,7 @@ func Init() *echo.Echo {
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Project-NDL")
+		return c.String(http.StatusOK, "Project-Skripsi-Project-Management")
 	})
 
 	kv := e.Group("/kv")
@@ -90,7 +90,7 @@ func Init() *echo.Echo {
 	//update_status_laporan_vendor
 	LV.PUT("/update-status", vendor_all.UpdateStatusLaporanVendor)
 	//See Kontrak Vendor
-	LV.GET("/see-kontak-vendor", vendor_all.SeeTaskVendor)
+	LV.GET("/see-kontrak-vendor", vendor_all.SeeTaskVendor)
 	//Delete Laporan Vendor
 	LV.DELETE("/delete-laporan-vendor", vendor_all.DeleteLaporanVendor)
 

@@ -15,8 +15,6 @@ import (
 	"time"
 )
 
-//(blm dicoba)
-
 //input-laporan-Vendor (done)V
 func Input_Laporan_Vendor(id_proyek string, laporan string, tanggal_laporan string, id_kontrak string, check_box string) (tools2.Response, error) {
 	var res tools2.Response
@@ -45,7 +43,7 @@ func Input_Laporan_Vendor(id_proyek string, laporan string, tanggal_laporan stri
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_proyek, id_LV, laporan, date_sql, 0, id_kontrak, check_box)
+	_, err = stmt.Exec(nm_str, id_proyek, id_LV, laporan, date_sql, 0)
 
 	if err != nil {
 		return res, err
@@ -55,13 +53,12 @@ func Input_Laporan_Vendor(id_proyek string, laporan string, tanggal_laporan stri
 	ck := tools2.String_Separator_To_Int(check_box)
 
 	for i := 0; i < len(ip); i++ {
+		fmt.Println("masuk")
 		progress := 0
 		if ck[i] == 1 {
-
 			sqlstatemen_jdl := "SELECT id_kontrak,working_progress,working_complate,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) FROM kontrak_vendor WHERE id_kontrak=?"
 
-			_ = con.QueryRow(sqlstatemen_jdl, ip[i]).Scan(&RP.Id_kontrak, &RP.Working_Progess,
-				&RP.Durasi, &RP.Working_Complate)
+			_ = con.QueryRow(sqlstatemen_jdl, ip[i]).Scan(&RP.Id_kontrak, &RP.Working_Progess, &RP.Working_Complate, &RP.Durasi)
 
 			if RP.Durasi == RP.Working_Progess+1 {
 				RP.Working_Progess++
@@ -75,6 +72,7 @@ func Input_Laporan_Vendor(id_proyek string, laporan string, tanggal_laporan stri
 			stmt, err := con.Prepare(sqlStatement)
 
 			if err != nil {
+				fmt.Println("masuk2")
 				return res, err
 			}
 
@@ -84,6 +82,8 @@ func Input_Laporan_Vendor(id_proyek string, laporan string, tanggal_laporan stri
 			durasi_float := float64(RP.Durasi)
 
 			progress = int(math.Round((progress_float / durasi_float) * 100))
+			fmt.Println(RP.Durasi)
+			fmt.Println(progress)
 
 		} else if ck[i] == 2 {
 
@@ -224,7 +224,121 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, id_kontrak 
 
 	_ = con.QueryRow(sqlStatement, id_laporan_vendor).Scan(&st.Status)
 
-	if st.Status == 0 {
+	cont := 0
+
+	sqls := "SELECT count(id_laporan_vendor) FROM detail_laporan_vendor WHERE id_laporan_vendor=?"
+	_ = con.QueryRow(sqls, id_laporan_vendor).Scan(&cont)
+
+	fmt.Println(cont)
+
+	if cont == 0 && st.Status == 0 {
+		var RP vendor_all.Progress_Vendor
+
+		ip := tools2.String_Separator_To_String(id_kontrak)
+		ck := tools2.String_Separator_To_Int(check_box)
+
+		for i := 0; i < len(ip); i++ {
+			fmt.Println("masuk")
+			progress := 0
+			if ck[i] == 1 {
+				sqlstatemen_jdl := "SELECT id_kontrak,working_progress,working_complate,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) FROM kontrak_vendor WHERE id_kontrak=?"
+
+				_ = con.QueryRow(sqlstatemen_jdl, ip[i]).Scan(&RP.Id_kontrak, &RP.Working_Progess, &RP.Working_Complate, &RP.Durasi)
+
+				if RP.Durasi == RP.Working_Progess+1 {
+					RP.Working_Progess++
+					RP.Working_Complate = 1
+				} else {
+					RP.Working_Progess = RP.Working_Progess + 1
+				}
+
+				sqlStatement = "UPDATE kontrak_vendor SET working_progress=?,working_complate=? WHERE id_kontrak=?"
+
+				stmt, err := con.Prepare(sqlStatement)
+
+				if err != nil {
+					fmt.Println("masuk2")
+					return res, err
+				}
+
+				_, err = stmt.Exec(RP.Working_Progess, RP.Working_Complate, ip[i])
+
+				progress_float := float64(RP.Working_Progess)
+				durasi_float := float64(RP.Durasi)
+
+				progress = int(math.Round((progress_float / durasi_float) * 100))
+				fmt.Println(RP.Durasi)
+				fmt.Println(progress)
+
+			} else if ck[i] == 2 {
+
+				sqlStatement = "UPDATE kontrak_vendor SET working_complate=? WHERE id_kontrak=?"
+
+				stmt, err := con.Prepare(sqlStatement)
+
+				if err != nil {
+					return res, err
+				}
+
+				_, err = stmt.Exec(1, ip[i])
+
+				progress = 100
+			}
+			nm_str_DLPV := 0
+
+			Sqlstatement := "SELECT co FROM detail_laporan_vendor ORDER BY co DESC Limit 1"
+
+			_ = con.QueryRow(Sqlstatement).Scan(&nm_str_DLPV)
+
+			nm_str_DLPV = nm_str_DLPV + 1
+
+			id_detail_laporan_vendor := "DLPV-" + strconv.Itoa(nm_str_DLPV)
+
+			sqlStatement := "INSERT INTO detail_laporan_vendor (co, id_detail_laporan_vendor, id_laporan_vendor, id_kontrak, check_box, progress) values(?,?,?,?,?,?)"
+
+			stmt, err := con.Prepare(sqlStatement)
+
+			if err != nil {
+				return res, err
+			}
+
+			_, err = stmt.Exec(nm_str_DLPV, id_detail_laporan_vendor, id_laporan_vendor, ip[i], ck[i], progress)
+
+			if err != nil {
+				return res, err
+			}
+
+		}
+
+		sqlStatement = "UPDATE laporan_vendor SET laporan=? WHERE id_laporan_vendor=?"
+
+		stmt, err := con.Prepare(sqlStatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		result, err := stmt.Exec(laporan, id_laporan_vendor)
+
+		if err != nil {
+			return res, err
+		}
+
+		rowschanged, err := result.RowsAffected()
+
+		if err != nil {
+			return res, err
+		}
+
+		res.Status = http.StatusOK
+		res.Message = "Suksess"
+		res.Data = map[string]int64{
+			"rows": rowschanged,
+		}
+
+		stmt.Close()
+
+	} else if cont != 0 && st.Status == 0 {
 
 		var read_dt_lp vendor_all.Detail_Laporan_Vendor_Update
 		var arr_read_dt_lp []vendor_all.Detail_Laporan_Vendor_Update
@@ -400,6 +514,7 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, id_kontrak 
 					err = con.QueryRow(sqlstatemen_jdl, ip[i]).Scan(&RP.Id_kontrak, &RP.Working_Progess, &RP.Durasi, &RP.Working_Complate)
 
 					if err != nil {
+						fmt.Println("masuk 3")
 						return res, err
 					}
 
@@ -502,8 +617,10 @@ func Update_Laporan_Vendor(id_laporan_vendor string, laporan string, id_kontrak 
 
 				err = con.QueryRow(Sqlstatement).Scan(&nm_str_DLP)
 
+				fmt.Println(nm_str_DLP)
+
 				if err != nil {
-					return res, err
+					nm_str_DLP = 0
 				}
 
 				nm_str_DLP = nm_str_DLP + 1
@@ -856,9 +973,9 @@ func See_Task_Vendor(tanggal_laporan string, id_proyek string, id_laporan_vendor
 
 	if id_laporan_vendor == "" {
 
-		sqlStatement := "SELECT id_kontrak,nama_vendor,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_progress FROM kontrak_vendor JOIN vendor v ON v.id_master_vendor=kontrak_vendor.id_MV WHERE tanggal_pengerjaan_dimulai<=? && tanggal_pengerjaan_berakhir>=? && working_progress != DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) && id_proyek=?"
+		sqlStatement := "SELECT id_kontrak,nama_vendor,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),penkerjaan_vendor,working_progress FROM kontrak_vendor JOIN vendor v ON v.id_master_vendor=kontrak_vendor.id_MV WHERE tanggal_pengerjaan_dimulai<=? && tanggal_pengerjaan_berakhir>=? && working_progress != DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) && id_proyek=?"
 
-		rows, err := con.Query(sqlStatement, date_sql)
+		rows, err := con.Query(sqlStatement, date_sql, date_sql, id_proyek)
 
 		defer rows.Close()
 
@@ -872,7 +989,10 @@ func See_Task_Vendor(tanggal_laporan string, id_proyek string, id_laporan_vendor
 
 			err = rows.Scan(&rt_lp.Id_Kontrak, &rt_lp.Nama_Vendor, &durasi, &rt_lp.Pekerjaan_Vendor, &rt_lp.Progress)
 
-			rt_lp.Progress = (rt_lp.Progress / durasi) * 100
+			progress_float := float64(rt_lp.Progress)
+			durasi_float := float64(durasi)
+
+			rt_lp.Progress = int(math.Round((progress_float / durasi_float) * 100))
 
 			if err != nil {
 				return res, err
@@ -885,7 +1005,7 @@ func See_Task_Vendor(tanggal_laporan string, id_proyek string, id_laporan_vendor
 
 		sqlStatement := "SELECT kontrak_vendor.id_kontrak,nama_vendor,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_progress,check_box FROM kontrak_vendor JOIN vendor v ON v.id_master_vendor=kontrak_vendor.id_MV LEFT JOIN detail_laporan_vendor dlv on kontrak_vendor.id_kontrak = dlv.id_kontrak WHERE (tanggal_pengerjaan_dimulai<=? && tanggal_pengerjaan_berakhir>=? && working_progress != DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) && id_proyek=?) || id_laporan_vendor=?"
 
-		rows, err := con.Query(sqlStatement, date_sql)
+		rows, err := con.Query(sqlStatement, date_sql, date_sql, id_proyek, id_laporan_vendor)
 
 		defer rows.Close()
 
@@ -899,7 +1019,10 @@ func See_Task_Vendor(tanggal_laporan string, id_proyek string, id_laporan_vendor
 
 			err = rows.Scan(&rt_lp.Id_Kontrak, &rt_lp.Nama_Vendor, &durasi, &rt_lp.Pekerjaan_Vendor, &rt_lp.Progress, rt_lp.Check_Box)
 
-			rt_lp.Progress = (rt_lp.Progress / durasi) * 100
+			progress_float := float64(rt_lp.Progress)
+			durasi_float := float64(durasi)
+
+			rt_lp.Progress = int(math.Round((progress_float / durasi_float) * 100))
 
 			if err != nil {
 				return res, err
@@ -923,7 +1046,7 @@ func See_Task_Vendor(tanggal_laporan string, id_proyek string, id_laporan_vendor
 	return res, nil
 }
 
-//delete laporan vendor (done) (grg done)
+//delete laporan vendor (done)
 func Delete_laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
 	var res tools2.Response
 	var st jadwal.Status_laporan

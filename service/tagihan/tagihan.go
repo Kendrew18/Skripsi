@@ -2,7 +2,6 @@ package tagihan
 
 import (
 	"Skripsi/config/db"
-	str "Skripsi/models"
 	"Skripsi/models/tagihan"
 	tools2 "Skripsi/service/tools"
 	"net/http"
@@ -10,47 +9,23 @@ import (
 	"time"
 )
 
-//Generate Id Tagihan
-func Generate_Id_Tagihan() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_tagihan FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_tagihan=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
 //Input-Tagihan
-func Input_Tagihan(id_proyek string, perihal string, tanggal_pembarian_kwitansi string,
-	tanggal_pembayaran string, nominal_keseluruhan int64, id_penawaran string,
-	id_sub_pekerjaan string, nominal string) (tools2.Response, error) {
+func Input_Tagihan(id_proyek string, perihal string, tanggal_pembarian_kwitansi string, tanggal_pembayaran string, nominal_keseluruhan int64, id_penawaran string, id_sub_pekerjaan string, nominal string) (tools2.Response, error) {
 	var res tools2.Response
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Tagihan()
+	nm_str := 0
 
-	nm_str := strconv.Itoa(nm)
+	Sqlstatement := "SELECT co FROM penawaran ORDER BY co DESC Limit 1"
 
-	id_real := "TG-" + nm_str
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
-	sqlStatement := "INSERT INTO tagihan (id_tagihan,id_proyek, perihal_tagihan, tanggal_pemberian_kwitansi, tanggal_pembayaran, nominal_keseluruhan,id_penawaran, id_sub_pekerjaan, nominal) values(?,?,?,?,?,?,?,?,?)"
+	nm_str = nm_str + 1
+
+	id_Tagihan := "TG-" + strconv.Itoa(nm_str)
+
+	sqlStatement := "INSERT INTO tagihan (co,id_tagihan,id_proyek, perihal_tagihan, tanggal_pemberian_kwitansi, tanggal_pembayaran, nominal_keseluruhan) values(?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -64,8 +39,41 @@ func Input_Tagihan(id_proyek string, perihal string, tanggal_pembarian_kwitansi 
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_real, id_proyek, perihal, date_sql2, date_sql,
-		nominal_keseluruhan, id_penawaran, id_sub_pekerjaan, nominal)
+	_, err = stmt.Exec(nm_str, id_Tagihan, id_proyek, perihal, date_sql2, date_sql, nominal_keseluruhan, id_penawaran, id_sub_pekerjaan, nominal)
+
+	if err != nil {
+		return res, err
+	}
+
+	id_p := tools2.String_Separator_To_String(id_penawaran)
+	id_s_p := tools2.String_Separator_To_String(id_sub_pekerjaan)
+	nom := tools2.String_Separator_To_Int64(nominal)
+
+	for i := 0; i < len(id_p); i++ {
+		nm_str2 := 0
+
+		Sqlstatement = "SELECT co FROM penawaran ORDER BY co DESC Limit 1"
+
+		_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
+
+		nm_str2 = nm_str2 + 1
+
+		id_Detail_Tagihan := "DTG-" + strconv.Itoa(nm_str2)
+
+		sqlStatement = "INSERT INTO detail_tagihan (co, id_detail_tagihan, id_tagihan, id_penawaran, id_sub_pekerjaan, nominal) values(?,?,?,?,?,?)"
+
+		stmt, err = con.Prepare(sqlStatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		_, err = stmt.Exec(nm_str2, id_Detail_Tagihan, id_Tagihan, id_p[i], id_s_p[i], nom[i])
+
+		if err != nil {
+			return res, err
+		}
+	}
 
 	stmt.Close()
 

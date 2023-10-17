@@ -220,7 +220,114 @@ func Update_Laporan(id_laporan string, laporan string, id_penjadwalan string, ch
 
 	_ = con.QueryRow(sqlStatement, id_laporan).Scan(&st.Status)
 
-	if st.Status == 0 {
+	cont := 0
+
+	sqls := "SELECT count(id_laporan) FROM detail_laporan WHERE id_laporan=?"
+	_ = con.QueryRow(sqls, id_laporan).Scan(&cont)
+
+	fmt.Println(cont)
+
+	if cont == 0 && st.Status == 0 {
+		var RP jadwal.Progress
+
+		ip := tools2.String_Separator_To_String(id_penjadwalan)
+		ck := tools2.String_Separator_To_Int(check)
+
+		for i := 0; i < len(ip); i++ {
+			progress := 0
+			if ck[i] == 1 {
+				sqlstatemen_jdl := "SELECT id_penjadwalan,progress,durasi,complate FROM penjadwalan WHERE id_penjadwalan=?"
+
+				err := con.QueryRow(sqlstatemen_jdl, ip[i]).Scan(&RP.Id_penjadwalan, &RP.Progress,
+					&RP.Durasi, &RP.Complate)
+
+				if RP.Durasi == RP.Progress+1 {
+					RP.Progress++
+					RP.Complate = 1
+				} else {
+					RP.Progress = RP.Progress + 1
+				}
+
+				sqlStatement = "UPDATE penjadwalan SET progress=?,complate=? WHERE id_penjadwalan=?"
+
+				stmt, err := con.Prepare(sqlStatement)
+
+				if err != nil {
+					return res, err
+				}
+
+				_, err = stmt.Exec(RP.Progress, RP.Complate, ip[i])
+
+				progress_float := float64(RP.Progress)
+				durasi_float := float64(RP.Durasi)
+
+				progress = int(math.Round((progress_float / durasi_float) * 100))
+
+			} else if ck[i] == 2 {
+
+				sqlStatement = "UPDATE penjadwalan SET complate=? WHERE id_penjadwalan=?"
+
+				stmt, err := con.Prepare(sqlStatement)
+
+				if err != nil {
+					return res, err
+				}
+
+				_, err = stmt.Exec(1, ip[i])
+
+				progress = 100
+			}
+
+			nm_str_DLP := 0
+
+			Sqlstatement := "SELECT co FROM detail_laporan ORDER BY co DESC Limit 1"
+
+			_ = con.QueryRow(Sqlstatement).Scan(&nm_str_DLP)
+
+			nm_str_DLP = nm_str_DLP + 1
+
+			id_detail_laporan := "DLP-" + strconv.Itoa(nm_str_DLP)
+
+			sqlStatement := "INSERT INTO detail_laporan (co, id_detail_laporan, id_laporan, id_jadwal, checkbox,progress) values(?,?,?,?,?,?)"
+
+			stmt, err := con.Prepare(sqlStatement)
+
+			if err != nil {
+				return res, err
+			}
+
+			_, err = stmt.Exec(nm_str_DLP, id_detail_laporan, id_laporan, ip[i], ck[i], progress)
+		}
+
+		sqlStatement = "UPDATE laporan SET laporan=? WHERE id_laporan=?"
+
+		stmt, err := con.Prepare(sqlStatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		result, err := stmt.Exec(laporan, id_laporan)
+
+		if err != nil {
+			return res, err
+		}
+
+		rowschanged, err := result.RowsAffected()
+
+		if err != nil {
+			return res, err
+		}
+
+		res.Status = http.StatusOK
+		res.Message = "Suksess"
+		res.Data = map[string]int64{
+			"rows": rowschanged,
+		}
+
+		stmt.Close()
+
+	} else if cont != 0 && st.Status == 0 {
 
 		var read_dt_lp jadwal.Detail_Laporan_Update
 		var arr_read_dt_lp []jadwal.Detail_Laporan_Update
@@ -910,7 +1017,10 @@ func See_Task(tanggal_laporan string, id_proyek string, id_laporan string) (tool
 
 			err = rows.Scan(&rt_lp.Id_penjadwalan, &rt_lp.Nama_Task, &durasi, &rt_lp.Progress)
 
-			rt_lp.Progress = (rt_lp.Progress / durasi) * 100
+			progress_float := float64(rt_lp.Progress)
+			durasi_float := float64(durasi)
+
+			rt_lp.Progress = int(math.Round((progress_float / durasi_float) * 100))
 
 			if err != nil {
 				return res, err
@@ -936,7 +1046,10 @@ func See_Task(tanggal_laporan string, id_proyek string, id_laporan string) (tool
 
 			err = rows.Scan(&rt_lp.Id_penjadwalan, &rt_lp.Nama_Task, &durasi, &rt_lp.Progress, &rt_lp.Check_box)
 
-			rt_lp.Progress = (rt_lp.Progress / durasi) * 100
+			progress_float := float64(rt_lp.Progress)
+			durasi_float := float64(durasi)
+
+			rt_lp.Progress = int(math.Round((progress_float / durasi_float) * 100))
 
 			if err != nil {
 				return res, err
