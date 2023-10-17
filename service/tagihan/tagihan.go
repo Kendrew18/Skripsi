@@ -89,11 +89,9 @@ func Read_Realisasi(id_proyek string) (tools2.Response, error) {
 	var arr_invent []tagihan.Read_Tagihan
 	var invent tagihan.Read_Tagihan
 
-	var rtf tagihan.Read_Detail_Tagihan
-
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_tagihan,perihal_tagihan, DATE_FORMAT(tanggal_pemberian_kwitansi, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pembayaran, '%d-%m%-%Y'),nominal_keseluruhan,id_penawaran,id_sub_pekerjaan,nominal FROM tagihan WHERE id_proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_tagihan,perihal_tagihan, DATE_FORMAT(tanggal_pemberian_kwitansi, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pembayaran, '%d-%m%-%Y'),nominal_keseluruhan FROM tagihan WHERE id_proyek=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, id_proyek)
 
@@ -104,27 +102,31 @@ func Read_Realisasi(id_proyek string) (tools2.Response, error) {
 	}
 
 	for rows.Next() {
-		ip := ""
-		isp := ""
-		nm := ""
+		var obj tagihan.Read_Detail_Tagihan
+		var arr_obj []tagihan.Read_Detail_Tagihan
 		err = rows.Scan(&invent.Id_Tagihan, &invent.Perihal_Tagihan, &invent.Tanggal_Pemberian_Kwitansi,
-			&invent.Tanggal_Pembayaran, &invent.Nominal_Keseluruhan, &ip, &isp, &nm)
+			&invent.Tanggal_Pembayaran, &invent.Nominal_Keseluruhan)
 
-		temp_ip := tools2.String_Separator_To_String(ip)
-		temp_isp := tools2.String_Separator_To_String(isp)
-		temp_nm := tools2.String_Separator_To_Int64(nm)
+		sqlStatement := "SELECT id_detail_tagihan, id_penawaran, id_sub_pekerjaan, nominal FROM detail_tagihan WHERE id_tagihan=? ORDER BY co ASC "
 
-		for i := 0; i < len(temp_isp); i++ {
-			rtf.Id_Penawaran = temp_ip[i]
-			rtf.Id_Sub_Pekerjaan = temp_isp[i]
-			rtf.Nominal = temp_nm[i]
+		rows2, err := con.Query(sqlStatement, invent.Id_Tagihan)
 
-			sqlStatement = "SELECT nama_task FROM  penjadwalan WHERE id_penawaran=? && id_sub_pekerjaan=?"
+		defer rows.Close()
 
-			_ = con.QueryRow(sqlStatement, rtf.Id_Penawaran, rtf.Id_Sub_Pekerjaan).Scan(
-				&rtf.Nama_Sub_Pekerjaan)
-			invent.Read_Detail_Tagihan = append(invent.Read_Detail_Tagihan, rtf)
+		if err != nil {
+			return res, err
 		}
+
+		for rows2.Next() {
+			err = rows2.Scan(&obj.Id_detail_tagihan, &obj.Id_Penawaran, &obj.Id_Sub_Pekerjaan, &obj.Nominal)
+
+			if err != nil {
+				return res, err
+			}
+			arr_obj = append(arr_obj, obj)
+		}
+
+		invent.Read_Detail_Tagihan = arr_obj
 
 		if err != nil {
 			return res, err
@@ -151,7 +153,7 @@ func Delete_Tagihan(id_tagihan string) (tools2.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlstatement := "DELETE FROM tagihan WHERE id_tagihan=?"
+	sqlstatement := "DELETE FROM detail_tagihan WHERE id_tagihan=?"
 
 	stmt, err := con.Prepare(sqlstatement)
 
@@ -166,6 +168,26 @@ func Delete_Tagihan(id_tagihan string) (tools2.Response, error) {
 	}
 
 	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return res, err
+	}
+
+	sqlstatement = "DELETE FROM tagihan WHERE id_tagihan=?"
+
+	stmt, err = con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	result, err = stmt.Exec(id_tagihan)
+
+	if err != nil {
+		return res, err
+	}
+
+	rowsAffected, err = result.RowsAffected()
 
 	if err != nil {
 		return res, err
@@ -222,30 +244,30 @@ func See_Judul(id_proyek string) (tools2.Response, error) {
 }
 
 //See-Sub-Pekerjaan
-func See_Sub_Pekerjaan(id_proyek string, id_penawaran string) (tools2.Response, error) {
+func See_Sub_Pekerjaan(id_penawaran string) (tools2.Response, error) {
 	var res tools2.Response
 	var arr_invent []tagihan.See_Sub_Pekerjaan
 	var invent tagihan.See_Sub_Pekerjaan
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_sub_pekerjaan,sub_pekerjaan FROM penawaran WHERE id_proyek=? && id_penawaran=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_sub_pekerjaan,nama_sub_pekerjaan FROM detail_penawaran WHERE id_penawaran=? ORDER BY co ASC "
 
-	temp := ""
-	temp2 := ""
+	rows, err := con.Query(sqlStatement, id_penawaran)
 
-	err := con.QueryRow(sqlStatement, id_proyek, id_penawaran).Scan(&temp, &temp2)
+	defer rows.Close()
 
 	if err != nil {
 		return res, err
 	}
 
-	tp := tools2.String_Separator_To_String(temp)
-	tp2 := tools2.String_Separator_To_String(temp2)
+	for rows.Next() {
 
-	for i := 0; i < len(tp); i++ {
-		invent.Sub_Pekerjaan = tp2[i]
-		invent.Id_Sub_Pekerjaan = tp[i]
+		err = rows.Scan(&invent.Id_Sub_Pekerjaan, &invent.Sub_Pekerjaan)
+
+		if err != nil {
+			return res, err
+		}
 		arr_invent = append(arr_invent, invent)
 	}
 

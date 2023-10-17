@@ -10,15 +10,9 @@ type Read_Tagihan struct {
 }
 
 type Read_Detail_Tagihan struct {
+	Id_detail_tagihan  string `json:"id_detail_tagihan"`
 	Id_Penawaran       string `json:"id_penawaran"`
 	Id_Sub_Pekerjaan   string `json:"id_sub_pekerjaan"`
 	Nama_Sub_Pekerjaan string `json:"nama_sub_pekerjaan"`
 	Nominal            int64  `json:"nominal"`
-}
-
-type Read_Detail_Tagihan_string struct {
-	Id_Penawaran       string `json:"id_penawaran"`
-	Id_Sub_Pekerjaan   string `json:"id_sub_pekerjaan"`
-	Nama_Sub_Pekerjaan string `json:"nama_sub_pekerjaan"`
-	Nominal            string `json:"nominal"`
 }
