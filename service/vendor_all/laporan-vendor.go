@@ -1003,7 +1003,7 @@ func See_Task_Vendor(tanggal_laporan string, id_proyek string, id_laporan_vendor
 
 	} else {
 
-		sqlStatement := "SELECT kontrak_vendor.id_kontrak,nama_vendor,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_progress,check_box FROM kontrak_vendor JOIN vendor v ON v.id_master_vendor=kontrak_vendor.id_MV LEFT JOIN detail_laporan_vendor dlv on kontrak_vendor.id_kontrak = dlv.id_kontrak WHERE (tanggal_pengerjaan_dimulai<=? && tanggal_pengerjaan_berakhir>=? && working_progress != DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) && id_proyek=?) || id_laporan_vendor=?"
+		sqlStatement := "SELECT kontrak_vendor.id_kontrak,nama_vendor,DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),penkerjaan_vendor,working_progress,ifnull(check_box,0) FROM kontrak_vendor JOIN vendor v ON v.id_master_vendor=kontrak_vendor.id_MV LEFT JOIN detail_laporan_vendor dlv on kontrak_vendor.id_kontrak = dlv.id_kontrak WHERE (tanggal_pengerjaan_dimulai<=? && tanggal_pengerjaan_berakhir>=? && working_progress != DATEDIFF(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai) && id_proyek=?) || id_laporan_vendor=?"
 
 		rows, err := con.Query(sqlStatement, date_sql, date_sql, id_proyek, id_laporan_vendor)
 
@@ -1017,7 +1017,7 @@ func See_Task_Vendor(tanggal_laporan string, id_proyek string, id_laporan_vendor
 
 			durasi := 0
 
-			err = rows.Scan(&rt_lp.Id_Kontrak, &rt_lp.Nama_Vendor, &durasi, &rt_lp.Pekerjaan_Vendor, &rt_lp.Progress, rt_lp.Check_Box)
+			err = rows.Scan(&rt_lp.Id_Kontrak, &rt_lp.Nama_Vendor, &durasi, &rt_lp.Pekerjaan_Vendor, &rt_lp.Progress, &rt_lp.Check_Box)
 
 			progress_float := float64(rt_lp.Progress)
 			durasi_float := float64(durasi)
