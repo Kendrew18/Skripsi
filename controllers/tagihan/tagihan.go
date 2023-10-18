@@ -71,10 +71,9 @@ func SeeJudul(c echo.Context) error {
 
 //See_Sub_Pekerjaan
 func SeeSubPekerjaan(c echo.Context) error {
-	id_proyek := c.FormValue("id_proyek")
 	id_penawaran := c.FormValue("id_penawaran")
 
-	result, err := tagihan.See_Sub_Pekerjaan(id_proyek, id_penawaran)
+	result, err := tagihan.See_Sub_Pekerjaan(id_penawaran)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
