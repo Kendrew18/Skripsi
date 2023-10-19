@@ -61,6 +61,59 @@ func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string, total_nilai
 
 	_, err = stmt.Exec(nm_str, id_proyek, id_master_vendor, id_kontrak, total_nilai_kontrak, nominal_pembayaran, tanggal_dimulai_kontrak_SQL, tanggal_berakhir_kontrak_SQL, total_nilai_kontrak, Tanggal_Pengiriman_SQL, Tanggal_Pekerjaan_Dimulai, Tanggal_Pekerjaan_Berakhir, 0, 0, 0)
 
+	nama_vendor := ""
+
+	nama_proyek := ""
+
+	sqlst := "SELECT nama_vendor FROM vendor WHERE id_master_vendor=?"
+
+	err = con.QueryRow(sqlst, id_master_vendor).Scan(&nama_vendor)
+
+	if err != nil {
+		return res, err
+	}
+
+	sqlst = "SELECT nama_proyek FROM proyek WHERE id_proyek=?"
+
+	err = con.QueryRow(sqlst, id_proyek).Scan(&nama_proyek)
+
+	if err != nil {
+		return res, err
+	}
+
+	for i := 0; i < int(month); i++ {
+
+		date_notif, _ := time.Parse("02-01-2006", tanggal_dimulai)
+
+		date_notif = date_notif.AddDate(0, i, 0)
+
+		date_notif_sql := date_notif.Format("2006-01-02")
+
+		fmt.Println(date_notif_sql)
+
+		pesan := "Pembayaran yang harus dilakukan sebesar " + strconv.FormatInt(nominal_pembayaran, 10) + " untuk vendor dengan nama " + nama_vendor + " pada proyek " + nama_proyek
+
+		nm_str := 0
+
+		Sqlstatement := "SELECT co FROM notif ORDER BY co DESC Limit 1"
+
+		_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
+
+		nm_str = nm_str + 1
+
+		id_notif := "NT-" + strconv.Itoa(nm_str)
+
+		sqlStatement := "INSERT INTO notif (co, id_notif, id_kontrak, tanggal, pesan) values(?,?,?,?,?)"
+
+		stmt, err := con.Prepare(sqlStatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		_, err = stmt.Exec(nm_str, id_notif, id_kontrak, date_notif_sql, pesan)
+	}
+
 	stmt.Close()
 
 	res.Status = http.StatusOK
@@ -141,7 +194,7 @@ func Delete_Kontrak_Vendor(id_kontrak string) (tools.Response, error) {
 
 	if arrobj == nil {
 
-		sqlstatement := "DELETE FROM kontrak_vendor WHERE id_kontrak=?"
+		sqlstatement := "DELETE FROM notif WHERE id_kontrak=?"
 
 		stmt, err := con.Prepare(sqlstatement)
 
@@ -156,6 +209,26 @@ func Delete_Kontrak_Vendor(id_kontrak string) (tools.Response, error) {
 		}
 
 		rowsAffected, err := result.RowsAffected()
+
+		if err != nil {
+			return res, err
+		}
+
+		sqlstatement = "DELETE FROM kontrak_vendor WHERE id_kontrak=?"
+
+		stmt, err = con.Prepare(sqlstatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		result, err = stmt.Exec(id_kontrak)
+
+		if err != nil {
+			return res, err
+		}
+
+		rowsAffected, err = result.RowsAffected()
 
 		if err != nil {
 			return res, err
@@ -212,6 +285,112 @@ func Pick_Vendor() (tools.Response, error) {
 		res.Status = http.StatusOK
 		res.Message = "Sukses"
 		res.Data = arr_invent
+	}
+
+	return res, nil
+}
+
+//Read_notif
+func Read_Notif(tanggal string, status int) (tools.Response, error) {
+	var res tools.Response
+
+	var arr_all []vendor_all.Read_All_Notif
+	var invent_all vendor_all.Read_All_Notif
+
+	con := db.CreateCon()
+
+	if status == 0 {
+		var arr_invent []vendor_all.Read_Notif
+		var invent vendor_all.Read_Notif
+
+		date3, _ := time.Parse("02-01-2006", tanggal)
+		Tanggal_SQL := date3.Format("2006-01-02")
+
+		sqlStatement := "SELECT id_notif, id_kontrak, DATE_FORMAT(tanggal, '%d-%m%-%Y'), pesan FROM notif WHERE tanggal=?"
+
+		rows, err := con.Query(sqlStatement, Tanggal_SQL)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows.Next() {
+			err = rows.Scan(&invent.Id_notif, &invent.Id_kontrak, &invent.Tanggal, &invent.Pesan)
+			invent.Jam_Notif = "10:00"
+			if err != nil {
+				return res, err
+			}
+			arr_invent = append(arr_invent, invent)
+		}
+
+		if arr_invent == nil {
+			res.Status = http.StatusNotFound
+			res.Message = "Not Found"
+			res.Data = arr_invent
+		} else {
+			res.Status = http.StatusOK
+			res.Message = "Sukses"
+			res.Data = arr_invent
+		}
+
+	} else if status == 1 {
+
+		sqlStatement := "SELECT DISTINCT(tanggal),DATE_FORMAT(tanggal, '%d-%m%-%Y') FROM notif ORDER BY tanggal DESC "
+
+		rows, err := con.Query(sqlStatement)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows.Next() {
+			var arr_invent []vendor_all.Read_Notif
+			var invent vendor_all.Read_Notif
+			tgl := ""
+
+			err = rows.Scan(&tgl, &invent_all.Tanggal)
+
+			sqlStatement := "SELECT id_notif, id_kontrak, DATE_FORMAT(tanggal, '%d-%m%-%Y'), pesan FROM notif WHERE tanggal=?"
+
+			rows, err := con.Query(sqlStatement, tgl)
+
+			defer rows.Close()
+
+			if err != nil {
+				return res, err
+			}
+
+			for rows.Next() {
+				err = rows.Scan(&invent.Id_notif, &invent.Id_kontrak, &invent.Tanggal, &invent.Pesan)
+				invent.Jam_Notif = "10:00"
+				if err != nil {
+					return res, err
+				}
+				arr_invent = append(arr_invent, invent)
+			}
+
+			invent_all.Read_Notif = arr_invent
+
+			if err != nil {
+				return res, err
+			}
+			arr_all = append(arr_all, invent_all)
+		}
+
+		if arr_all == nil {
+			res.Status = http.StatusNotFound
+			res.Message = "Not Found"
+			res.Data = arr_all
+		} else {
+			res.Status = http.StatusOK
+			res.Message = "Sukses"
+			res.Data = arr_all
+		}
+
 	}
 
 	return res, nil

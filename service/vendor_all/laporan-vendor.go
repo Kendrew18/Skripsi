@@ -1184,6 +1184,22 @@ func Delete_laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
 			}
 		}
 
+		sqlStatement = "SELECT path FROM foto_laporan_vendor WHERE id_laporan_vendor=? "
+
+		rows, err = con.Query(sqlStatement, id_laporan_vendor)
+
+		defer rows.Close()
+
+		if err != nil {
+			return res, err
+		}
+
+		for rows.Next() {
+			path := ""
+			err = rows.Scan(&path)
+			os.Remove(path)
+		}
+
 		sqlstatement := "DELETE FROM laporan_vendor WHERE id_laporan_vendor=?"
 
 		stmt, err := con.Prepare(sqlstatement)

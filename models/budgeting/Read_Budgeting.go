@@ -13,3 +13,8 @@ type Read_Budgeting struct {
 	Judul              string               `json:"judul"`
 	Read_Sub_Pekerjaan []Read_Sub_Pekerjaan `json:"read_sub_pekerjaan"`
 }
+
+type Kontrak_Vendor struct {
+	Id_kontak_vendor string `json:"id_kontak_vendor"`
+	Nama_vendor      string `json:"nama_vendor"`
+}

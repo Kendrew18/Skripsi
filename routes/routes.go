@@ -178,6 +178,9 @@ func Init() *echo.Echo {
 	BU.PUT("/edit-realisasi", budgeting.UpdateRealisasi)
 	//Read_Budgeting
 	BU.GET("/read-budgeting", budgeting.ReadBudgeting)
+	//Pilih Kontrak
+	//Read_Budgeting
+	BU.GET("/pilih-kontrak", budgeting.PilihKontrak)
 
 	//Tagihan
 	//Input_Tagihan

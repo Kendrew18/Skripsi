@@ -278,6 +278,16 @@ func Delete_Pembayaran_Vendor(id_pembayaran_vendor string) (tools.Response, erro
 		return res, err
 	}
 
+	path := ""
+
+	sqlStatement = "SELECT foto_invoice FROM pembayaran_vendor WHERE id_kontrak=? "
+
+	_ = con.QueryRow(sqlStatement, ID_Kontrak).Scan(&path)
+
+	if path != "" {
+		os.Remove(path)
+	}
+
 	sqlstatement = "DELETE FROM pembayaran_vendor WHERE id_PV=?"
 
 	stmt, err = con.Prepare(sqlstatement)

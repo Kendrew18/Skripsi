@@ -20,8 +20,7 @@ func InputTagihan(c echo.Context) error {
 
 	nk, _ := strconv.ParseInt(nominal_keseluruhan, 10, 64)
 
-	result, err := tagihan.Input_Tagihan(id_proyek, perihal, tanggal_pemberian_kwitansi,
-		tanggal_pembayaran, nk, id_penawaran, id_sub_pekerjaan, nominal)
+	result, err := tagihan.Input_Tagihan(id_proyek, perihal, tanggal_pemberian_kwitansi, tanggal_pembayaran, nk, id_penawaran, id_sub_pekerjaan, nominal)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

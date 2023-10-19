@@ -2,7 +2,6 @@ package budgeting
 
 import (
 	"Skripsi/config/db"
-	str "Skripsi/models"
 	"Skripsi/models/budgeting"
 	tools2 "Skripsi/service/tools"
 	"net/http"
@@ -10,48 +9,25 @@ import (
 	"time"
 )
 
-//Generate Id Penjadwalan
-func Generate_Id_Realisasi() int {
-	var obj str.Generate_Id
-
-	con := db.CreateCon()
-
-	sqlStatement := "SELECT id_budgeting FROM generate_id"
-
-	_ = con.QueryRow(sqlStatement).Scan(&obj.Id)
-
-	no := obj.Id
-	no = no + 1
-
-	sqlstatement := "UPDATE generate_id SET id_budgeting=?"
-
-	stmt, err := con.Prepare(sqlstatement)
-
-	if err != nil {
-		return -1
-	}
-
-	stmt.Exec(no)
-
-	return no
-}
-
 //Input-Realisasi
 func Input_Realisasi(id_proyek string, id_sub_pekerjaan string, id_kontrak string,
-	perihal_pengeluaran string, tanggal_pembayaran string,
-	nominal_pembayaran int64, catatan string) (tools2.Response, error) {
+	perihal_pengeluaran string, tanggal_pembayaran string, nominal_pembayaran int64, catatan string) (tools2.Response, error) {
 
 	var res tools2.Response
 
 	con := db.CreateCon()
 
-	nm := Generate_Id_Realisasi()
+	nm_str := 0
 
-	nm_str := strconv.Itoa(nm)
+	Sqlstatement := "SELECT co FROM realisasi ORDER BY co DESC Limit 1"
 
-	id_real := "BU-" + nm_str
+	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
-	sqlStatement := "INSERT INTO realisasi (id_realisasi, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, tanggal_pembayaran, nominal_pembayaran, catatan) values(?,?,?,?,?,?,?,?,?,?)"
+	nm_str = nm_str + 1
+
+	id_real := "BU-" + strconv.Itoa(nm_str)
+
+	sqlStatement := "INSERT INTO realisasi (co, id_realisasi, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, tanggal_pembayaran, nominal_pembayaran, catatan) values(?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -62,7 +38,7 @@ func Input_Realisasi(id_proyek string, id_sub_pekerjaan string, id_kontrak strin
 		return res, err
 	}
 
-	_, err = stmt.Exec(id_real, id_proyek, id_sub_pekerjaan, id_kontrak,
+	_, err = stmt.Exec(nm_str, id_real, id_proyek, id_sub_pekerjaan, id_kontrak,
 		perihal_pengeluaran, date_sql, nominal_pembayaran, catatan)
 
 	stmt.Close()
@@ -101,7 +77,11 @@ func Read_Realisasi(id_proyek string, id_sub_pekerjaan string) (tools2.Response,
 
 			sqlStatement = "SELECT nama_vendor FROM kontrak_vendor join vendor on id_master_vendor=id_MV WHERE id_kontrak=?"
 
-			_ = con.QueryRow(sqlStatement, invent.Id_Kontrak).Scan(&invent.Nama_Vendor)
+			err = con.QueryRow(sqlStatement, invent.Id_Kontrak).Scan(&invent.Nama_Vendor)
+
+			if err != nil {
+				return res, err
+			}
 
 		} else {
 			invent.Nama_Vendor = ""
@@ -207,11 +187,10 @@ func Read_Budgeting(id_proyek string) (tools2.Response, error) {
 	var res tools2.Response
 	var arr_invent []budgeting.Read_Budgeting
 	var invent budgeting.Read_Budgeting
-	var tmp budgeting.Read_Sub_Pekerjaan
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_penawaran,judul, id_sub_pekerjaan,sub_pekerjaan, sub_total FROM penawaran WHERE id_proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_penawaran,judul FROM penawaran WHERE id_proyek=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, id_proyek)
 
@@ -222,27 +201,88 @@ func Read_Budgeting(id_proyek string) (tools2.Response, error) {
 	}
 
 	for rows.Next() {
-		id_sp := ""
-		sp := ""
-		st := ""
+		var rd_sub budgeting.Read_Sub_Pekerjaan
+		var arr_rd_sub []budgeting.Read_Sub_Pekerjaan
 
-		err = rows.Scan(&invent.Id_penawaran, &invent.Judul, &id_sp, &sp, &st)
-		id_sub_pekerjaan := tools2.String_Separator_To_String(id_sp)
-		sub_pekerjaan := tools2.String_Separator_To_String(sp)
-		sub_total := tools2.String_Separator_To_Int64(st)
+		err = rows.Scan(&invent.Id_penawaran, &invent.Judul)
 
-		for i := 0; i < len(id_sub_pekerjaan); i++ {
-			tmp.Id_sub_pekerjaan = id_sub_pekerjaan[i]
-			tmp.Sub_pekerjaan = sub_pekerjaan[i]
-			tmp.Biaya_Estimasi = sub_total[i]
+		sqlStatement := "SELECT id_sub_pekerjaan,nama_sub_pekerjaan,sub_total FROM detail_penawaran WHERE id_penawaran=? ORDER BY co ASC "
 
-			sqlStatement = "SELECT SUM(nominal_pembayaran) FROM realisasi WHERE id_sub_pekerjaan=?"
+		rows, err := con.Query(sqlStatement, id_proyek)
 
-			_ = con.QueryRow(sqlStatement, id_sub_pekerjaan[i]).Scan(&tmp.Biaya_Realisasi)
+		defer rows.Close()
 
-			invent.Read_Sub_Pekerjaan = append(invent.Read_Sub_Pekerjaan, tmp)
+		if err != nil {
+			return res, err
 		}
 
+		for rows.Next() {
+			err = rows.Scan(&rd_sub.Id_sub_pekerjaan, &rd_sub.Sub_pekerjaan, &rd_sub.Biaya_Estimasi)
+
+			if err != nil {
+				return res, err
+			}
+
+			sqlSt := "SELECT SUM(nominal) FROM tagihan join detail_tagihan dt on tagihan.id_tagihan = dt.id_tagihan WHERE id_proyek=? && id_sub_pekerjaan=? ORDER BY co ASC "
+
+			err = con.QueryRow(sqlSt, id_proyek, rd_sub.Id_sub_pekerjaan).Scan(&rd_sub.Biaya_Pelunasan)
+
+			if err != nil {
+				return res, err
+			}
+
+			sqlSt = "SELECT SUM(nominal_pembayaran) FROM realisasi WHERE id_proyek=? && id_sub_pekerjaan=? ORDER BY co ASC "
+
+			err = con.QueryRow(sqlSt, id_proyek, rd_sub.Id_sub_pekerjaan).Scan(&rd_sub.Biaya_Realisasi)
+
+			if err != nil {
+				return res, err
+			}
+
+			arr_rd_sub = append(arr_rd_sub, rd_sub)
+		}
+
+		invent.Read_Sub_Pekerjaan = arr_rd_sub
+
+		if err != nil {
+			return res, err
+		}
+		arr_invent = append(arr_invent, invent)
+	}
+
+	if arr_invent == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr_invent
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = arr_invent
+	}
+
+	return res, nil
+}
+
+//Pilih Kontrak Vendor
+func Pilih_Kontrak(id_proyek string) (tools2.Response, error) {
+	var res tools2.Response
+	var arr_invent []budgeting.Kontrak_Vendor
+	var invent budgeting.Kontrak_Vendor
+
+	con := db.CreateCon()
+
+	sqlStatement := "SELECT id_kontrak,nama_vendor FROM kontrak_vendor JOIN vendor v on kontrak_vendor.id_MV = v.id_master_vendor WHERE id_proyek=? ORDER BY kontrak_vendor.co ASC "
+
+	rows, err := con.Query(sqlStatement, id_proyek)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&invent.Id_kontak_vendor, &invent.Nama_vendor)
 		if err != nil {
 			return res, err
 		}
