@@ -1,7 +1,7 @@
 # How TO Use API Budgeting
 __________
 ##  Input Budgeting
-Link: kostsoda.onthewifi.com:38600/BU/input-detail-budgeting
+Link: kostsoda.onthewifi.com:38600/BU/input-realisasi
 
 Method: POST
 
@@ -16,7 +16,7 @@ Controllers:
 	catatan := c.FormValue("catatan")
 
 ##  Read Detail Budgeting
-Link: kostsoda.onthewifi.com:38600/BU/read-detail-budgeting
+Link: kostsoda.onthewifi.com:38600/BU/read-realisasi
 
 Method: GET
 
@@ -26,7 +26,7 @@ Controllers:
 	id_sub_pekerjaan := c.FormValue("id_sub_pekerjaan")
 
 ##  Delete Detail Budgeting
-Link: kostsoda.onthewifi.com:38600/BU/delete-detail-budgetin
+Link: kostsoda.onthewifi.com:38600/BU/delete-realisasi
 
 Method: Delete
 
@@ -35,7 +35,7 @@ Controllers:
     id_budgeting := c.FormValue("id_budgeting")
 
 ##  Update Detail Budgeting
-Link: kostsoda.onthewifi.com:38600/BU/edit-detail-budgeting
+Link: kostsoda.onthewifi.com:38600/BU/edit-realisasi
 
 Method: PUT
 

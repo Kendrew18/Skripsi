@@ -169,17 +169,16 @@ func Init() *echo.Echo {
 
 	//Budgeting
 	//Input_Realisasi
-	BU.POST("/input-detail-budgeting", budgeting.InputDetailBudgeting)
+	BU.POST("/input-realisasi", budgeting.InputDetailBudgeting)
 	//Read_Realisasi
-	BU.GET("/read-detail-budgeting", budgeting.ReadDetailBudgeting)
+	BU.GET("/read-realisasi", budgeting.ReadDetailBudgeting)
 	//Read_Realisasi
-	BU.DELETE("/delete-detail-budgeting", budgeting.DeleteDetailBudgeting)
+	BU.DELETE("/delete-realisasi", budgeting.DeleteDetailBudgeting)
 	//Read_Realisasi
-	BU.PUT("/edit-detail-budgeting", budgeting.UpdateDetailBudgeting)
+	BU.PUT("/edit-realisasi", budgeting.UpdateDetailBudgeting)
 	//Read_Budgeting
 	BU.GET("/read-budgeting", budgeting.ReadBudgeting)
-	//Pilih Kontrak
-	//Read_Budgeting
+	//Pilih Kontra
 	BU.GET("/pilih-kontrak", budgeting.PilihKontrak)
 
 	//Tagihan
