@@ -1,7 +1,7 @@
 # How TO Use API Budgeting
 __________
 ##  Input Budgeting
-Link: kostsoda.onthewifi.com:38600/BU/input-realisasi
+Link: kostsoda.onthewifi.com:38600/BU/input-detail-budgeting
 
 Method: POST
 
@@ -15,8 +15,8 @@ Controllers:
 	nominal_pembayaran := c.FormValue("nominal_pembayaran")
 	catatan := c.FormValue("catatan")
 
-##  Read Realisasi
-Link: kostsoda.onthewifi.com:38600/BU/read-realisasi
+##  Read Detail Budgeting
+Link: kostsoda.onthewifi.com:38600/BU/read-detail-budgeting
 
 Method: GET
 
@@ -24,29 +24,24 @@ Controllers:
 
     id_proyek := c.FormValue("id_proyek")
 	id_sub_pekerjaan := c.FormValue("id_sub_pekerjaan")
-	id_kontrak := c.FormValue("id_kontrak")
-	perihal_pengeluaran := c.FormValue("perihal_pengeluaran")
-	tanggal_pembayaran := c.FormValue("tanggal_pembayaran")
-	nominal_pembayaran := c.FormValue("nominal_pembayaran")
-	catatan := c.FormValue("catatan")
 
-##  Delete Realisasi
-Link: kostsoda.onthewifi.com:38600/BU/delete-realisasi
+##  Delete Detail Budgeting
+Link: kostsoda.onthewifi.com:38600/BU/delete-detail-budgetin
 
 Method: Delete
 
 Controllers:
 
-    id_realisasi := c.FormValue("id_realisasi")
+    id_budgeting := c.FormValue("id_budgeting")
 
-##  Update Realisasi
-Link: kostsoda.onthewifi.com:38600/BU/delete-realisasi
+##  Update Detail Budgeting
+Link: kostsoda.onthewifi.com:38600/BU/edit-detail-budgeting
 
 Method: PUT
 
 Controllers:
 
-    id_realisasi := c.FormValue("id_realisasi")
+    id_budgeting := c.FormValue("id_budgeting")
 	id_kontrak := c.FormValue("id_kontrak")
 	perihal_pengeluaran := c.FormValue("perihal_pengeluaran")
 	tanggal_pembayaran := c.FormValue("tanggal_pembayaran")

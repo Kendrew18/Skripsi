@@ -84,7 +84,7 @@ func Input_Tagihan(id_proyek string, perihal string, tanggal_pembarian_kwitansi 
 }
 
 //Read-Tagihan
-func Read_Realisasi(id_proyek string) (tools2.Response, error) {
+func Read_Tagihan(id_proyek string) (tools2.Response, error) {
 	var res tools2.Response
 	var arr_invent []tagihan.Read_Tagihan
 	var invent tagihan.Read_Tagihan

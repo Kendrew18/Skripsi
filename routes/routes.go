@@ -169,13 +169,13 @@ func Init() *echo.Echo {
 
 	//Budgeting
 	//Input_Realisasi
-	BU.POST("/input-realisasi", budgeting.InputRealisasi)
+	BU.POST("/input-detail-budgeting", budgeting.InputDetailBudgeting)
 	//Read_Realisasi
-	BU.GET("/read-realisasi", budgeting.ReadRealisasi)
+	BU.GET("/read-detail-budgeting", budgeting.ReadDetailBudgeting)
 	//Read_Realisasi
-	BU.DELETE("/delete-realisasi", budgeting.DeleteRealisasi)
+	BU.DELETE("/delete-detail-budgeting", budgeting.DeleteDetailBudgeting)
 	//Read_Realisasi
-	BU.PUT("/edit-realisasi", budgeting.UpdateRealisasi)
+	BU.PUT("/edit-detail-budgeting", budgeting.UpdateDetailBudgeting)
 	//Read_Budgeting
 	BU.GET("/read-budgeting", budgeting.ReadBudgeting)
 	//Pilih Kontrak
@@ -186,7 +186,7 @@ func Init() *echo.Echo {
 	//Input_Tagihan
 	TG.POST("/input-tagihan", tagihan.InputTagihan)
 	//Read_Realisasi
-	TG.GET("/read-realisasi", tagihan.ReadRealisasi)
+	TG.GET("/read-tagihan", tagihan.ReadTagihan)
 	//Delete_Tagihan
 	TG.DELETE("/delete-tagihan", tagihan.DeleteTagihan)
 	//See_Judul

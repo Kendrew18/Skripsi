@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-//Input-Realisasi
-func Input_Realisasi(id_proyek string, id_sub_pekerjaan string, id_kontrak string,
+//Input-Detail_Budgeting
+func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontrak string,
 	perihal_pengeluaran string, tanggal_pembayaran string, nominal_pembayaran int64, catatan string) (tools2.Response, error) {
 
 	var res tools2.Response
@@ -50,8 +50,8 @@ func Input_Realisasi(id_proyek string, id_sub_pekerjaan string, id_kontrak strin
 
 }
 
-//Read-Realisasi
-func Read_Realisasi(id_proyek string, id_sub_pekerjaan string) (tools2.Response, error) {
+//Read-Detail_Budgeting
+func Read_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string) (tools2.Response, error) {
 	var res tools2.Response
 	var arr_invent []budgeting.Read_Realisasi
 	var invent budgeting.Read_Realisasi
@@ -106,8 +106,8 @@ func Read_Realisasi(id_proyek string, id_sub_pekerjaan string) (tools2.Response,
 	return res, nil
 }
 
-//Delete-Realisasi
-func Delete_Realisasi(id_realisasi string) (tools2.Response, error) {
+//Delete-Detail_Budgeting
+func Delete_Detail_Budgeting(id_realisasi string) (tools2.Response, error) {
 	var res tools2.Response
 
 	con := db.CreateCon()
@@ -141,8 +141,8 @@ func Delete_Realisasi(id_realisasi string) (tools2.Response, error) {
 	return res, nil
 }
 
-//Update-Realisasi
-func Update_Realisasi(id_realisasi string, id_kontrak string,
+//Update-Detail_Budgeting
+func Update_Detail_Budgeting(id_realisasi string, id_kontrak string,
 	perihal_pengeluaran string, tanggal_pembayaran string, nominal_pembayaran int64,
 	catatan string) (tools2.Response, error) {
 	var res tools2.Response

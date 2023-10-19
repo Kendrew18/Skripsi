@@ -19,9 +19,9 @@ Controllers:
 
 NB: id_penawaran, id_sub_pekerjaan, nominal berupa String Separator
 
-##  Read Realisasi
+##  Read Tagihan
 
-Link: kostsoda.onthewifi.com:38600/TG/read-realisasi
+Link: kostsoda.onthewifi.com:38600/TG/read-tagihan
 
 Method: GET
 

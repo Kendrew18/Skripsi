@@ -30,10 +30,10 @@ func InputTagihan(c echo.Context) error {
 }
 
 //Read_Realisasi
-func ReadRealisasi(c echo.Context) error {
+func ReadTagihan(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
 
-	result, err := tagihan.Read_Realisasi(id_proyek)
+	result, err := tagihan.Read_Tagihan(id_proyek)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
