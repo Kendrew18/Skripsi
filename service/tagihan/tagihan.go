@@ -39,7 +39,7 @@ func Input_Tagihan(id_proyek string, perihal string, tanggal_pembarian_kwitansi 
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_Tagihan, id_proyek, perihal, date_sql2, date_sql, nominal_keseluruhan, id_penawaran, id_sub_pekerjaan, nominal)
+	_, err = stmt.Exec(nm_str, id_Tagihan, id_proyek, perihal, date_sql2, date_sql, nominal_keseluruhan)
 
 	if err != nil {
 		return res, err
@@ -104,10 +104,9 @@ func Read_Tagihan(id_proyek string) (tools2.Response, error) {
 	for rows.Next() {
 		var obj tagihan.Read_Detail_Tagihan
 		var arr_obj []tagihan.Read_Detail_Tagihan
-		err = rows.Scan(&invent.Id_Tagihan, &invent.Perihal_Tagihan, &invent.Tanggal_Pemberian_Kwitansi,
-			&invent.Tanggal_Pembayaran, &invent.Nominal_Keseluruhan)
+		err = rows.Scan(&invent.Id_Tagihan, &invent.Perihal_Tagihan, &invent.Tanggal_Pemberian_Kwitansi, &invent.Tanggal_Pembayaran, &invent.Nominal_Keseluruhan)
 
-		sqlStatement := "SELECT id_detail_tagihan, id_penawaran, id_sub_pekerjaan, nominal FROM detail_tagihan WHERE id_tagihan=? ORDER BY co ASC "
+		sqlStatement := "SELECT id_detail_tagihan, detail_tagihan.id_penawaran, detail_tagihan.id_sub_pekerjaan,nama_sub_pekerjaan, nominal FROM detail_tagihan JOIN detail_penawaran dp on detail_tagihan.id_sub_pekerjaan = dp.id_sub_pekerjaan WHERE id_tagihan=? ORDER BY detail_tagihan.co ASC "
 
 		rows2, err := con.Query(sqlStatement, invent.Id_Tagihan)
 
@@ -118,7 +117,7 @@ func Read_Tagihan(id_proyek string) (tools2.Response, error) {
 		}
 
 		for rows2.Next() {
-			err = rows2.Scan(&obj.Id_detail_tagihan, &obj.Id_Penawaran, &obj.Id_Sub_Pekerjaan, &obj.Nominal)
+			err = rows2.Scan(&obj.Id_detail_tagihan, &obj.Id_Penawaran, &obj.Id_Sub_Pekerjaan, &obj.Nama_Sub_Pekerjaan, &obj.Nominal)
 
 			if err != nil {
 				return res, err

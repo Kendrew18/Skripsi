@@ -116,6 +116,8 @@ func Delete_Detail_Budgeting(id_realisasi string) (tools2.Response, error) {
 
 	con := db.CreateCon()
 
+	fmt.Println(id_realisasi)
+
 	sqlstatement := "DELETE FROM realisasi WHERE id_realisasi=?"
 
 	stmt, err := con.Prepare(sqlstatement)
