@@ -4,14 +4,14 @@ import (
 	"Skripsi/config/db"
 	"Skripsi/models/budgeting"
 	tools2 "Skripsi/service/tools"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 )
 
 //Input-Detail_Budgeting
-func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontrak string,
-	perihal_pengeluaran string, tanggal_pembayaran string, nominal_pembayaran int64, catatan string) (tools2.Response, error) {
+func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontrak string, perihal_pengeluaran string, tanggal_pembayaran string, nominal_pembayaran int64, catatan string) (tools2.Response, error) {
 
 	var res tools2.Response
 
@@ -194,6 +194,8 @@ func Read_Budgeting(id_proyek string) (tools2.Response, error) {
 
 	rows, err := con.Query(sqlStatement, id_proyek)
 
+	fmt.Println(id_proyek)
+
 	defer rows.Close()
 
 	if err != nil {
@@ -208,7 +210,7 @@ func Read_Budgeting(id_proyek string) (tools2.Response, error) {
 
 		sqlStatement := "SELECT id_sub_pekerjaan,nama_sub_pekerjaan,sub_total FROM detail_penawaran WHERE id_penawaran=? ORDER BY co ASC "
 
-		rows, err := con.Query(sqlStatement, id_proyek)
+		rows, err := con.Query(sqlStatement, invent.Id_penawaran)
 
 		defer rows.Close()
 
@@ -219,11 +221,13 @@ func Read_Budgeting(id_proyek string) (tools2.Response, error) {
 		for rows.Next() {
 			err = rows.Scan(&rd_sub.Id_sub_pekerjaan, &rd_sub.Sub_pekerjaan, &rd_sub.Biaya_Estimasi)
 
+			fmt.Println(rd_sub)
+
 			if err != nil {
 				return res, err
 			}
 
-			sqlSt := "SELECT SUM(nominal) FROM tagihan join detail_tagihan dt on tagihan.id_tagihan = dt.id_tagihan WHERE id_proyek=? && id_sub_pekerjaan=? ORDER BY co ASC "
+			sqlSt := "SELECT ifnull(SUM(nominal),0) FROM tagihan join detail_tagihan dt on tagihan.id_tagihan = dt.id_tagihan WHERE id_proyek=? && id_sub_pekerjaan=? ORDER BY tagihan.co ASC "
 
 			err = con.QueryRow(sqlSt, id_proyek, rd_sub.Id_sub_pekerjaan).Scan(&rd_sub.Biaya_Pelunasan)
 
@@ -231,7 +235,7 @@ func Read_Budgeting(id_proyek string) (tools2.Response, error) {
 				return res, err
 			}
 
-			sqlSt = "SELECT SUM(nominal_pembayaran) FROM realisasi WHERE id_proyek=? && id_sub_pekerjaan=? ORDER BY co ASC "
+			sqlSt = "SELECT IFNULL(SUM(nominal_pembayaran),0) FROM realisasi WHERE id_proyek=? && id_sub_pekerjaan=? ORDER BY co ASC "
 
 			err = con.QueryRow(sqlSt, id_proyek, rd_sub.Id_sub_pekerjaan).Scan(&rd_sub.Biaya_Realisasi)
 
