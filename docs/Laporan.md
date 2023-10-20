@@ -28,7 +28,7 @@ Controllers:
 
 Link: kostsoda.onthewifi.com:38600/LP/update-lp
 
-Method: PUT
+Method: POST
 
 Controllers:
 

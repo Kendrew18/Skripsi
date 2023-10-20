@@ -58,7 +58,10 @@ func Read_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string) (tools2.Re
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_realisasi, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, DATE_FORMAT(tanggal_pembayaran, '%d-%m%-%Y'), nominal_pembayaran, catatan FROM realisasi WHERE id_proyek=? && id_realisasi=? ORDER BY co ASC "
+	fmt.Println(id_proyek)
+	fmt.Println(id_sub_pekerjaan)
+
+	sqlStatement := "SELECT id_realisasi, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, DATE_FORMAT(tanggal_pembayaran, '%d-%m%-%Y'), nominal_pembayaran, catatan FROM realisasi WHERE id_proyek=? && id_sub_pekerjaan=? ORDER BY co ASC "
 
 	rows, err := con.Query(sqlStatement, id_proyek, id_sub_pekerjaan)
 
@@ -69,9 +72,10 @@ func Read_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string) (tools2.Re
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&invent.Id_Realisasi, &invent.Id_Proyek, &invent.Id_Sub_Pekerjaan,
-			&invent.Id_Kontrak, &invent.Perihal_Pengeluaran, &invent.Tanggal_Pembayaran,
-			&invent.Nominal_Pembayaran, &invent.Catatan)
+		fmt.Println("masuk")
+		err = rows.Scan(&invent.Id_Realisasi, &invent.Id_Proyek, &invent.Id_Sub_Pekerjaan, &invent.Id_Kontrak, &invent.Perihal_Pengeluaran, &invent.Tanggal_Pembayaran, &invent.Nominal_Pembayaran, &invent.Catatan)
+
+		fmt.Println(invent)
 
 		if invent.Id_Kontrak != "" {
 
