@@ -146,9 +146,7 @@ func Delete_Detail_Budgeting(id_realisasi string) (tools2.Response, error) {
 }
 
 //Update-Detail_Budgeting
-func Update_Detail_Budgeting(id_realisasi string, id_kontrak string,
-	perihal_pengeluaran string, tanggal_pembayaran string, nominal_pembayaran int64,
-	catatan string) (tools2.Response, error) {
+func Update_Detail_Budgeting(id_realisasi string, id_kontrak string, perihal_pengeluaran string, tanggal_pembayaran string, nominal_pembayaran int64, catatan string) (tools2.Response, error) {
 	var res tools2.Response
 
 	con := db.CreateCon()
@@ -164,8 +162,7 @@ func Update_Detail_Budgeting(id_realisasi string, id_kontrak string,
 		return res, err
 	}
 
-	result, err := stmt.Exec(id_kontrak, perihal_pengeluaran, date_sql,
-		nominal_pembayaran, catatan, id_realisasi)
+	result, err := stmt.Exec(id_kontrak, perihal_pengeluaran, date_sql, nominal_pembayaran, catatan, id_realisasi)
 
 	if err != nil {
 		return res, err

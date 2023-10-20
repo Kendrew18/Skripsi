@@ -17,7 +17,7 @@ func Input_Tagihan(id_proyek string, perihal string, tanggal_pembarian_kwitansi 
 
 	nm_str := 0
 
-	Sqlstatement := "SELECT co FROM penawaran ORDER BY co DESC Limit 1"
+	Sqlstatement := "SELECT co FROM tagihan ORDER BY co DESC Limit 1"
 
 	_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
 
