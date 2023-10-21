@@ -214,7 +214,11 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 
 	var arr_invent_blm []jadwal.Gene_JDL
 
+	var arr_invent_blm_lama []jadwal.Gene_JDL
+
 	urt := 1
+
+	get := 0
 
 	for i := 0; i < len(arr_invent); i++ {
 		if arr_invent[i].Dependentcies == "" {
@@ -225,19 +229,25 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 		}
 	}
 
+	if arr_invent_fn != nil {
+		get = 1
+	}
+
 	arr_invent = arr_invent_blm
-	fmt.Println("seng gak onok dep:", arr_invent)
+	fmt.Println("seng onok dep:", arr_invent)
 	urt++
 
 	co := 0
 	i := -1
 	var arr_index []int
 
-	for 0 < len(arr_invent) {
+	for 0 < len(arr_invent) && get != 1 {
 		i++
 
 		arr_dep := tools2.String_Separator_To_String(arr_invent[i].Dependentcies)
 		co_dep := len(arr_dep)
+
+		fmt.Println(arr_dep)
 
 		for j := 0; j < len(arr_invent_fn); j++ {
 			for k := 0; k < len(arr_dep); k++ {
@@ -274,7 +284,12 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 				test = 0
 			}
 
-			arr_invent = arr_invent_blm
+			if arr_invent_blm_lama == nil || len(arr_invent_blm_lama) != len(arr_invent_blm) {
+				arr_invent = arr_invent_blm
+				arr_invent_blm_lama = arr_invent_blm
+			} else {
+				get = 1
+			}
 
 			i = -1
 			urt++
@@ -285,6 +300,8 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 		co = 0
 
 	}
+
+	fmt.Println(get)
 
 	//CPM
 	//ES EF
@@ -417,8 +434,7 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 			return res, err
 		}
 
-		_, err = stmt.Exec(arr_invent_fn[j].Es, arr_invent_fn[j].Ls, arr_invent_fn[j].Ef, arr_invent_fn[j].Lf,
-			arr_invent_fn[j].Tf, arr_invent_fn[j].Ff, arr_invent_fn[j].Status_urutan, arr_invent_fn[j].Tanggal_mulai, arr_invent_fn[j].Tanggal_berakhir, 0, arr_invent_fn[j].Id)
+		_, err = stmt.Exec(arr_invent_fn[j].Status_urutan, arr_invent_fn[j].Tanggal_mulai, arr_invent_fn[j].Tanggal_berakhir, 0, arr_invent_fn[j].Id)
 
 		if err != nil {
 			return res, err
@@ -430,7 +446,7 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 
 	if arr_invent_fn == nil {
 		res.Status = http.StatusNotFound
-		res.Message = "Not Found"
+		res.Message = "terjadi looping"
 		res.Data = arr_invent_fn
 	} else {
 		res.Status = http.StatusOK
