@@ -2,6 +2,7 @@ package routes
 
 import (
 	controllers "Skripsi/controllers"
+	"Skripsi/controllers/analisa_budgeting"
 	"Skripsi/controllers/budgeting"
 	"Skripsi/controllers/jadwal"
 	"Skripsi/controllers/penawaran"
@@ -29,6 +30,7 @@ func Init() *echo.Echo {
 	MV := e.Group("/MV")
 	BU := e.Group("/BU")
 	TG := e.Group("/TG")
+	AB := e.Group("/AB")
 
 	//MAIN
 	//User_Management(Ready)
@@ -195,6 +197,7 @@ func Init() *echo.Echo {
 
 	//Analisa Budgeting(perkiraan budget mingguan)
 	//Read
+	AB.GET("/read-analisa-budgeting", analisa_budgeting.ReadAnalisaBudgeting)
 
 	return e
 }

@@ -20,7 +20,7 @@ type Detail_Analisa_Budgeting struct {
 type Detail_Sub_Pekerjaan struct {
 	Id_Sub_Pekerjaan   string `json:"id_sub_pekerjaan"`
 	Nama_Sub_Pekerjaan string `json:"nama_sub_pekerjaan"`
-	Progress           string `json:"progress"`
+	Progress           int64  `json:"progress"`
 	PV                 int64  `json:"pv"`
 	EV                 int64  `json:"ev"`
 	AC                 int64  `json:"ac"`
