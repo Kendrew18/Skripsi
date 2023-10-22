@@ -177,7 +177,9 @@ func Analisa_Budgeting(Tanggal_sekarang string, id_proyek string) (tools.Respons
 			return res, err
 		}
 
-		sqlStatement = "SELECT dp.id_sub_pekerjaan,dp.nama_sub_pekerjaan,durasi,progress,SUM(r.nominal_pembayaran),dp.sub_total FROM penjadwalan JOIN detail_penawaran dp on penjadwalan.id_penawaran = dp.id_penawaran JOIN realisasi r on dp.id_sub_pekerjaan = r.id_sub_pekerjaan WHERE dp.id_penawaran=?"
+		fmt.Println(D_A_B.Id_penawaran)
+
+		sqlStatement = "SELECT penjadwalan.id_sub_pekerjaan, nama_sub_pekerjaan,durasi,progress,dp.sub_total FROM penjadwalan JOIN detail_penawaran dp on penjadwalan.id_sub_pekerjaan = dp.id_sub_pekerjaan WHERE penjadwalan.id_penawaran=?"
 
 		rows2, err := con.Query(sqlStatement, D_A_B.Id_penawaran)
 
@@ -191,7 +193,18 @@ func Analisa_Budgeting(Tanggal_sekarang string, id_proyek string) (tools.Respons
 			dur := 0
 			prog := 0
 
-			err = rows.Scan(&D_S_P.Id_Sub_Pekerjaan, &D_S_P.Nama_Sub_Pekerjaan, &dur, &prog, &D_S_P.AC, &D_S_P.PV)
+			err = rows2.Scan(&D_S_P.Id_Sub_Pekerjaan, &D_S_P.Nama_Sub_Pekerjaan, &dur, &prog, &D_S_P.PV)
+
+			sqlSt := "SELECT ifnull(SUM(nominal_pembayaran),0) FROM realisasi WHERE id_sub_pekerjaan=? && id_proyek=?"
+
+			err = con.QueryRow(sqlSt, D_S_P.Id_Sub_Pekerjaan, id_proyek).Scan(&D_S_P.AC)
+
+			if err != nil {
+				return res, err
+			}
+
+			fmt.Println("prog :", prog)
+			fmt.Println("dur :", dur)
 
 			if err != nil {
 				return res, err
@@ -200,7 +213,7 @@ func Analisa_Budgeting(Tanggal_sekarang string, id_proyek string) (tools.Respons
 			dur_f := float64(dur)
 			prog_f := float64(prog)
 
-			D_S_P.Progress = int64(math.Round((dur_f / prog_f) * 100))
+			D_S_P.Progress = int64(math.Round((prog_f / dur_f) * 100))
 
 			D_S_P.EV = D_S_P.AC * D_S_P.Progress
 
@@ -214,6 +227,8 @@ func Analisa_Budgeting(Tanggal_sekarang string, id_proyek string) (tools.Respons
 		D_A_B.Detail_Sub_Pekerjaan = arr_D_S_P
 
 		arr_D_A_B = append(arr_D_A_B, D_A_B)
+
+		fmt.Println(arr_D_A_B)
 	}
 
 	analisa_budgeting.CV = tot_EV - tot_AC

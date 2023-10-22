@@ -60,27 +60,6 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string, catat
 
 	for i := 0; i < len(ttl); i++ {
 
-		//input penjadwalan
-		nm_str := 0
-
-		Sqlstatement := "SELECT co FROM penjadwalan ORDER BY co DESC Limit 1"
-
-		_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
-
-		nm_str = nm_str + 1
-
-		id_penjadwalan := "PJD-" + strconv.Itoa(nm_str)
-
-		sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,status_urutan,dependencies) values(?,?,?,?,?,?,?)"
-
-		stmt, err := con.Prepare(sqlStatement)
-
-		if err != nil {
-			return res, err
-		}
-
-		_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, Sub_pekerjaan[i], 0, "")
-
 		//input sub pekerjaan
 		nm_str_DP := 0
 
@@ -108,6 +87,28 @@ func Input_Penawaran(id_proyek string, judul string, sub_pekerjaan string, catat
 		if err != nil {
 			return res, err
 		}
+
+		//input penjadwalan
+		nm_str := 0
+
+		Sqlstatement := "SELECT co FROM penjadwalan ORDER BY co DESC Limit 1"
+
+		_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
+
+		nm_str = nm_str + 1
+
+		id_penjadwalan := "PJD-" + strconv.Itoa(nm_str)
+
+		sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,status_urutan,dependencies,id_sub_pekerjaan) values(?,?,?,?,?,?,?,?)"
+
+		stmt, err := con.Prepare(sqlStatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, Sub_pekerjaan[i], 0, "", id_detail_penawaran)
+
 	}
 
 	sqlStatement = "UPDATE penawaran SET total=? WHERE id_penawaran=?"
@@ -164,7 +165,7 @@ func Input_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan st
 
 	id_penjadwalan := "PJD-" + strconv.Itoa(nm_str)
 
-	sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,status_urutan,dependencies) values(?,?,?,?,?,?,?)"
+	sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,status_urutan,dependencies,id_sub_pekerjaan) values(?,?,?,?,?,?,?,?)"
 
 	stmt, err = con.Prepare(sqlStatement)
 
@@ -172,7 +173,7 @@ func Input_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pekerjaan st
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, 0, "")
+	_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, 0, "", id_detail_penawaran)
 
 	//update total
 	var temp penawaran.Read_Detail_Penawaran
@@ -551,7 +552,7 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 
 	tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
 
-	sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,durasi,tanggal_dimulai,tanggal_selesai,status_urutan,progress) values(?,?,?,?,?,?,?,?,?,?)"
+	sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,durasi,tanggal_dimulai,tanggal_selesai,status_urutan,progress,id_sub_pekerjaan) values(?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	stmt, err = con.Prepare(sqlStatement)
 
@@ -559,7 +560,7 @@ func Input_Tambahan_Sub_Pekerjaan(id_proyek string, id_penawaran string, sub_pek
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, durasi, date_sql, tanggal_Pekerjaan_Selesai, -1, 0)
+	_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, sub_pekerjaan, durasi, date_sql, tanggal_Pekerjaan_Selesai, -1, 0, id_detail_penawaran)
 
 	stmt.Close()
 
@@ -614,41 +615,6 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 
 	for i := 0; i < len(ttl); i++ {
 
-		//input penjadwalan
-		nm_str := 0
-
-		Sqlstatement := "SELECT co FROM penjadwalan ORDER BY co DESC Limit 1"
-
-		_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
-
-		nm_str = nm_str + 1
-
-		id_penjadwalan := "PJD-" + strconv.Itoa(nm_str)
-
-		fmt.Println(tm[i])
-
-		date, _ := time.Parse("02-01-2006", tm[i])
-		date_sql := date.Format("2006-01-02")
-
-		date_a, _ := time.Parse("02-01-2006", tm[i])
-		date_awal := date_a.AddDate(0, 0, dur[i]-1)
-
-		tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
-
-		sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,tanggal_dimulai,tanggal_selesai,durasi,status_urutan,progress) values(?,?,?,?,?,?,?,?,?,?)"
-
-		stmt, err := con.Prepare(sqlStatement)
-
-		if err != nil {
-			return res, err
-		}
-
-		_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, Sub_pekerjaan[i], date_sql, tanggal_Pekerjaan_Selesai, dur[i], -1, 0)
-
-		if err != nil {
-			return res, err
-		}
-
 		//input sub pekerjaan
 		nm_str_DP := 0
 
@@ -672,6 +638,41 @@ func Input_Tambahan_Pekerjaan_Tambah(id_proyek string, judul string, sub_pekerja
 		total += sbt_i
 
 		_, err = stmt.Exec(nm_str_DP, id_detail_penawaran, Sub_pekerjaan[i], id_penawaran, Jumlah[i], Harga[i], Satuan[i], sbt_i, Catatan[i])
+
+		//input penjadwalan
+		nm_str := 0
+
+		Sqlstatement := "SELECT co FROM penjadwalan ORDER BY co DESC Limit 1"
+
+		_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
+
+		nm_str = nm_str + 1
+
+		id_penjadwalan := "PJD-" + strconv.Itoa(nm_str)
+
+		fmt.Println(tm[i])
+
+		date, _ := time.Parse("02-01-2006", tm[i])
+		date_sql := date.Format("2006-01-02")
+
+		date_a, _ := time.Parse("02-01-2006", tm[i])
+		date_awal := date_a.AddDate(0, 0, dur[i]-1)
+
+		tanggal_Pekerjaan_Selesai := date_awal.Format("2006-01-02")
+
+		sqlStatement = "INSERT INTO penjadwalan (co,id_penjadwalan,id_proyek,id_penawaran,nama_task,tanggal_dimulai,tanggal_selesai,durasi,status_urutan,progress,id_sub_pekerjaan) values(?,?,?,?,?,?,?,?,?,?,?)"
+
+		stmt, err := con.Prepare(sqlStatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		_, err = stmt.Exec(nm_str, id_penjadwalan, id_proyek, id_penawaran, Sub_pekerjaan[i], date_sql, tanggal_Pekerjaan_Selesai, dur[i], -1, 0, id_detail_penawaran)
+
+		if err != nil {
+			return res, err
+		}
 
 	}
 
