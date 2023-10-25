@@ -52,9 +52,9 @@ func Input_Tagihan(id_proyek string, perihal string, tanggal_pembarian_kwitansi 
 	for i := 0; i < len(id_p); i++ {
 		nm_str2 := 0
 
-		Sqlstatement = "SELECT co FROM penawaran ORDER BY co DESC Limit 1"
+		Sqlstatement = "SELECT co FROM detail_tagihan ORDER BY co DESC Limit 1"
 
-		_ = con.QueryRow(Sqlstatement).Scan(&nm_str)
+		_ = con.QueryRow(Sqlstatement).Scan(&nm_str2)
 
 		nm_str2 = nm_str2 + 1
 
