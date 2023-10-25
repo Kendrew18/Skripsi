@@ -36,6 +36,10 @@ func Init() *echo.Echo {
 	//User_Management(Ready)
 	um := e.Group("/um")
 	um.GET("/login-user", controllers.LoginUM)
+	//Update_Token
+	um.PUT("/update-token", controllers.UpdateToken)
+	//Delete_Token
+	um.PUT("/delete-token", controllers.DeleteToken)
 
 	//Proyek(Ready)
 	pryk := e.Group("/pryk")

@@ -36,4 +36,72 @@ func Login(username string, password string) (tools.Response, error) {
 	return res, nil
 }
 
-//User Profile atas
+//Update Token
+func Update_Token(id_user string, token string) (tools.Response, error) {
+	var res tools.Response
+
+	con := db.CreateCon()
+
+	sqlstatement := "UPDATE user SET token=? WHERE kode_user=?"
+
+	stmt, err := con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	result, err := stmt.Exec(token, id_user)
+
+	if err != nil {
+		return res, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Suksess"
+	res.Data = map[string]int64{
+		"rows": rowsAffected,
+	}
+
+	return res, nil
+}
+
+//Delete Token
+func Delete_Token(id_user string) (tools.Response, error) {
+	var res tools.Response
+
+	con := db.CreateCon()
+
+	sqlstatement := "UPDATE user SET token=? WHERE kode_user=?"
+
+	stmt, err := con.Prepare(sqlstatement)
+
+	if err != nil {
+		return res, err
+	}
+
+	result, err := stmt.Exec("", id_user)
+
+	if err != nil {
+		return res, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return res, err
+	}
+
+	res.Status = http.StatusOK
+	res.Message = "Suksess"
+	res.Data = map[string]int64{
+		"rows": rowsAffected,
+	}
+
+	return res, nil
+}

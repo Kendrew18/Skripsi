@@ -12,3 +12,11 @@ type Read_Notif struct {
 	Pesan      string `json:"pesan"`
 	Jam_Notif  string `json:"jam_notif"`
 }
+
+type Read_Notif_Pop_up struct {
+	Id_notif string `json:"id_notif"`
+	Tanggal  string `json:"tanggal"`
+	Pesan    string `json:"pesan"`
+	Status_1 string `json:"status_1"`
+	Status_2 string `json:"status_2"`
+}

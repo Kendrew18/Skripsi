@@ -5,7 +5,11 @@ import (
 	"Skripsi/models/vendor_all"
 	"Skripsi/service/tools"
 	"fmt"
+	"github.com/appleboy/go-fcm"
+	"github.com/joho/godotenv"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -394,4 +398,38 @@ func Read_Notif(tanggal string, status int) (tools.Response, error) {
 	}
 
 	return res, nil
+}
+
+//POP-UP-Notif
+func sendFCMNotification(token string, title string, message string) error {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	// Set up FCM client
+	client, err := fcm.NewClient(os.Getenv("FCMKEY"))
+	if err != nil {
+		return err
+	}
+
+	// Create the FCM message
+	msg := &fcm.Message{
+		RegistrationIDs: []string{token},
+		Notification: &fcm.Notification{
+			Title: title,
+			Body:  message,
+		},
+		//To:   token,
+		//Data: map[string]interface{}{"title": title, "message": message},
+	}
+
+	// Send the FCM message
+	_, err = client.Send(msg)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
