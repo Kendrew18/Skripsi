@@ -17,6 +17,6 @@ type Read_Notif_Pop_up struct {
 	Id_notif string `json:"id_notif"`
 	Tanggal  string `json:"tanggal"`
 	Pesan    string `json:"pesan"`
-	Status_1 string `json:"status_1"`
-	Status_2 string `json:"status_2"`
+	Status_1 int    `json:"status_1"`
+	Status_2 int    `json:"status_2"`
 }
