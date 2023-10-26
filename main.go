@@ -71,7 +71,7 @@ func Pop_Up_Notif() {
 
 	con := db.CreateCon()
 
-	sqlst := "SELECT kode_user, nama, token, status_user FROM user WHERE token!=''"
+	sqlst := "SELECT kode_user, nama, token, status_user FROM user WHERE token!='' && status_user != 3"
 
 	rows_user, err := con.Query(sqlst)
 
