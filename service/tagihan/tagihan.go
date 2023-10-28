@@ -152,7 +152,34 @@ func Delete_Tagihan(id_tagihan string) (tools2.Response, error) {
 
 	con := db.CreateCon()
 
-	sqlstatement := "DELETE FROM detail_tagihan WHERE id_tagihan=?"
+	id := ""
+	sqlstate := "SELECT id_detail_tagihan FROM detail_tagihan WHERE id_tagihan=?"
+
+	err := con.QueryRow(sqlstate, id_tagihan).Scan(&id)
+
+	if id != "" {
+		sqlstatement := "DELETE FROM detail_tagihan WHERE id_tagihan=?"
+
+		stmt, err := con.Prepare(sqlstatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		result, err := stmt.Exec(id_tagihan)
+
+		if err != nil {
+			return res, err
+		}
+
+		_, err = result.RowsAffected()
+
+		if err != nil {
+			return res, err
+		}
+	}
+
+	sqlstatement := "DELETE FROM tagihan WHERE id_tagihan=?"
 
 	stmt, err := con.Prepare(sqlstatement)
 
@@ -167,26 +194,6 @@ func Delete_Tagihan(id_tagihan string) (tools2.Response, error) {
 	}
 
 	rowsAffected, err := result.RowsAffected()
-
-	if err != nil {
-		return res, err
-	}
-
-	sqlstatement = "DELETE FROM tagihan WHERE id_tagihan=?"
-
-	stmt, err = con.Prepare(sqlstatement)
-
-	if err != nil {
-		return res, err
-	}
-
-	result, err = stmt.Exec(id_tagihan)
-
-	if err != nil {
-		return res, err
-	}
-
-	rowsAffected, err = result.RowsAffected()
 
 	if err != nil {
 		return res, err

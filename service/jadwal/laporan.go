@@ -826,13 +826,145 @@ func Delete_Laporan(id_laporan string) (tools2.Response, error) {
 	_ = con.QueryRow(sqlStatement, id_laporan).Scan(&st.Status)
 	if st.Status == 0 {
 
-		var read_dt_lp jadwal.Detail_Laporan_Update
-		var arr_read_dt_lp []jadwal.Detail_Laporan_Update
-		var rp jadwal.Progress
+		id := ""
 
-		//mengurus detail laporan lama yang tidak di pakai lagi
+		Sql := "SELECT id_detail_laporan FROM detail_laporan WHERE id_laporan=?"
 
-		sqlStatement = "SELECT co,id_detail_laporan,id_jadwal,checkbox FROM detail_laporan WHERE id_laporan=?"
+		_ = con.QueryRow(Sql, id_laporan).Scan(&id)
+
+		if id != "" {
+
+			var read_dt_lp jadwal.Detail_Laporan_Update
+			var arr_read_dt_lp []jadwal.Detail_Laporan_Update
+			var rp jadwal.Progress
+
+			//mengurus detail laporan lama yang tidak di pakai lagi
+
+			sqlStatement = "SELECT co,id_detail_laporan,id_jadwal,checkbox FROM detail_laporan WHERE id_laporan=?"
+
+			rows, err := con.Query(sqlStatement, id_laporan)
+
+			defer rows.Close()
+
+			if err != nil {
+				return res, err
+			}
+
+			for rows.Next() {
+				err = rows.Scan(&read_dt_lp.Co, &read_dt_lp.Id_detail_laporan, &read_dt_lp.Id_Penjadwalan, &read_dt_lp.Check_Box)
+
+				if err != nil {
+					return res, err
+				}
+				arr_read_dt_lp = append(arr_read_dt_lp, read_dt_lp)
+			}
+
+			fmt.Println(arr_read_dt_lp, len(arr_read_dt_lp))
+
+			for i := 0; i < len(arr_read_dt_lp); i++ {
+				fmt.Println("masuk")
+
+				sqlStatement = "SELECT id_penjadwalan,progress,durasi,complate FROM penjadwalan WHERE id_penjadwalan=?"
+
+				_ = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&rp.Id_penjadwalan, &rp.Progress, &rp.Durasi, &rp.Complate)
+
+				if rp.Complate == 1 && arr_read_dt_lp[i].Check_Box == 1 {
+					rp.Complate = 0
+					rp.Progress--
+				} else if rp.Complate == 1 {
+					rp.Complate = 0
+				} else if rp.Complate == 0 {
+					rp.Progress--
+				}
+
+				sqlStatement = "UPDATE penjadwalan SET progress=?,complate=? WHERE id_penjadwalan=?"
+
+				stmt, err := con.Prepare(sqlStatement)
+
+				if err != nil {
+					return res, err
+				}
+
+				_, err = stmt.Exec(rp.Progress, rp.Complate, rp.Id_penjadwalan)
+
+				if err != nil {
+					return res, err
+				}
+
+				//update penjadwalan
+				var ARR_Id_Detail_Laporan []jadwal.Id_Detail_Laporan
+				var Id_Detail_Laporan jadwal.Id_Detail_Laporan
+
+				progres_lama := 0
+
+				sqlStatement = "SELECT COUNT(id_detail_laporan) FROM detail_laporan JOIN laporan JOIN laporan l on detail_laporan.id_laporan = l.id_laporan WHERE laporan.co < ? && id_jadwal=?"
+
+				err = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&progres_lama)
+
+				sqlStatement = "SELECT id_detail_laporan FROM detail_laporan JOIN laporan JOIN laporan l on detail_laporan.id_laporan = l.id_laporan WHERE l.co > ? && id_jadwal=? ORDER BY l.co ASC"
+
+				rows, err = con.Query(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Penjadwalan)
+
+				defer rows.Close()
+
+				for rows.Next() {
+					err = rows.Scan(&Id_Detail_Laporan.Id_detail_laporan)
+
+					if err != nil {
+						return res, err
+					}
+					ARR_Id_Detail_Laporan = append(ARR_Id_Detail_Laporan, Id_Detail_Laporan)
+				}
+
+				for x := 0; x < len(ARR_Id_Detail_Laporan); x++ {
+					progres_lama++
+					progress_float := float64(progres_lama)
+					durasi_float := float64(rp.Durasi)
+
+					progress := int(math.Round((progress_float / durasi_float) * 100))
+
+					sqlStatement = "UPDATE detail_laporan SET progress=? WHERE id_detail_laporan=?"
+
+					stmt, err := con.Prepare(sqlStatement)
+
+					if err != nil {
+						return res, err
+					}
+
+					_, err = stmt.Exec(progress, ARR_Id_Detail_Laporan[x].Id_detail_laporan)
+
+					if err != nil {
+						return res, err
+					}
+				}
+
+				// menghilangkan detail laporan yang gak perlu --
+
+				sqlstatement := "DELETE FROM detail_laporan WHERE id_laporan=?"
+
+				fmt.Println("SQL:", sqlstatement)
+
+				stmt, err = con.Prepare(sqlstatement)
+
+				if err != nil {
+					return res, err
+				}
+
+				result, err := stmt.Exec(id_laporan)
+
+				if err != nil {
+					return res, err
+				}
+
+				_, err = result.RowsAffected()
+
+				if err != nil {
+					return res, err
+				}
+			}
+		}
+
+		sqlStatement = "SELECT path_foto FROM foto_laporan WHERE foto_laporan.id_laporan=? "
 
 		rows, err := con.Query(sqlStatement, id_laporan)
 
@@ -843,132 +975,11 @@ func Delete_Laporan(id_laporan string) (tools2.Response, error) {
 		}
 
 		for rows.Next() {
-			err = rows.Scan(&read_dt_lp.Co, &read_dt_lp.Id_detail_laporan, &read_dt_lp.Id_Penjadwalan, &read_dt_lp.Check_Box)
-
-			if err != nil {
-				return res, err
-			}
-			arr_read_dt_lp = append(arr_read_dt_lp, read_dt_lp)
-		}
-
-		fmt.Println(arr_read_dt_lp, len(arr_read_dt_lp))
-
-		for i := 0; i < len(arr_read_dt_lp); i++ {
-			fmt.Println("masuk")
-
-			sqlStatement = "SELECT id_penjadwalan,progress,durasi,complate FROM penjadwalan WHERE id_penjadwalan=?"
-
-			_ = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&rp.Id_penjadwalan, &rp.Progress, &rp.Durasi, &rp.Complate)
-
-			if rp.Complate == 1 && arr_read_dt_lp[i].Check_Box == 1 {
-				rp.Complate = 0
-				rp.Progress--
-			} else if rp.Complate == 1 {
-				rp.Complate = 0
-			} else if rp.Complate == 0 {
-				rp.Progress--
-			}
-
-			sqlStatement = "UPDATE penjadwalan SET progress=?,complate=? WHERE id_penjadwalan=?"
-
-			stmt, err := con.Prepare(sqlStatement)
-
-			if err != nil {
-				return res, err
-			}
-
-			_, err = stmt.Exec(rp.Progress, rp.Complate, rp.Id_penjadwalan)
-
-			if err != nil {
-				return res, err
-			}
-
-			//update penjadwalan
-			var ARR_Id_Detail_Laporan []jadwal.Id_Detail_Laporan
-			var Id_Detail_Laporan jadwal.Id_Detail_Laporan
-
-			progres_lama := 0
-
-			sqlStatement = "SELECT COUNT(id_detail_laporan) FROM detail_laporan JOIN laporan JOIN laporan l on detail_laporan.id_laporan = l.id_laporan WHERE laporan.co < ? && id_jadwal=?"
-
-			err = con.QueryRow(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Penjadwalan).Scan(&progres_lama)
-
-			sqlStatement = "SELECT id_detail_laporan FROM detail_laporan JOIN laporan JOIN laporan l on detail_laporan.id_laporan = l.id_laporan WHERE l.co > ? && id_jadwal=? ORDER BY l.co ASC"
-
-			rows, err = con.Query(sqlStatement, arr_read_dt_lp[i].Co, arr_read_dt_lp[i].Id_Penjadwalan)
-
-			defer rows.Close()
-
-			for rows.Next() {
-				err = rows.Scan(&Id_Detail_Laporan.Id_detail_laporan)
-
-				if err != nil {
-					return res, err
-				}
-				ARR_Id_Detail_Laporan = append(ARR_Id_Detail_Laporan, Id_Detail_Laporan)
-			}
-
-			for x := 0; x < len(ARR_Id_Detail_Laporan); x++ {
-				progres_lama++
-				progress_float := float64(progres_lama)
-				durasi_float := float64(rp.Durasi)
-
-				progress := int(math.Round((progress_float / durasi_float) * 100))
-
-				sqlStatement = "UPDATE detail_laporan SET progress=? WHERE id_detail_laporan=?"
-
-				stmt, err := con.Prepare(sqlStatement)
-
-				if err != nil {
-					return res, err
-				}
-
-				_, err = stmt.Exec(progress, ARR_Id_Detail_Laporan[x].Id_detail_laporan)
-
-				if err != nil {
-					return res, err
-				}
-			}
-
-			// menghilangkan detail laporan yang gak perlu --
-
-			sqlstatement := "DELETE FROM detail_laporan WHERE id_laporan=?"
-
-			fmt.Println("SQL:", sqlstatement)
-
-			stmt, err = con.Prepare(sqlstatement)
-
-			if err != nil {
-				return res, err
-			}
-
-			result, err := stmt.Exec(id_laporan)
-
-			if err != nil {
-				return res, err
-			}
-
-			_, err = result.RowsAffected()
-
-			if err != nil {
-				return res, err
-			}
-		}
-
-		sqlStatement = "SELECT path_foto FROM foto_laporan WHERE foto_laporan.id_laporan=? "
-
-		rows, err = con.Query(sqlStatement, id_laporan)
-
-		defer rows.Close()
-
-		if err != nil {
-			return res, err
-		}
-
-		for rows.Next() {
 			path := ""
 			err = rows.Scan(&path)
-			os.Remove(path)
+
+			path = "./" + path
+			_ = os.Remove(path)
 		}
 
 		sqlstatement := "DELETE FROM laporan WHERE id_laporan=?"
