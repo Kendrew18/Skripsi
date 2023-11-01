@@ -1212,7 +1212,7 @@ func Delete_laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
 			_ = os.Remove(path)
 		}
 
-		sqlstatement := "DELETE FROM laporan_vendor WHERE id_laporan_vendor=?"
+		sqlstatement := "DELETE FROM foto_laporan_vendor WHERE id_laporan_vendor=?"
 
 		stmt, err := con.Prepare(sqlstatement)
 
@@ -1221,6 +1221,20 @@ func Delete_laporan_Vendor(id_laporan_vendor string) (tools2.Response, error) {
 		}
 
 		result, err := stmt.Exec(id_laporan_vendor)
+
+		if err != nil {
+			return res, err
+		}
+
+		sqlstatement = "DELETE FROM laporan_vendor WHERE id_laporan_vendor=?"
+
+		stmt, err = con.Prepare(sqlstatement)
+
+		if err != nil {
+			return res, err
+		}
+
+		result, err = stmt.Exec(id_laporan_vendor)
 
 		if err != nil {
 			return res, err
