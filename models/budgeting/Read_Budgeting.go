@@ -3,14 +3,11 @@ package budgeting
 type Read_Sub_Pekerjaan struct {
 	Id_sub_pekerjaan string `json:"id_sub_pekerjaan"`
 	Sub_pekerjaan    string `json:"sub_pekerjaan"`
-	Biaya_Estimasi   int64  `json:"biaya_estimasi"`
-	Biaya_Realisasi  int64  `json:"biaya_realisasi"`
-	Biaya_Pelunasan  int64  `json:"biaya_pelunasan"`
 }
 
-type Read_Budgeting struct {
-	Id_penawaran       string               `json:"id_penawaran"`
-	Judul              string               `json:"judul"`
+type Read_Pengeluaran struct {
+	Id_laporan         string               `json:"id_laporan"`
+	Tanggal            string               `json:"tanggal"`
 	Read_Sub_Pekerjaan []Read_Sub_Pekerjaan `json:"read_sub_pekerjaan"`
 }
 

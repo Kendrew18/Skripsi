@@ -13,14 +13,12 @@ func InputDetailBudgeting(c echo.Context) error {
 	id_sub_pekerjaan := c.FormValue("id_sub_pekerjaan")
 	id_kontrak := c.FormValue("id_kontrak")
 	perihal_pengeluaran := c.FormValue("perihal_pengeluaran")
-	tanggal_pembayaran := c.FormValue("tanggal_pembayaran")
 	nominal_pembayaran := c.FormValue("nominal_pembayaran")
 	catatan := c.FormValue("catatan")
 
 	nm, _ := strconv.ParseInt(nominal_pembayaran, 10, 64)
 
-	result, err := budgeting.Input_Detail_Budgeting(id_proyek, id_sub_pekerjaan, id_kontrak,
-		perihal_pengeluaran, tanggal_pembayaran, nm, catatan)
+	result, err := budgeting.Input_Detail_Budgeting(id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, nm, catatan)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -33,8 +31,9 @@ func InputDetailBudgeting(c echo.Context) error {
 func ReadDetailBudgeting(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
 	id_sub_pekerjaan := c.FormValue("id_sub_pekerjaan")
+	id_laporan := c.FormValue("id_laporan")
 
-	result, err := budgeting.Read_Detail_Budgeting(id_proyek, id_sub_pekerjaan)
+	result, err := budgeting.Read_Detail_Budgeting(id_proyek, id_sub_pekerjaan, id_laporan)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -61,14 +60,12 @@ func UpdateDetailBudgeting(c echo.Context) error {
 	id_budgeting := c.FormValue("id_budgeting")
 	id_kontrak := c.FormValue("id_kontrak")
 	perihal_pengeluaran := c.FormValue("perihal_pengeluaran")
-	tanggal_pembayaran := c.FormValue("tanggal_pembayaran")
 	nominal_pembayaran := c.FormValue("nominal_pembayaran")
 	catatan := c.FormValue("catatan")
 
 	nm, _ := strconv.ParseInt(nominal_pembayaran, 10, 64)
 
-	result, err := budgeting.Update_Detail_Budgeting(id_budgeting, id_kontrak, perihal_pengeluaran,
-		tanggal_pembayaran, nm, catatan)
+	result, err := budgeting.Update_Detail_Budgeting(id_budgeting, id_kontrak, perihal_pengeluaran, nm, catatan)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})

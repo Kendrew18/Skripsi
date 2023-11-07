@@ -34,8 +34,9 @@ func InputKontrakVendor(c echo.Context) error {
 //Read_Kontrak_Vendor
 func ReadKontrakVendor(c echo.Context) error {
 	id_proyek := c.FormValue("id_proyek")
+	id_master_vendor := c.FormValue("id_master_vendor")
 
-	result, err := vendor_all.Read_Kontrak_Vendor(id_proyek)
+	result, err := vendor_all.Read_Kontrak_Vendor(id_proyek, id_master_vendor)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
@@ -67,4 +68,17 @@ func PickVendor(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, result)
+}
+
+//Data_Filter
+func DataFilter(c echo.Context) error {
+	id_proyek := c.FormValue("id_proyek")
+	result, err := vendor_all.Data_Filter(id_proyek)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+
 }

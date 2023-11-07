@@ -69,6 +69,8 @@ func Init() *echo.Echo {
 	kv.DELETE("/delete-kontrak", vendor_all.DeleteKontrakVendor)
 	//Pick_Vendor
 	kv.GET("/pick-vendor", vendor_all.PickVendor)
+	//Data_Filter
+	kv.GET("/data-filter", vendor_all.DataFilter)
 
 	//Pembayaran-Vendor
 	//input

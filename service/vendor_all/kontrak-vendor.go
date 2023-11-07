@@ -127,17 +127,25 @@ func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string, total_nilai
 }
 
 //Read_Kontrak_Vendor
-func Read_Kontrak_Vendor(id_Proyek string) (tools.Response, error) {
+func Read_Kontrak_Vendor(id_Proyek string, id_master_vendor string) (tools.Response, error) {
 	var res tools.Response
 	var arr_invent []vendor_all.Read_Kontrak_Vendor
 	var invent vendor_all.Read_Kontrak_Vendor
 	var det_kon vendor_all.Detail_Kontrak_Vendor
 
 	con := db.CreateCon()
+	sqlStatement := ""
 
-	sqlStatement := "SELECT id_kontrak,nama_vendor,penkerjaan_vendor,DATE_FORMAT(tanggal_mulai_kontrak, '%d-%m%-%Y'),DATE_FORMAT(tanggal_berakhir_kontrak, '%d-%m%-%Y'),total_nilai_kontrak,nominal_pembayaran,sisa_pembayaran,DATE_FORMAT(tanggal_pengiriman, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_berakhir, '%d-%m%-%Y') FROM kontrak_vendor JOIN vendor ON kontrak_vendor.id_MV = vendor.id_master_vendor WHERE id_Proyek=? ORDER BY kontrak_vendor.co ASC "
+	rows, err := con.Query(sqlStatement)
+	if id_master_vendor == "" {
 
-	rows, err := con.Query(sqlStatement, id_Proyek)
+		sqlStatement = "SELECT id_kontrak,nama_vendor,penkerjaan_vendor,DATE_FORMAT(tanggal_mulai_kontrak, '%d-%m%-%Y'),DATE_FORMAT(tanggal_berakhir_kontrak, '%d-%m%-%Y'),total_nilai_kontrak,nominal_pembayaran,sisa_pembayaran,DATE_FORMAT(tanggal_pengiriman, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_berakhir, '%d-%m%-%Y') FROM kontrak_vendor JOIN vendor ON kontrak_vendor.id_MV = vendor.id_master_vendor WHERE id_Proyek=? ORDER BY kontrak_vendor.co ASC "
+		rows, err = con.Query(sqlStatement, id_Proyek)
+
+	} else {
+		sqlStatement = "SELECT id_kontrak,nama_vendor,penkerjaan_vendor,DATE_FORMAT(tanggal_mulai_kontrak, '%d-%m%-%Y'),DATE_FORMAT(tanggal_berakhir_kontrak, '%d-%m%-%Y'),total_nilai_kontrak,nominal_pembayaran,sisa_pembayaran,DATE_FORMAT(tanggal_pengiriman, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_pengerjaan_berakhir, '%d-%m%-%Y') FROM kontrak_vendor JOIN vendor ON kontrak_vendor.id_MV = vendor.id_master_vendor WHERE id_Proyek=? && id_MV=? ORDER BY kontrak_vendor.co ASC "
+		rows, err = con.Query(sqlStatement, id_Proyek, id_master_vendor)
+	}
 
 	defer rows.Close()
 
@@ -432,4 +440,46 @@ func sendFCMNotification(token string, title string, message string) error {
 	}
 
 	return nil
+}
+
+//Data Filter
+func Data_Filter(id_proyek string) (tools.Response, error) {
+
+	var res tools.Response
+
+	var arr []vendor_all.Filter_Kontrak
+	var obj vendor_all.Filter_Kontrak
+
+	con := db.CreateCon()
+	sqlStatement := "SELECT distinct(id_master_vendor),nama_vendor FROM kontrak_vendor JOIN vendor ON kontrak_vendor.id_MV = vendor.id_master_vendor WHERE id_Proyek=? ORDER BY kontrak_vendor.co ASC "
+
+	rows, err := con.Query(sqlStatement, id_proyek)
+
+	defer rows.Close()
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&obj.Id_master_vendor, &obj.Nama_vendor)
+
+		if err != nil {
+			return res, err
+		}
+
+		arr = append(arr, obj)
+	}
+
+	if arr == nil {
+		res.Status = http.StatusNotFound
+		res.Message = "Not Found"
+		res.Data = arr
+	} else {
+		res.Status = http.StatusOK
+		res.Message = "Sukses"
+		res.Data = arr
+	}
+
+	return res, nil
 }

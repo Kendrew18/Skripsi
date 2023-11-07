@@ -17,3 +17,8 @@ type Detail_Kontrak_Vendor struct {
 	Tanggal_berakhir_pengerjaan string `json:"tanggal_berakhir_kontrak"`
 	Sisa_pembayaran             int64  `json:"sisa_pembayaran"`
 }
+
+type Filter_Kontrak struct {
+	Id_master_vendor string `json:"id_master_vendor"`
+	Nama_vendor      string `json:"nama_vendor"`
+}

@@ -7,11 +7,10 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 //Input-Detail_Budgeting
-func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontrak string, perihal_pengeluaran string, tanggal_pembayaran string, nominal_pembayaran int64, catatan string) (tools2.Response, error) {
+func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontrak string, perihal_pengeluaran string, nominal_pembayaran int64, catatan string) (tools2.Response, error) {
 
 	var res tools2.Response
 
@@ -27,19 +26,15 @@ func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontra
 
 	id_real := "BU-" + strconv.Itoa(nm_str)
 
-	sqlStatement := "INSERT INTO realisasi (co, id_realisasi, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, tanggal_pembayaran, nominal_pembayaran, catatan) values(?,?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO realisasi (co, id_realisasi, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, nominal_pembayaran, catatan) values(?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
-
-	date, _ := time.Parse("02-01-2006", tanggal_pembayaran)
-	date_sql := date.Format("2006-01-02")
 
 	if err != nil {
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_real, id_proyek, id_sub_pekerjaan, id_kontrak,
-		perihal_pengeluaran, date_sql, nominal_pembayaran, catatan)
+	_, err = stmt.Exec(nm_str, id_real, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, nominal_pembayaran, catatan)
 
 	stmt.Close()
 
@@ -51,7 +46,7 @@ func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontra
 }
 
 //Read-Detail_Budgeting
-func Read_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string) (tools2.Response, error) {
+func Read_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_laporan string) (tools2.Response, error) {
 	var res tools2.Response
 	var arr_invent []budgeting.Read_Realisasi
 	var invent budgeting.Read_Realisasi
@@ -61,9 +56,9 @@ func Read_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string) (tools2.Re
 	fmt.Println(id_proyek)
 	fmt.Println(id_sub_pekerjaan)
 
-	sqlStatement := "SELECT id_realisasi, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, DATE_FORMAT(tanggal_pembayaran, '%d-%m%-%Y'), nominal_pembayaran, catatan FROM realisasi WHERE id_proyek=? && id_sub_pekerjaan=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_realisasi, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, nominal_pembayaran, catatan FROM realisasi WHERE id_proyek=? && id_sub_pekerjaan=? && id_laporan=? ORDER BY co ASC "
 
-	rows, err := con.Query(sqlStatement, id_proyek, id_sub_pekerjaan)
+	rows, err := con.Query(sqlStatement, id_proyek, id_sub_pekerjaan, id_laporan)
 
 	defer rows.Close()
 
@@ -73,7 +68,7 @@ func Read_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string) (tools2.Re
 
 	for rows.Next() {
 		fmt.Println("masuk")
-		err = rows.Scan(&invent.Id_Realisasi, &invent.Id_Proyek, &invent.Id_Sub_Pekerjaan, &invent.Id_Kontrak, &invent.Perihal_Pengeluaran, &invent.Tanggal_Pembayaran, &invent.Nominal_Pembayaran, &invent.Catatan)
+		err = rows.Scan(&invent.Id_Realisasi, &invent.Id_Proyek, &invent.Id_Sub_Pekerjaan, &invent.Id_Kontrak, &invent.Perihal_Pengeluaran, &invent.Nominal_Pembayaran, &invent.Catatan)
 
 		fmt.Println(invent)
 
@@ -148,15 +143,12 @@ func Delete_Detail_Budgeting(id_realisasi string) (tools2.Response, error) {
 }
 
 //Update-Detail_Budgeting
-func Update_Detail_Budgeting(id_realisasi string, id_kontrak string, perihal_pengeluaran string, tanggal_pembayaran string, nominal_pembayaran int64, catatan string) (tools2.Response, error) {
+func Update_Detail_Budgeting(id_realisasi string, id_kontrak string, perihal_pengeluaran string, nominal_pembayaran int64, catatan string) (tools2.Response, error) {
 	var res tools2.Response
 
 	con := db.CreateCon()
 
-	date, _ := time.Parse("02-01-2006", tanggal_pembayaran)
-	date_sql := date.Format("2006-01-02")
-
-	sqlstatement := "UPDATE realisasi SET id_kontrak=?,perihal_pengeluaran=?,tanggal_pembayaran=?,nominal_pembayaran=?,catatan=? WHERE id_realisasi=?"
+	sqlstatement := "UPDATE realisasi SET id_kontrak=?,perihal_pengeluaran=?,nominal_pembayaran=?,catatan=? WHERE id_realisasi=?"
 
 	stmt, err := con.Prepare(sqlstatement)
 
@@ -164,7 +156,7 @@ func Update_Detail_Budgeting(id_realisasi string, id_kontrak string, perihal_pen
 		return res, err
 	}
 
-	result, err := stmt.Exec(id_kontrak, perihal_pengeluaran, date_sql, nominal_pembayaran, catatan, id_realisasi)
+	result, err := stmt.Exec(id_kontrak, perihal_pengeluaran, nominal_pembayaran, catatan, id_realisasi)
 
 	if err != nil {
 		return res, err
@@ -188,12 +180,12 @@ func Update_Detail_Budgeting(id_realisasi string, id_kontrak string, perihal_pen
 //Read-Budgeting
 func Read_Budgeting(id_proyek string) (tools2.Response, error) {
 	var res tools2.Response
-	var arr_invent []budgeting.Read_Budgeting
-	var invent budgeting.Read_Budgeting
+	var arr_invent []budgeting.Read_Pengeluaran
+	var invent budgeting.Read_Pengeluaran
 
 	con := db.CreateCon()
 
-	sqlStatement := "SELECT id_penawaran,judul FROM penawaran WHERE id_proyek=? ORDER BY co ASC "
+	sqlStatement := "SELECT id_laporan,DATE_FORMAT(tanggal_laporan, '%d-%m%-%Y') FROM laporan WHERE id_proyek=? ORDER BY co DESC "
 
 	rows, err := con.Query(sqlStatement, id_proyek)
 
@@ -209,11 +201,11 @@ func Read_Budgeting(id_proyek string) (tools2.Response, error) {
 		var rd_sub budgeting.Read_Sub_Pekerjaan
 		var arr_rd_sub []budgeting.Read_Sub_Pekerjaan
 
-		err = rows.Scan(&invent.Id_penawaran, &invent.Judul)
+		err = rows.Scan(&invent.Id_laporan, &invent.Tanggal)
 
-		sqlStatement := "SELECT id_sub_pekerjaan,nama_sub_pekerjaan,sub_total FROM detail_penawaran WHERE id_penawaran=? ORDER BY co ASC "
+		sqlStatement := "SELECT p.id_sub_pekerjaan,nama_sub_pekerjaan FROM detail_laporan JOIN penjadwalan p on detail_laporan.id_jadwal = p.id_penjadwalan JOIN detail_penawaran dp on p.id_sub_pekerjaan = dp.id_sub_pekerjaan WHERE id_laporan=? ORDER BY detail_laporan.co ASC "
 
-		rows, err := con.Query(sqlStatement, invent.Id_penawaran)
+		rows, err := con.Query(sqlStatement, invent.Id_laporan)
 
 		defer rows.Close()
 
@@ -222,25 +214,9 @@ func Read_Budgeting(id_proyek string) (tools2.Response, error) {
 		}
 
 		for rows.Next() {
-			err = rows.Scan(&rd_sub.Id_sub_pekerjaan, &rd_sub.Sub_pekerjaan, &rd_sub.Biaya_Estimasi)
+			err = rows.Scan(&rd_sub.Id_sub_pekerjaan, &rd_sub.Sub_pekerjaan)
 
 			fmt.Println(rd_sub)
-
-			if err != nil {
-				return res, err
-			}
-
-			sqlSt := "SELECT ifnull(SUM(nominal),0) FROM tagihan join detail_tagihan dt on tagihan.id_tagihan = dt.id_tagihan WHERE id_proyek=? && id_sub_pekerjaan=? ORDER BY tagihan.co ASC "
-
-			err = con.QueryRow(sqlSt, id_proyek, rd_sub.Id_sub_pekerjaan).Scan(&rd_sub.Biaya_Pelunasan)
-
-			if err != nil {
-				return res, err
-			}
-
-			sqlSt = "SELECT IFNULL(SUM(nominal_pembayaran),0) FROM realisasi WHERE id_proyek=? && id_sub_pekerjaan=? ORDER BY co ASC "
-
-			err = con.QueryRow(sqlSt, id_proyek, rd_sub.Id_sub_pekerjaan).Scan(&rd_sub.Biaya_Realisasi)
 
 			if err != nil {
 				return res, err
