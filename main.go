@@ -136,7 +136,7 @@ func Pop_Up_Notif() {
 
 				stmt, _ := con.Prepare(sqlstatement)
 
-				_, _ = stmt.Exec(1)
+				_, _ = stmt.Exec(1, invent.Id_notif)
 			}
 		}
 	}
