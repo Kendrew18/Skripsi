@@ -5,6 +5,7 @@ import (
 	"Skripsi/controllers/analisa_budgeting"
 	"Skripsi/controllers/budgeting"
 	"Skripsi/controllers/jadwal"
+	"Skripsi/controllers/laporan_akhir"
 	"Skripsi/controllers/penawaran"
 	"Skripsi/controllers/proyek"
 	"Skripsi/controllers/tagihan"
@@ -31,6 +32,7 @@ func Init() *echo.Echo {
 	BU := e.Group("/BU")
 	TG := e.Group("/TG")
 	AB := e.Group("/AB")
+	LA := e.Group("/LA")
 
 	//MAIN
 	//User_Management(Ready)
@@ -204,6 +206,12 @@ func Init() *echo.Echo {
 	//Analisa Budgeting(perkiraan budget mingguan)
 	//Read
 	AB.GET("/read-analisa-budgeting", analisa_budgeting.ReadAnalisaBudgeting)
+
+	//Laporan_akhir
+	//Read
+	//Update
+	LA.GET("/laporan-akhir", laporan_akhir.ReadLaporanAkhir)
+	LA.PUT("/laporan-akhir", laporan_akhir.UpdateStatus)
 
 	return e
 }
