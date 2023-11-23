@@ -113,7 +113,7 @@ func Pop_Up_Notif() {
 
 		for i := 0; i < len(arr_user); i++ {
 			if arr_user[i].Token_user != "" {
-
+				fmt.Println(invent.Id_notif)
 				sqlstatement := ""
 
 				if arr_user[i].Status_akun == 1 && invent.Status_1 == 0 {
@@ -125,6 +125,14 @@ func Pop_Up_Notif() {
 					}
 
 					sqlstatement = "UPDATE notif SET status_pop_up_1=? WHERE id_notif=?"
+
+					stmt, _ := con.Prepare(sqlstatement)
+
+					_, err = stmt.Exec(1, invent.Id_notif)
+
+					if err != nil {
+						fmt.Println(err)
+					}
 				} else if arr_user[i].Status_akun == 2 && invent.Status_2 == 0 {
 					err = sendFCMNotification(arr_user[i].Token_user, "Hello "+arr_user[i].Nama_user, invent.Pesan)
 					if err != nil {
@@ -132,11 +140,15 @@ func Pop_Up_Notif() {
 					}
 
 					sqlstatement = "UPDATE notif SET status_pop_up_2=? WHERE id_notif=?"
+					stmt, _ := con.Prepare(sqlstatement)
+
+					_, err = stmt.Exec(1, invent.Id_notif)
+
+					if err != nil {
+						fmt.Println(err)
+					}
 				}
 
-				stmt, _ := con.Prepare(sqlstatement)
-
-				_, _ = stmt.Exec(1, invent.Id_notif)
 			}
 		}
 	}
