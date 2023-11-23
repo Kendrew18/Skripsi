@@ -186,7 +186,7 @@ func Read_Laporan(id_Proyek string) (tools2.Response, error) {
 				&dl.Nama_Sub_Pekerjaan, &durasi, &complate)
 
 			if complate == 1 && durasi != dl.Progress {
-				dl.Progress = durasi
+				dl.Progress = dl.Progress / durasi * 100
 			}
 
 			arr_lp[i].Detail_Laporan = append(arr_lp[i].Detail_Laporan, dl)
