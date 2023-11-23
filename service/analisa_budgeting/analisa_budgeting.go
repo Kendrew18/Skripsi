@@ -215,7 +215,7 @@ func Analisa_Budgeting(Tanggal_sekarang string, id_proyek string) (tools.Respons
 
 			D_S_P.Progress = int64(math.Round((prog_f / dur_f) * 100))
 
-			D_S_P.EV = D_S_P.AC * D_S_P.Progress
+			D_S_P.EV = D_S_P.AC * D_S_P.Progress / 100
 
 			tot_EV = tot_EV + D_S_P.EV
 			tot_AC = tot_AC + D_S_P.AC

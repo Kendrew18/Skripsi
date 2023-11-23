@@ -30,7 +30,7 @@ func sendFCMNotification(token string, title string, message string) error {
 	}
 
 	// Set up FCM client
-	client, err := fcm.NewClient(os.Getenv("FCMKEY"))
+	client, err := fcm.NewClient(os.Getenv("FCM_KEY"))
 	if err != nil {
 		return err
 	}
@@ -71,11 +71,13 @@ func Pop_Up_Notif() {
 
 	con := db.CreateCon()
 
-	sqlst := "SELECT kode_user, nama, token, status_user FROM user WHERE token!='' && status_user != 3"
+	sqlst := "SELECT kode_user, nama, token, status_user FROM user WHERE token != ? && status_user != ?"
 
-	rows_user, err := con.Query(sqlst)
+	rows_user, err := con.Query(sqlst, "", 3)
 
 	defer rows_user.Close()
+
+	//fmt.Println(err)
 
 	if err != nil {
 		fmt.Println(err)
@@ -118,7 +120,8 @@ func Pop_Up_Notif() {
 
 					err = sendFCMNotification(arr_user[i].Token_user, "Hello "+arr_user[i].Nama_user, invent.Pesan)
 					if err != nil {
-						fmt.Println(err)
+
+						fmt.Println("client 1: ", err)
 					}
 
 					sqlstatement = "UPDATE notif SET status_pop_up_1=? WHERE id_notif=?"
@@ -149,7 +152,7 @@ func main() {
 	s := gocron.NewScheduler(jakartatime)
 
 	s.WaitForScheduleAll()
-	s.Every(1).Day().At("09:00;12:00;15:00;18:00").Do(Pop_Up_Notif)
+	s.Every(5).Second().Do(Pop_Up_Notif)
 	s.StartAsync()
 	fmt.Println(s.IsRunning())
 
