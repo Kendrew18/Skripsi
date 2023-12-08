@@ -235,12 +235,12 @@ func Analisa_Budgeting(Tanggal_sekarang string, id_proyek string) (tools.Respons
 	analisa_budgeting.SV = tot_EV - tot_PV
 
 	if tot_AC != 0 {
-		analisa_budgeting.CPI = tot_EV / tot_AC
+		analisa_budgeting.CPI = math.Round(float64(tot_EV)/float64(tot_AC)*100) / 100
 	} else {
 		analisa_budgeting.CPI = 0
 	}
 
-	analisa_budgeting.SPI = tot_EV / tot_PV
+	analisa_budgeting.SPI = math.Round(float64(tot_EV)/float64(tot_PV)*100) / 100
 
 	analisa_budgeting.Detail_Analisa_Budgeting = arr_D_A_B
 

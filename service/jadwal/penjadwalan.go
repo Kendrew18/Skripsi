@@ -404,6 +404,12 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 
 		arr_invent_fn[i].Tanggal_berakhir = date_akhir.Format("2006-01-02")
 
+		if arr_invent_fn[i].Tf == 0 && arr_invent_fn[i].Ff == 0 {
+			arr_invent_fn[i].CPM = 1
+		} else {
+			arr_invent_fn[i].CPM = 0
+		}
+
 	}
 
 	fmt.Println("Println:", arr_invent_fn)
@@ -425,7 +431,7 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 
 	for j := 0; j < len(arr_invent_fn); j++ {
 
-		sqlStatement = "UPDATE penjadwalan SET status_urutan=?,tanggal_dimulai=?,tanggal_selesai=?,progress=? WHERE id_penjadwalan=?"
+		sqlStatement = "UPDATE penjadwalan SET status_urutan=?,tanggal_dimulai=?,tanggal_selesai=?,progress=?,cpm=? WHERE id_penjadwalan=?"
 
 		stmt, err := con.Prepare(sqlStatement)
 
@@ -434,7 +440,7 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 			return res, err
 		}
 
-		_, err = stmt.Exec(arr_invent_fn[j].Status_urutan, arr_invent_fn[j].Tanggal_mulai, arr_invent_fn[j].Tanggal_berakhir, 0, arr_invent_fn[j].Id)
+		_, err = stmt.Exec(arr_invent_fn[j].Status_urutan, arr_invent_fn[j].Tanggal_mulai, arr_invent_fn[j].Tanggal_berakhir, 0, arr_invent_fn[j].CPM, arr_invent_fn[j].Id)
 
 		if err != nil {
 			return res, err
@@ -568,7 +574,7 @@ func See_Calender(id_proyek string, status_user int) (tools2.Response, error) {
 	con := db.CreateCon()
 
 	//Penjadwalan
-	sqlStatement := "SELECT nama_task,DATE_FORMAT(tanggal_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_selesai, '%d-%m%-%Y') FROM penjadwalan WHERE id_proyek=?"
+	sqlStatement := "SELECT nama_task,DATE_FORMAT(tanggal_dimulai, '%d-%m%-%Y'),DATE_FORMAT(tanggal_selesai, '%d-%m%-%Y'),cpm FROM penjadwalan WHERE id_proyek=?"
 
 	rows, err := con.Query(sqlStatement, id_proyek)
 
@@ -578,8 +584,13 @@ func See_Calender(id_proyek string, status_user int) (tools2.Response, error) {
 		return res, err
 	}
 
+	//0= coklat
+	//1= merah
+	//2= biru
+	//3= kuning
+
 	for rows.Next() {
-		err = rows.Scan(&invent.Judul, &invent.Tanggal_mulai, &invent.Tanggal_selesai)
+		err = rows.Scan(&invent.Judul, &invent.Tanggal_mulai, &invent.Tanggal_selesai, &invent.Status_warna)
 		if err != nil {
 			return res, err
 		}
@@ -634,6 +645,7 @@ func See_Calender(id_proyek string, status_user int) (tools2.Response, error) {
 				invent.Judul = judul
 				invent.Tanggal_mulai = date_sql
 				invent.Tanggal_selesai = date_sql
+				invent.Status_warna = 2
 
 				arr_invent = append(arr_invent, invent)
 				x++
@@ -673,6 +685,9 @@ func See_Calender(id_proyek string, status_user int) (tools2.Response, error) {
 		invent.Judul = judul
 		invent.Tanggal_mulai = date_sql
 		invent.Tanggal_selesai = date_sql2
+		invent.Status_warna = 3
+
+		arr_invent = append(arr_invent, invent)
 	}
 
 	if arr_invent == nil {

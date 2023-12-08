@@ -4,6 +4,7 @@ type See_Calender struct {
 	Judul           string `json:"judul"`
 	Tanggal_mulai   string `json:"tanggal_mulai"`
 	Tanggal_selesai string `json:"tanggal_selesai"`
+	Status_warna    int    `json:"status_warna"`
 }
 
 type See_Calender_Vendor struct {

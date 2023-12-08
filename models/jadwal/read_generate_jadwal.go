@@ -13,4 +13,5 @@ type Gene_JDL struct {
 	Ff               int    `json:"ff"`
 	Tanggal_mulai    string `json:"tanggal_mulai"`
 	Tanggal_berakhir string `json:"tanggal_berakhir"`
+	CPM              int    `json:"CPM"`
 }

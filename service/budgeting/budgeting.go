@@ -10,7 +10,7 @@ import (
 )
 
 //Input-Detail_Budgeting
-func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontrak string, perihal_pengeluaran string, nominal_pembayaran int64, catatan string) (tools2.Response, error) {
+func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontrak string, perihal_pengeluaran string, nominal_pembayaran int64, catatan string, id_laporan string) (tools2.Response, error) {
 
 	var res tools2.Response
 
@@ -26,7 +26,7 @@ func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontra
 
 	id_real := "BU-" + strconv.Itoa(nm_str)
 
-	sqlStatement := "INSERT INTO realisasi (co, id_realisasi, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, nominal_pembayaran, catatan) values(?,?,?,?,?,?,?,?)"
+	sqlStatement := "INSERT INTO realisasi (co, id_realisasi, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, nominal_pembayaran, catatan,id_laporan) values(?,?,?,?,?,?,?,?,?)"
 
 	stmt, err := con.Prepare(sqlStatement)
 
@@ -34,7 +34,7 @@ func Input_Detail_Budgeting(id_proyek string, id_sub_pekerjaan string, id_kontra
 		return res, err
 	}
 
-	_, err = stmt.Exec(nm_str, id_real, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, nominal_pembayaran, catatan)
+	_, err = stmt.Exec(nm_str, id_real, id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, nominal_pembayaran, catatan, id_laporan)
 
 	stmt.Close()
 

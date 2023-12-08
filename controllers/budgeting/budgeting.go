@@ -15,10 +15,11 @@ func InputDetailBudgeting(c echo.Context) error {
 	perihal_pengeluaran := c.FormValue("perihal_pengeluaran")
 	nominal_pembayaran := c.FormValue("nominal_pembayaran")
 	catatan := c.FormValue("catatan")
+	id_laporan := c.FormValue("id_laporan")
 
 	nm, _ := strconv.ParseInt(nominal_pembayaran, 10, 64)
 
-	result, err := budgeting.Input_Detail_Budgeting(id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, nm, catatan)
+	result, err := budgeting.Input_Detail_Budgeting(id_proyek, id_sub_pekerjaan, id_kontrak, perihal_pengeluaran, nm, catatan, id_laporan)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
