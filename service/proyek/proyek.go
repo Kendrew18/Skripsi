@@ -52,35 +52,35 @@ func Input_Proyek(id_user string, nama_proyek string, nama_client string, jenis_
 
 	stmt.Close()
 
-	var nm = [4]string{"Bocor", "Air", "Listrik", "Lampu"}
-
-	for i := 0; i < 4; i++ {
-		nm_str2 := 0
-
-		Sqlstatement := "SELECT co FROM proyek ORDER BY co DESC Limit 1"
-
-		_ = con.QueryRow(Sqlstatement).Scan(&nm_str2)
-
-		nm_str2 = nm_str2 + 1
-
-		kode_laporan_akhir := "LA-" + strconv.Itoa(nm_str2)
-
-		sqlStatement := "INSERT INTO laporan_akhir (co, kode_laporan_akhir, id_proyek, nama, status) values(?,?,?,?,?)"
-
-		stmt, err := con.Prepare(sqlStatement)
-
-		fmt.Println(err)
-
-		if err != nil {
-			return res, err
-		}
-
-		_, err = stmt.Exec(nm_str2, kode_laporan_akhir, kode_proyek, nm[i], 0)
-
-		if err != nil {
-			return res, err
-		}
-	}
+	//var nm = [4]string{"Bocor", "Air", "Listrik", "Lampu"}
+	//
+	//for i := 0; i < 4; i++ {
+	//	nm_str2 := 0
+	//
+	//	Sqlstatement := "SELECT co FROM proyek ORDER BY co DESC Limit 1"
+	//
+	//	_ = con.QueryRow(Sqlstatement).Scan(&nm_str2)
+	//
+	//	nm_str2 = nm_str2 + 1
+	//
+	//	kode_laporan_akhir := "LA-" + strconv.Itoa(nm_str2)
+	//
+	//	sqlStatement := "INSERT INTO laporan_akhir (co, kode_laporan_akhir, id_proyek, nama, status) values(?,?,?,?,?)"
+	//
+	//	stmt, err := con.Prepare(sqlStatement)
+	//
+	//	fmt.Println(err)
+	//
+	//	if err != nil {
+	//		return res, err
+	//	}
+	//
+	//	_, err = stmt.Exec(nm_str2, kode_laporan_akhir, kode_proyek, nm[i], 0)
+	//
+	//	if err != nil {
+	//		return res, err
+	//	}
+	//}
 
 	res.Status = http.StatusOK
 	res.Message = "Sukses"

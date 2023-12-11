@@ -229,7 +229,7 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 		}
 	}
 
-	if arr_invent_fn != nil {
+	if arr_invent_fn == nil {
 		get = 1
 	}
 
@@ -242,6 +242,7 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 	var arr_index []int
 
 	for 0 < len(arr_invent) && get != 1 {
+		fmt.Println(get)
 		i++
 
 		arr_dep := tools2.String_Separator_To_String(arr_invent[i].Dependentcies)
@@ -315,6 +316,7 @@ func Generate_Jadwal(id_proyek string) (tools2.Response, error) {
 	x := 1
 
 	for x < urt {
+		fmt.Println(arr_invent_fn)
 		x++
 		for i := 0; i < len(arr_invent_fn); i++ {
 			if arr_invent_fn[i].Status_urutan == x {
