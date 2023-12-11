@@ -183,16 +183,9 @@ func Read_Laporan_Vendor(id_Proyek string) (tools2.Response, error) {
 				return res, err
 			}
 
-			durasi := 0
-			complate := 0
+			sqlstatemen_jdl := "SELECT kontrak_vendor.id_kontrak,nama_vendor,penkerjaan_vendor,progress FROM kontrak_vendor JOIN vendor v on kontrak_vendor.id_MV=v.id_master_vendor JOIN detail_laporan_vendor dlv on kontrak_vendor.id_kontrak = dlv.id_kontrak WHERE kontrak_vendor.id_kontrak=?"
 
-			sqlstatemen_jdl := "SELECT id_kontrak,nama_vendor,penkerjaan_vendor,datediff(tanggal_pengerjaan_berakhir,tanggal_pengerjaan_dimulai),working_complate FROM kontrak_vendor JOIN vendor v on kontrak_vendor.id_MV=v.id_master_vendor WHERE id_kontrak=?"
-
-			_ = con.QueryRow(sqlstatemen_jdl, RlV.Id_Kontrak).Scan(&dl.Id_kontrak, &dl.Nama_vendor, &dl.Pekerjaan_vendor, &durasi, &complate)
-
-			if complate == 1 && durasi != dl.Progress {
-				dl.Progress = durasi
-			}
+			_ = con.QueryRow(sqlstatemen_jdl, RlV.Id_Kontrak).Scan(&dl.Id_kontrak, &dl.Nama_vendor, &dl.Pekerjaan_vendor, dl.Progress)
 
 			arr_invent[i].Detail_Laporan_Vendor = append(arr_invent[i].Detail_Laporan_Vendor, dl)
 

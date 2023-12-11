@@ -87,15 +87,31 @@ func Input_Kontrak_Vendor(id_proyek string, id_master_vendor string, total_nilai
 
 	for i := 0; i < int(month); i++ {
 
-		date_notif, _ := time.Parse("02-01-2006", tanggal_dimulai)
+		pesan := ""
 
-		date_notif = date_notif.AddDate(0, i, 0)
+		date_notif_sql := ""
 
-		date_notif_sql := date_notif.Format("2006-01-02")
+		if i == int(month)-1 {
 
-		fmt.Println(date_notif_sql)
+			date_notif, _ := time.Parse("02-01-2006", tanggal_selesai)
 
-		pesan := "Pembayaran yang harus dilakukan sebesar " + strconv.FormatInt(nominal_pembayaran, 10) + " untuk vendor dengan nama " + nama_vendor + " pada proyek " + nama_proyek
+			date_notif_sql = date_notif.Format("2006-01-02")
+
+			fmt.Println(date_notif_sql)
+
+			pesan = "Pembayaran yang harus dilakukan sebesar " + strconv.FormatInt(nominal_pembayaran, 10) + " untuk vendor dengan nama " + nama_vendor + " pada proyek " + nama_proyek
+
+		} else {
+			date_notif, _ := time.Parse("02-01-2006", tanggal_dimulai)
+
+			date_notif = date_notif.AddDate(0, i, 0)
+
+			date_notif_sql = date_notif.Format("2006-01-02")
+
+			fmt.Println(date_notif_sql)
+
+			pesan = "Pembayaran yang harus dilakukan sebesar " + strconv.FormatInt(nominal_pembayaran, 10) + " untuk vendor dengan nama " + nama_vendor + " pada proyek " + nama_proyek
+		}
 
 		nm_str := 0
 
